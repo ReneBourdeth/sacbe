@@ -14,7 +14,7 @@ git init
 git add .
 git commit -m "chore: initial Sacbé project setup"
 git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/sacbe.git
+git remote add origin https://github.com/ReneBourdeth/sacbe.git
 git push -u origin main
 
 # 1c. Create all branches
