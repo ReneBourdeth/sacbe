@@ -1,0 +1,65 @@
+/* ── SACBÉ DESIGN TOKENS ───────────────────────────────────── */
+:root {
+  --negro:    #0C0B09;
+  --negro2:   #141310;
+  --negro3:   #1C1A16;
+  --negro4:   #252219;
+  --blanco:   #F5F0E8;
+  --blanco2:  #E8E1D4;
+  --blanco3:  #C8BFB0;
+  --dorado:   #C9A84C;
+  --dorado2:  #E8C86A;
+  --dorado3:  #8B6B2A;
+  --rojo:     #ef4444;
+  --verde:    #22c55e;
+
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-sans:  'DM Sans', sans-serif;
+
+  --borde:    rgba(201, 168, 76, 0.18);
+  --borde2:   rgba(245, 240, 232, 0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--negro);
+  color: var(--blanco);
+  font-size: 15px;
+  line-height: 1.65;
+  overflow-x: hidden;
+}
+
+/* Maya grid background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(201,168,76,.04) 39px, rgba(201,168,76,.04) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(201,168,76,.04) 39px, rgba(201,168,76,.04) 40px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+a { color: inherit; text-decoration: none; }
+
+input, select, button { font-family: var(--font-sans); }
+
+/* Utility classes */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border-width: 0;
+}
+
+.z1 { position: relative; z-index: 1; }
