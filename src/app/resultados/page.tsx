@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import ResultadosClient from './ResultadosClient'
 import { getViajes } from '@/lib/api'
 import type { Viaje } from '@/lib/supabase'
 
-export default function ResultadosPage() {
+function ResultadosInner() {
   const searchParams = useSearchParams()
   const origen = searchParams.get('origen') || 'SPS'
   const destino = searchParams.get('destino') || 'TGU'
@@ -51,5 +51,17 @@ export default function ResultadosPage() {
       destino={destino}
       fecha={fecha}
     />
+  )
+}
+
+export default function ResultadosPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C9A84C', fontFamily: 'serif', fontSize: '1.2rem', letterSpacing: 2 }}>
+        Cargando...
+      </div>
+    }>
+      <ResultadosInner />
+    </Suspense>
   )
 }
