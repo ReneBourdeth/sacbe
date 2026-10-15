@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Cormorant_Garamond, DM_Sans } from 'next/font/google'
 import '../styles/globals.css'
+import { LangProvider } from '@/lib/i18n'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${cormorant.variable} ${dmSans.variable}`}>
-      <body>{children}</body>
+      <body><LangProvider>{children}</LangProvider></body>
     </html>
   )
 }

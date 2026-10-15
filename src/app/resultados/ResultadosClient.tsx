@@ -3,6 +3,10 @@
 import { useState, useEffect } from 'react'
 import { createClient, type Viaje, type Asiento } from '@/lib/supabase'
 import { subscribeAsientos } from '@/lib/api'
+import { useLang, LangToggle } from '@/lib/i18n'
+
+// Always show times in Honduras time, whatever the viewer's timezone
+const TZ = 'America/Tegucigalpa'
 
 const NOM: Record<string, string> = {
   SPS: 'San Pedro Sula', TGU: 'Tegucigalpa', CEI: 'La Ceiba',
@@ -27,6 +31,9 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
   const [filtro,   setFiltro]   = useState('todos')
   const [loading,  setLoading]  = useState(false)
   const [codigoQR, setCodigoQR] = useState('')
+  const [asientosCargados, setAsientosCargados] = useState(false)
+  const { t, locale } = useLang()
+  const hora = (iso: string) => new Date(iso).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: TZ })
 
   // Passenger form
   const [nombre,   setNombre]   = useState('')
@@ -38,8 +45,10 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
   useEffect(() => {
     if (!viaje) return
     const supabase = createClient()
+    setAsientosCargados(false)
     supabase.from('asientos').select('*').eq('viaje_id', viaje.id).then(({ data }) => {
       setAsientos(data || [])
+      setAsientosCargados(true)
     })
     // Subscribe to realtime seat changes
     const channel = subscribeAsientos(viaje.id, setAsientos)
@@ -87,7 +96,7 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
 
       setPaso(4)
     } catch (e) {
-      alert('Error procesando la compra. Intenta de nuevo.')
+      alert(t.errorCompra)
     } finally {
       setLoading(false)
     }
@@ -102,14 +111,17 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
       {/* ── HEADER ── */}
       <header style={S.header}>
         <a href="/" style={S.logo}>SAC<span style={{ color: 'var(--dorado)' }}>BÉ</span></a>
-        <a href="/" style={S.back}>← Cambiar búsqueda</a>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <a href="/" style={S.back}>{t.cambiarBusqueda}</a>
+          <LangToggle />
+        </div>
       </header>
 
       {/* ── SUBHEADER ── */}
       <div style={S.subhead}>
         <span style={S.shRuta}>{NOM[origen]} — {NOM[destino]}</span>
-        <span style={S.shFecha}>{new Date(fecha + 'T12:00:00').toLocaleDateString('es-HN', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
-        <a href="/" style={S.shEdit}>Editar</a>
+        <span style={S.shFecha}>{new Date(fecha + 'T12:00:00').toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+        <a href="/" style={S.shEdit}>{t.editar}</a>
       </div>
 
       {/* ── LAYOUT ── */}
@@ -121,7 +133,7 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
             {['todos', 'economica', 'ejecutivo', 'primera'].map(f => (
               <button key={f} onClick={() => setFiltro(f)}
                 style={{ ...S.chip, ...(filtro === f ? S.chipOn : {}) }}>
-                {f === 'todos' ? 'Todos' : f.charAt(0).toUpperCase() + f.slice(1)}
+                {t[f as 'todos' | 'economica' | 'ejecutivo' | 'primera']}
               </button>
             ))}
           </div>
@@ -129,8 +141,8 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
           {/* Trip cards */}
           {viajesFiltrados.length === 0 ? (
             <div style={S.noResults}>
-              <div style={{ fontFamily: 'var(--font-cormorant)', fontSize: '1.25rem', marginBottom: '.5rem' }}>Sin resultados</div>
-              <p style={{ color: 'var(--blanco3)', fontSize: '.85rem', fontWeight: 300 }}>Intenta con otra fecha</p>
+              <div style={{ fontFamily: 'var(--font-cormorant)', fontSize: '1.25rem', marginBottom: '.5rem' }}>{t.sinResultados}</div>
+              <p style={{ color: 'var(--blanco3)', fontSize: '.85rem', fontWeight: 300 }}>{t.otraFecha}</p>
             </div>
           ) : viajesFiltrados.map(v => (
             <div key={v.id} onClick={() => selViaje(v)}
@@ -139,29 +151,29 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
                 <div style={S.tripEmp}>{v.empresa}</div>
                 <div style={S.tripClase}>
                   <span style={{ ...S.dot, background: v.clase === 'ejecutivo' ? 'var(--dorado)' : v.clase === 'primera' ? '#a78bfa' : 'var(--dorado3)' }} />
-                  {{ economica: 'Económica', ejecutivo: 'Ejecutivo', primera: 'Primera' }[v.clase]}
+                  {t[v.clase]}
                 </div>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={S.hora}>{new Date(v.salida).toLocaleTimeString('es-HN', { hour: '2-digit', minute: '2-digit' })}</div>
-                <div style={S.ciudadLabel}>{NOM[origen]?.split(' ')[0]}</div>
+                <div style={S.hora}>{hora(v.salida)}</div>
+                <div style={S.ciudadLabel}>{NOM[origen]}</div>
               </div>
               <div style={S.rutaMid}>
                 <span style={S.duracion}>{Math.floor(v.duracion_min / 60)}h {v.duracion_min % 60 ? v.duracion_min % 60 + 'm' : ''}</span>
                 <div style={S.rutaLine} />
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={S.hora}>{new Date(v.llegada_est).toLocaleTimeString('es-HN', { hour: '2-digit', minute: '2-digit' })}</div>
-                <div style={S.ciudadLabel}>{NOM[destino]?.split(' ')[0]}</div>
+                <div style={S.hora}>{hora(v.llegada_est)}</div>
+                <div style={S.ciudadLabel}>{NOM[destino]}</div>
               </div>
               <div style={S.precioCol}>
                 <div style={S.precio}>L. {v.precio}</div>
                 <div style={{ fontSize: '.68rem', color: v.asientos_disp <= 5 ? 'var(--rojo)' : 'var(--dorado3)' }}>
-                  {v.asientos_disp <= 5 ? `⚠ ${v.asientos_disp} asientos` : `✓ ${v.asientos_disp} disp.`}
+                  {v.asientos_disp <= 5 ? t.asientosPocos(v.asientos_disp) : t.asientosDisp(v.asientos_disp)}
                 </div>
                 <button style={{ ...S.btnSel, ...(viaje?.id === v.id ? S.btnSelOn : {}) }}
                   onClick={e => { e.stopPropagation(); selViaje(v) }}>
-                  {viaje?.id === v.id ? '✓ Elegido' : 'Elegir'}
+                  {viaje?.id === v.id ? t.elegido : t.elegir}
                 </button>
               </div>
             </div>
@@ -171,21 +183,21 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
         {/* SIDEBAR */}
         <div>
           <div style={S.sideCard}>
-            <div style={S.sideLabel}>Tu selección</div>
+            <div style={S.sideLabel}>{t.tuSeleccion}</div>
             {!viaje ? (
               <p style={{ color: 'var(--blanco3)', fontSize: '.82rem', fontWeight: 300, textAlign: 'center', padding: '1rem 0' }}>
-                Selecciona un viaje
+                {t.seleccionaViaje}
               </p>
             ) : (
               <>
                 <div style={{ fontFamily: 'var(--font-cormorant)', fontSize: '1.05rem', fontWeight: 600, marginBottom: 3 }}>{viaje.empresa}</div>
                 <div style={{ fontSize: '.78rem', fontWeight: 300, color: 'var(--blanco3)', marginBottom: 12 }}>
-                  {new Date(viaje.salida).toLocaleTimeString('es-HN', { hour: '2-digit', minute: '2-digit' })} → {new Date(viaje.llegada_est).toLocaleTimeString('es-HN', { hour: '2-digit', minute: '2-digit' })}
+                  {hora(viaje.salida)} → {hora(viaje.llegada_est)}
                 </div>
-                <div style={S.sbLine}><span>Boleto</span><strong>L. {viaje.precio}</strong></div>
-                <div style={S.sbLine}><span>Cargo servicio</span><strong>L. 15</strong></div>
-                <div style={S.sbTotal}><span>Total</span><span>L. {viaje.precio + 15}</span></div>
-                <button style={S.btnComprar} onClick={abrirModal}>Comprar boleto</button>
+                <div style={S.sbLine}><span>{t.boleto}</span><strong>L. {viaje.precio}</strong></div>
+                <div style={S.sbLine}><span>{t.cargoServicio}</span><strong>L. 15</strong></div>
+                <div style={S.sbTotal}><span>{t.total}</span><span>L. {viaje.precio + 15}</span></div>
+                <button style={S.btnComprar} onClick={abrirModal}>{t.comprarBoleto}</button>
               </>
             )}
           </div>
@@ -208,14 +220,14 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
             {/* PASO 1 — ASIENTO */}
             {paso === 1 && (
               <div>
-                <div style={S.mEyebrow}>Paso 1 de 3</div>
-                <div style={S.mTitle}>Selecciona tu asiento</div>
-                <div style={S.mSub}>{viaje?.empresa} · {viaje && new Date(viaje.salida).toLocaleTimeString('es-HN', { hour: '2-digit', minute: '2-digit' })}</div>
+                <div style={S.mEyebrow}>{t.paso(1)}</div>
+                <div style={S.mTitle}>{t.seleccionaAsiento}</div>
+                <div style={S.mSub}>{viaje?.empresa} · {viaje && hora(viaje.salida)}</div>
                 <div style={S.busShell}>
-                  <div style={S.busFront}><span style={{ fontSize: '.55rem', letterSpacing: 2, textTransform: 'uppercase', color: 'var(--negro)', fontWeight: 500 }}>Frente</span></div>
+                  <div style={S.busFront}><span style={{ fontSize: '.55rem', letterSpacing: 2, textTransform: 'uppercase', color: 'var(--negro)', fontWeight: 500 }}>{t.frente}</span></div>
                   <div style={S.busGrid}>
                     {asientos.length === 0
-                      ? <p style={{ color: 'var(--blanco3)', fontSize: '.8rem', gridColumn: '1/-1', textAlign: 'center' }}>Cargando asientos...</p>
+                      ? <p style={{ color: 'var(--blanco3)', fontSize: '.8rem', gridColumn: '1/-1', textAlign: 'center' }}>{asientosCargados ? t.sinAsientos : t.cargandoAsientos}</p>
                       : (() => {
                           const rows: React.ReactNode[] = []
                           const sorted = [...asientos].sort((a, b) => a.fila - b.fila || a.columna.localeCompare(b.columna))
@@ -243,7 +255,7 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
                   </div>
                 </div>
                 <div style={{ textAlign: 'right', marginTop: '1rem' }}>
-                  <button style={S.btnPagar} onClick={() => { if (!asientoSel) { alert('Selecciona un asiento'); return } setPaso(2) }}>Continuar →</button>
+                  <button style={S.btnPagar} onClick={() => { if (!asientoSel) { alert(t.alertAsiento); return } setPaso(2) }}>{t.continuar}</button>
                 </div>
               </div>
             )}
@@ -251,30 +263,30 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
             {/* PASO 2 — PASAJERO */}
             {paso === 2 && (
               <div>
-                <div style={S.mEyebrow}>Paso 2 de 3</div>
-                <div style={S.mTitle}>Datos del pasajero</div>
-                <div style={S.mSub}>Asiento: <strong style={{ color: 'var(--dorado)' }}>{asientoSel?.numero}</strong></div>
+                <div style={S.mEyebrow}>{t.paso(2)}</div>
+                <div style={S.mTitle}>{t.datosPasajero}</div>
+                <div style={S.mSub}>{t.asiento}: <strong style={{ color: 'var(--dorado)' }}>{asientoSel?.numero}</strong></div>
                 <label style={S.checkRow}>
                   <input type="checkbox" checked={esMenor} onChange={e => setEsMenor(e.target.checked)} style={{ accentColor: 'var(--dorado)', width: 16, height: 16 }} />
-                  <span style={{ fontSize: '.82rem', fontWeight: 300, color: 'var(--blanco3)' }}>Pasajero es menor de edad</span>
+                  <span style={{ fontSize: '.82rem', fontWeight: 300, color: 'var(--blanco3)' }}>{t.esMenor}</span>
                 </label>
                 <div style={S.formGrid}>
                   <div style={{ ...S.ff, gridColumn: '1/-1' }}>
-                    <label style={S.ffLabel}>Nombre completo</label>
+                    <label style={S.ffLabel}>{t.nombreCompleto}</label>
                     <input style={S.ffInput} value={nombre} onChange={e => setNombre(e.target.value)} placeholder="María García López" />
                   </div>
                   <div style={S.ff}>
-                    <label style={S.ffLabel}>Identidad / Pasaporte</label>
+                    <label style={S.ffLabel}>{t.identidad}</label>
                     <input style={S.ffInput} value={identidad} onChange={e => setIdentidad(e.target.value)} placeholder="0801-1990-00000" />
                   </div>
                   <div style={S.ff}>
-                    <label style={S.ffLabel}>Teléfono</label>
+                    <label style={S.ffLabel}>{t.telefono}</label>
                     <input style={S.ffInput} type="tel" placeholder="9999-9999" />
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '.5rem', marginTop: '1rem' }}>
-                  <button style={S.btnBack} onClick={() => setPaso(1)}>← Atrás</button>
-                  <button style={{ ...S.btnPagar, flex: 1 }} onClick={() => { if (!nombre || !identidad) { alert('Completa los datos'); return } setPaso(3) }}>Continuar →</button>
+                  <button style={S.btnBack} onClick={() => setPaso(1)}>{t.atras}</button>
+                  <button style={{ ...S.btnPagar, flex: 1 }} onClick={() => { if (!nombre || !identidad) { alert(t.alertDatos); return } setPaso(3) }}>{t.continuar}</button>
                 </div>
               </div>
             )}
@@ -282,14 +294,14 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
             {/* PASO 3 — PAGO */}
             {paso === 3 && (
               <div>
-                <div style={S.mEyebrow}>Paso 3 de 3</div>
-                <div style={S.mTitle}>Método de pago</div>
+                <div style={S.mEyebrow}>{t.paso(3)}</div>
+                <div style={S.mTitle}>{t.metodoPago}</div>
                 <div style={S.metodos}>
                   {(['tarjeta', 'efectivo'] as const).map(m => (
                     <button key={m} style={{ ...S.metodo, ...(metodo === m ? S.metodoOn : {}) }} onClick={() => setMetodo(m)}>
                       <div>{m === 'tarjeta' ? '💳' : '💵'}</div>
                       <div style={{ fontSize: '.68rem', letterSpacing: 1, textTransform: 'uppercase', color: metodo === m ? 'var(--dorado)' : 'var(--blanco3)' }}>
-                        {m === 'tarjeta' ? 'Tarjeta' : 'Efectivo'}
+                        {m === 'tarjeta' ? t.tarjeta : t.efectivo}
                       </div>
                     </button>
                   ))}
@@ -297,27 +309,27 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
                 {metodo === 'tarjeta' && (
                   <div style={S.cardFields}>
                     <div style={{ ...S.ff, gridColumn: '1/-1' }}>
-                      <label style={S.ffLabel}>Número de tarjeta</label>
+                      <label style={S.ffLabel}>{t.numTarjeta}</label>
                       <input style={S.ffInput} placeholder="4242 4242 4242 4242" maxLength={19} />
                     </div>
-                    <div style={S.ff}><label style={S.ffLabel}>Vencimiento</label><input style={S.ffInput} placeholder="MM/AA" maxLength={5} /></div>
+                    <div style={S.ff}><label style={S.ffLabel}>{t.vencimiento}</label><input style={S.ffInput} placeholder={t.vencPlaceholder} maxLength={5} /></div>
                     <div style={S.ff}><label style={S.ffLabel}>CVV</label><input style={S.ffInput} placeholder="123" maxLength={3} /></div>
                   </div>
                 )}
                 {metodo === 'efectivo' && (
                   <div style={{ background: 'var(--negro4)', border: '1px solid var(--borde2)', padding: '1rem', fontSize: '.82rem', fontWeight: 300, color: 'var(--blanco3)', marginTop: '.875rem' }}>
-                    Recibirás un código para pagar en puntos <strong style={{ color: 'var(--blanco)' }}>PagoExpress</strong>.
+                    {t.efectivoInfoA} <strong style={{ color: 'var(--blanco)' }}>PagoExpress</strong>.
                   </div>
                 )}
                 <div style={S.resumenBox}>
-                  <div style={S.resLine}><span>Boleto asiento {asientoSel?.numero}</span><strong>L. {viaje?.precio}</strong></div>
-                  <div style={S.resLine}><span>Cargo por servicio</span><strong>L. 15</strong></div>
-                  <div style={S.resTotal}><span>Total</span><span>L. {(viaje?.precio || 0) + 15}</span></div>
+                  <div style={S.resLine}><span>{t.boletoAsiento(asientoSel?.numero || '')}</span><strong>L. {viaje?.precio}</strong></div>
+                  <div style={S.resLine}><span>{t.cargoPorServicio}</span><strong>L. 15</strong></div>
+                  <div style={S.resTotal}><span>{t.total}</span><span>L. {(viaje?.precio || 0) + 15}</span></div>
                 </div>
                 <div style={{ display: 'flex', gap: '.5rem' }}>
-                  <button style={S.btnBack} onClick={() => setPaso(2)}>← Atrás</button>
+                  <button style={S.btnBack} onClick={() => setPaso(2)}>{t.atras}</button>
                   <button style={{ ...S.btnPagar, flex: 1, opacity: loading ? .7 : 1 }} onClick={confirmarCompra} disabled={loading}>
-                    {loading ? 'Procesando...' : '🔒 Confirmar y pagar'}
+                    {loading ? t.procesando : t.confirmarPagar}
                   </button>
                 </div>
               </div>
@@ -327,33 +339,33 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
             {paso === 4 && (
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontFamily: 'var(--font-cormorant)', fontSize: '3rem', color: 'var(--dorado)', marginBottom: '1rem' }}>✦</div>
-                <div style={{ fontFamily: 'var(--font-cormorant)', fontSize: '1.75rem', fontWeight: 600, marginBottom: '.5rem' }}>Boleto confirmado</div>
-                <p style={{ fontSize: '.85rem', fontWeight: 300, color: 'var(--blanco3)', marginBottom: '1.5rem' }}>Tu camino blanco comienza aquí.</p>
+                <div style={{ fontFamily: 'var(--font-cormorant)', fontSize: '1.75rem', fontWeight: 600, marginBottom: '.5rem' }}>{t.boletoConfirmado}</div>
+                <p style={{ fontSize: '.85rem', fontWeight: 300, color: 'var(--blanco3)', marginBottom: '1.5rem' }}>{t.caminoBlanco}</p>
                 <div style={{ background: 'white', padding: 12, display: 'inline-block', marginBottom: '1rem' }}>
                   <img src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=0C0B09&bgcolor=FFFFFF&data=${codigoQR}`} alt="QR" style={{ display: 'block', width: 180, height: 180 }} />
                 </div>
                 <div style={{ background: 'var(--negro4)', border: '1px solid var(--borde2)', padding: '1rem', textAlign: 'left', marginBottom: '1rem' }}>
                   {[
-                    ['Empresa', viaje?.empresa],
-                    ['Ruta', `${NOM[origen]} → ${NOM[destino]}`],
-                    ['Salida', viaje && new Date(viaje.salida).toLocaleString('es-HN')],
-                    ['Asiento', asientoSel?.numero],
-                    ['Pasajero', nombre],
-                    ['Código', codigoQR],
+                    [t.empresa, viaje?.empresa],
+                    [t.ruta, `${NOM[origen]} → ${NOM[destino]}`],
+                    [t.salida, viaje && new Date(viaje.salida).toLocaleString(locale, { timeZone: TZ })],
+                    [t.asiento, asientoSel?.numero],
+                    [t.pasajero, nombre],
+                    [t.codigo, codigoQR],
                   ].map(([k, v]) => (
                     <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.82rem', marginBottom: 4 }}>
                       <span style={{ color: 'var(--blanco3)', fontWeight: 300 }}>{k}</span>
-                      <span style={k === 'Asiento' ? { color: 'var(--dorado)' } : {}}>{v}</span>
+                      <span style={k === t.asiento ? { color: 'var(--dorado)' } : {}}>{v}</span>
                     </div>
                   ))}
                 </div>
                 <button style={{ ...S.btnPagar, marginBottom: '.5rem', background: '#25D366' }}
-                  onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Mi boleto Sacbé ✦\n${NOM[origen]} → ${NOM[destino]}\nAsiento: ${asientoSel?.numero}\nCódigo: ${codigoQR}`)}`,'_blank')}>
-                  📲 Enviar por WhatsApp
+                  onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`${t.whatsappMsg}\n${NOM[origen]} → ${NOM[destino]}\n${t.asiento}: ${asientoSel?.numero}\n${t.codigo}: ${codigoQR}`)}`,'_blank')}>
+                  {t.whatsapp}
                 </button>
                 <button style={{ ...S.btnPagar, background: 'transparent', border: '1px solid var(--borde)', color: 'var(--blanco3)' }}
                   onClick={() => location.href = '/mis-viajes'}>
-                  Ver mis boletos
+                  {t.verBoletos}
                 </button>
               </div>
             )}

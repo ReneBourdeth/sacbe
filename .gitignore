@@ -1,2 +1,5 @@
 .vs/
 .env.local
+node_modules/
+.next/
+*.tsbuildinfo
