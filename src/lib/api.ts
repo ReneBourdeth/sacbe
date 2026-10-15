@@ -52,39 +52,28 @@ export async function reservarAsiento(
     esMenor: boolean
     tutorNombre?: string
     tutorIdentidad?: string
-  },
-  usuarioId: string
+  }
 ) {
   const supabase = createClient()
 
   // Generate unique QR code
   const codigoQr = `SCB-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2,6).toUpperCase()}`
 
-  // Get trip price
-  const { data: viaje } = await supabase
-    .from('viajes')
-    .select('precio')
-    .eq('id', viajeId)
-    .single()
-
-  if (!viaje) throw new Error('Viaje no encontrado')
-
-  // Use RPC for atomic seat reservation (prevents race conditions)
+  // RPC does the whole booking atomically (see docs/sprint1-reservas.sql):
+  // price comes from the DB and the user comes from the session, not the browser
   const { data, error } = await supabase.rpc('reservar_asiento', {
     p_viaje_id:        viajeId,
     p_asiento_id:      asientoId,
-    p_usuario_id:      usuarioId,
     p_codigo_qr:       codigoQr,
     p_nombre_pasajero: pasajero.nombre,
     p_identidad_pas:   pasajero.identidad,
     p_es_menor:        pasajero.esMenor,
     p_tutor_nombre:    pasajero.tutorNombre || null,
     p_tutor_identidad: pasajero.tutorIdentidad || null,
-    p_precio_final:    viaje.precio,
   })
 
   if (error) throw new Error(error.message)
-  return { boletoId: data, codigoQr }
+  return { boletoId: data as string, codigoQr }
 }
 
 // ── Get user tickets

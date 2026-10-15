@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { createClient, type Viaje, type Asiento } from '@/lib/supabase'
-import { subscribeAsientos } from '@/lib/api'
+import QRCode from 'qrcode'
+import { subscribeAsientos, reservarAsiento } from '@/lib/api'
 import { useLang, LangToggle } from '@/lib/i18n'
 
 // Always show times in Honduras time, whatever the viewer's timezone
@@ -32,6 +33,7 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
   const [loading,  setLoading]  = useState(false)
   const [codigoQR, setCodigoQR] = useState('')
   const [asientosCargados, setAsientosCargados] = useState(false)
+  const [qrImg, setQrImg] = useState('')
   const { t, locale } = useLang()
   const hora = (iso: string) => new Date(iso).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: TZ })
 
@@ -76,27 +78,19 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
     if (!viaje || !asientoSel || !nombre || !identidad) return
     setLoading(true)
     try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-
-      const codigo = `SCB-${Date.now().toString(36).toUpperCase()}-${asientoSel.numero}`
-      setCodigoQR(codigo)
-
-      // In production: call reservarAsiento() from api.ts
-      // For Sprint 1 demo, just update the seat status
-      await supabase
-        .from('asientos')
-        .update({ estado: 'vendido' })
-        .eq('id', asientoSel.id)
-
-      await supabase
-        .from('viajes')
-        .update({ asientos_disp: viaje.asientos_disp - 1 })
-        .eq('id', viaje.id)
-
+      const { codigoQr } = await reservarAsiento(viaje.id, asientoSel.id, { nombre, identidad, esMenor })
+      setCodigoQR(codigoQr)
+      setQrImg(await QRCode.toDataURL(codigoQr, { width: 180, margin: 0, color: { dark: '#0C0B09', light: '#FFFFFF' } }))
       setPaso(4)
     } catch (e) {
-      alert(t.errorCompra)
+      const msg = e instanceof Error ? e.message : ''
+      if (msg.includes('ASIENTO_OCUPADO')) {
+        alert(t.asientoOcupado)
+        setAsientoSel(null)
+        setPaso(1)
+      } else {
+        alert(t.errorCompra)
+      }
     } finally {
       setLoading(false)
     }
@@ -342,7 +336,8 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
                 <div style={{ fontFamily: 'var(--font-cormorant)', fontSize: '1.75rem', fontWeight: 600, marginBottom: '.5rem' }}>{t.boletoConfirmado}</div>
                 <p style={{ fontSize: '.85rem', fontWeight: 300, color: 'var(--blanco3)', marginBottom: '1.5rem' }}>{t.caminoBlanco}</p>
                 <div style={{ background: 'white', padding: 12, display: 'inline-block', marginBottom: '1rem' }}>
-                  <img src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=0C0B09&bgcolor=FFFFFF&data=${codigoQR}`} alt="QR" style={{ display: 'block', width: 180, height: 180 }} />
+                  {/* eslint-disable-next-line @next/next/no-img-element -- local data: URL, nothing to optimize */}
+                  <img src={qrImg} alt="QR" style={{ display: 'block', width: 180, height: 180 }} />
                 </div>
                 <div style={{ background: 'var(--negro4)', border: '1px solid var(--borde2)', padding: '1rem', textAlign: 'left', marginBottom: '1rem' }}>
                   {[
