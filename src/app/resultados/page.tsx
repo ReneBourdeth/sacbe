@@ -3,14 +3,14 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import ResultadosClient from './ResultadosClient'
-import { getViajes } from '@/lib/api'
+import { getViajes, hoyHonduras } from '@/lib/api'
 import type { Viaje } from '@/lib/supabase'
 
 function ResultadosInner() {
   const searchParams = useSearchParams()
   const origen = searchParams.get('origen') || 'SPS'
   const destino = searchParams.get('destino') || 'TGU'
-  const fecha = searchParams.get('fecha') || new Date().toISOString().split('T')[0]
+  const fecha = searchParams.get('fecha') || hoyHonduras()
 
   const [viajes, setViajes] = useState<Viaje[]>([])
   const [loading, setLoading] = useState(true)

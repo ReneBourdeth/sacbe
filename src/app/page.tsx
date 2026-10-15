@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { hoyHonduras } from '@/lib/api'
 
 const TERMINALES = [
     { codigo: 'SPS', nombre: 'San Pedro Sula' },
@@ -19,7 +20,7 @@ const NOM: Record<string, string> = Object.fromEntries(
 
 export default function HomePage() {
     const router = useRouter()
-    const today = new Date().toISOString().split('T')[0]
+    const today = hoyHonduras()
     const [origen, setOrigen] = useState('SPS')
     const [destino, setDestino] = useState('TGU')
     const [fecha, setFecha] = useState(today)

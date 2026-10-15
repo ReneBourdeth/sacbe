@@ -1,10 +1,20 @@
 import { createClient } from './supabase'
 
+// Honduras is UTC-6 year-round (no DST)
+const HN_OFFSET = '-06:00'
+
+// ── Today's date (YYYY-MM-DD) in Honduras, not UTC
+export function hoyHonduras() {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Tegucigalpa' }).format(new Date())
+}
+
 // ── Search trips
 export async function getViajes(origen: string, destino: string, fecha: string) {
   const supabase = createClient()
-  const fechaStart = `${fecha}T00:00:00`
-  const fechaEnd   = `${fecha}T23:59:59`
+  // salida is timestamptz — without an offset Postgres reads these as UTC,
+  // which drops every trip departing after 6 PM Honduras time
+  const fechaStart = `${fecha}T00:00:00${HN_OFFSET}`
+  const fechaEnd   = `${fecha}T23:59:59${HN_OFFSET}`
 
   const { data, error } = await supabase
     .from('v_viajes_disponibles')
