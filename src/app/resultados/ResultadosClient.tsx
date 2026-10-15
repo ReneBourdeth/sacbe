@@ -5,6 +5,7 @@ import { createClient, type Viaje, type Asiento } from '@/lib/supabase'
 import QRCode from 'qrcode'
 import { subscribeAsientos, reservarAsiento } from '@/lib/api'
 import { useLang, LangToggle } from '@/lib/i18n'
+import AuthLink from '@/components/AuthLink'
 
 // Always show times in Honduras time, whatever the viewer's timezone
 const TZ = 'America/Tegucigalpa'
@@ -34,6 +35,7 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
   const [codigoQR, setCodigoQR] = useState('')
   const [asientosCargados, setAsientosCargados] = useState(false)
   const [qrImg, setQrImg] = useState('')
+  const [logueado, setLogueado] = useState(true)
   const { t, locale } = useLang()
   const hora = (iso: string) => new Date(iso).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: TZ })
 
@@ -64,6 +66,7 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
 
   function abrirModal() {
     if (!viaje) return
+    createClient().auth.getSession().then(({ data }) => setLogueado(!!data.session))
     setModal(true)
     setPaso(1)
   }
@@ -107,6 +110,7 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
         <a href="/" style={S.logo}>SAC<span style={{ color: 'var(--dorado)' }}>BÉ</span></a>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <a href="/" style={S.back}>{t.cambiarBusqueda}</a>
+          <AuthLink />
           <LangToggle />
         </div>
       </header>
@@ -260,6 +264,9 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
                 <div style={S.mEyebrow}>{t.paso(2)}</div>
                 <div style={S.mTitle}>{t.datosPasajero}</div>
                 <div style={S.mSub}>{t.asiento}: <strong style={{ color: 'var(--dorado)' }}>{asientoSel?.numero}</strong></div>
+                {!logueado && (
+                  <a href={`/entrar?next=${encodeURIComponent(location.pathname + location.search)}`} style={S.loginHint}>{t.loginHint} →</a>
+                )}
                 <label style={S.checkRow}>
                   <input type="checkbox" checked={esMenor} onChange={e => setEsMenor(e.target.checked)} style={{ accentColor: 'var(--dorado)', width: 16, height: 16 }} />
                   <span style={{ fontSize: '.82rem', fontWeight: 300, color: 'var(--blanco3)' }}>{t.esMenor}</span>
@@ -431,5 +438,6 @@ const S: Record<string, React.CSSProperties> = {
   resLine: { display: 'flex', justifyContent: 'space-between', fontSize: '.82rem', marginBottom: 5, color: 'var(--blanco3)' },
   resTotal: { display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-cormorant)', fontSize: '1.05rem', fontWeight: 600, paddingTop: 10, marginTop: 8, borderTop: '1px solid var(--borde2)', color: 'var(--dorado)' },
   btnPagar: { width: '100%', background: 'var(--dorado)', color: 'var(--negro)', border: 'none', padding: 13, fontSize: '.7rem', letterSpacing: 2, textTransform: 'uppercase', cursor: 'pointer' },
+  loginHint: { display: 'block', fontSize: '.78rem', color: 'var(--dorado)', marginBottom: '.875rem', textDecoration: 'underline' },
   btnBack: { background: 'transparent', border: '1px solid var(--borde2)', color: 'var(--blanco3)', padding: '11px 18px', fontSize: '.65rem', letterSpacing: 1.5, textTransform: 'uppercase', cursor: 'pointer' },
 }

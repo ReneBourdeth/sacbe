@@ -39,19 +39,19 @@ Every feature goes: `sprint-N` → PR → `develop` → PR → `main`
 ## Sprints
 
 ### Sprint 1 — MVP (Week 1–3)
-- [ ] Project setup (GitHub + Vercel + Supabase)
-- [ ] Database schema
-- [ ] Homepage with search
-- [ ] Results page with seat map
-- [ ] Booking flow (no real payment yet)
-- [ ] QR generation
+- [x] Project setup (GitHub + Vercel + Supabase)
+- [x] Database schema
+- [x] Homepage with search
+- [x] Results page with seat map
+- [x] Booking flow (no real payment yet)
+- [x] QR generation
 
 ### Sprint 2 — Auth & Payments (Week 4–6)
-- [ ] Supabase Auth with phone OTP
-- [ ] User registration / login
+- [x] Supabase Auth with email OTP (phone/WhatsApp later — paid)
+- [x] User registration / login
 - [ ] Stripe card payments
 - [ ] PagoExpress cash flow
-- [ ] My tickets page
+- [x] My tickets page
 - [ ] WhatsApp notifications (Twilio)
 
 ### Sprint 3 — Company Dashboard (Week 7–9)

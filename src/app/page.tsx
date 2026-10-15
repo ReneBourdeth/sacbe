@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { hoyHonduras } from '@/lib/api'
 import { useLang, LangToggle } from '@/lib/i18n'
+import AuthLink from '@/components/AuthLink'
 
 const TERMINALES = [
     { codigo: 'SPS', nombre: 'San Pedro Sula' },
@@ -36,7 +37,10 @@ export default function HomePage() {
 
     return (
         <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative', zIndex: 1 }}>
-            <LangToggle style={{ position: 'absolute', top: '1.25rem', right: '1.5rem' }} />
+            <div style={{ position: 'absolute', top: '1.25rem', right: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <AuthLink />
+                <LangToggle />
+            </div>
             <div style={{ fontFamily: 'serif', fontSize: '.7rem', letterSpacing: 4, textTransform: 'uppercase', color: '#C9A84C', marginBottom: '1rem' }}>
                 {t.tagline}
             </div>
