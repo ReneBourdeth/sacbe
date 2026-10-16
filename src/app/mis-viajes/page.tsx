@@ -55,10 +55,10 @@ export default function MisViajesPage() {
 
   return (
     <main style={S.main}>
-      <header style={S.header}>
+      <header className="sb-header" style={S.header}>
         <a href="/" style={S.logo}>SAC<span style={{ color: 'var(--dorado)' }}>BÉ</span></a>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          {email && <span style={S.email}>{email}</span>}
+          {email && <span className="sb-hide-sm" style={S.email}>{email}</span>}
           {email && <button style={S.salir} onClick={salir}>{t.salir}</button>}
           <LangToggle />
         </div>

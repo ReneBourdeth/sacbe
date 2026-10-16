@@ -36,7 +36,7 @@ export default function HomePage() {
     }
 
     return (
-        <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative', zIndex: 1 }}>
+        <main className="sb-home" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative', zIndex: 1 }}>
             <div style={{ position: 'absolute', top: '1.25rem', right: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <AuthLink />
                 <LangToggle />
@@ -49,8 +49,8 @@ export default function HomePage() {
                 <em style={{ color: '#C9A84C' }}>{t.heroB}</em>
             </h1>
 
-            <div style={{ background: '#1C1A16', border: '1px solid rgba(201,168,76,.18)', padding: '1.75rem', width: '100%', maxWidth: 700 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 36px 1fr 1fr auto', gap: '.625rem', alignItems: 'end' }}>
+            <div className="sb-search-box" style={{ background: '#1C1A16', border: '1px solid rgba(201,168,76,.18)', padding: '1.75rem', width: '100%', maxWidth: 700 }}>
+                <div className="sb-search">
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                         <label style={{ fontSize: '.62rem', letterSpacing: 2, textTransform: 'uppercase', color: '#C9A84C' }}>{t.origen}</label>
                         <select value={origen} onChange={e => setOrigen(e.target.value)} style={{ padding: '10px 13px', background: '#252219', border: '1px solid rgba(245,240,232,.08)', color: '#F5F0E8', fontSize: '.875rem', outline: 'none' }}>

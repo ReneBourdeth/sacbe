@@ -54,12 +54,12 @@ function EntrarInner() {
 
   return (
     <main style={S.main}>
-      <header style={S.header}>
+      <header className="sb-header" style={S.header}>
         <a href="/" style={S.logo}>SAC<span style={{ color: 'var(--dorado)' }}>BÉ</span></a>
         <LangToggle />
       </header>
 
-      <div style={S.card}>
+      <div className="sb-card-auth" style={S.card}>
         <div style={S.eyebrow}>{t.entrar}</div>
         <h1 style={S.title}>{t.tituloEntrar}</h1>
 

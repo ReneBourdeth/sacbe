@@ -106,10 +106,10 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
   return (
     <main style={{ minHeight: '100vh', position: 'relative', zIndex: 1 }}>
       {/* ── HEADER ── */}
-      <header style={S.header}>
+      <header className="sb-header" style={S.header}>
         <a href="/" style={S.logo}>SAC<span style={{ color: 'var(--dorado)' }}>BÉ</span></a>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <a href="/" style={S.back}>{t.cambiarBusqueda}</a>
+        <div className="sb-header-links" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <a href="/" className="sb-hide-sm" style={S.back}>{t.cambiarBusqueda}</a>
           <AuthLink />
           <LangToggle />
         </div>
@@ -123,7 +123,7 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
       </div>
 
       {/* ── LAYOUT ── */}
-      <div style={S.layout}>
+      <div className="sb-layout">
         {/* LIST */}
         <div>
           {/* Filter chips */}
@@ -143,7 +143,7 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
               <p style={{ color: 'var(--blanco3)', fontSize: '.85rem', fontWeight: 300 }}>{t.otraFecha}</p>
             </div>
           ) : viajesFiltrados.map(v => (
-            <div key={v.id} onClick={() => selViaje(v)}
+            <div key={v.id} onClick={() => selViaje(v)} className="sb-trip"
               style={{ ...S.tripCard, ...(viaje?.id === v.id ? S.tripSel : {}) }}>
               <div>
                 <div style={S.tripEmp}>{v.empresa}</div>
@@ -179,7 +179,7 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
         </div>
 
         {/* SIDEBAR */}
-        <div>
+        <div className="sb-side">
           <div style={S.sideCard}>
             <div style={S.sideLabel}>{t.tuSeleccion}</div>
             {!viaje ? (
@@ -204,8 +204,8 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
 
       {/* ── MODAL ── */}
       {modal && (
-        <div style={S.overlay} onClick={cerrarModal}>
-          <div style={S.modal} onClick={e => e.stopPropagation()}>
+        <div className="sb-overlay" style={S.overlay} onClick={cerrarModal}>
+          <div className="sb-modal" style={S.modal} onClick={e => e.stopPropagation()}>
             <button style={S.modalX} onClick={cerrarModal}>✕</button>
 
             {/* Step bar */}
@@ -271,7 +271,7 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
                   <input type="checkbox" checked={esMenor} onChange={e => setEsMenor(e.target.checked)} style={{ accentColor: 'var(--dorado)', width: 16, height: 16 }} />
                   <span style={{ fontSize: '.82rem', fontWeight: 300, color: 'var(--blanco3)' }}>{t.esMenor}</span>
                 </label>
-                <div style={S.formGrid}>
+                <div className="sb-form2">
                   <div style={{ ...S.ff, gridColumn: '1/-1' }}>
                     <label style={S.ffLabel}>{t.nombreCompleto}</label>
                     <input style={S.ffInput} value={nombre} onChange={e => setNombre(e.target.value)} placeholder="María García López" />
@@ -308,7 +308,7 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
                   ))}
                 </div>
                 {metodo === 'tarjeta' && (
-                  <div style={S.cardFields}>
+                  <div className="sb-form2" style={S.cardFields}>
                     <div style={{ ...S.ff, gridColumn: '1/-1' }}>
                       <label style={S.ffLabel}>{t.numTarjeta}</label>
                       <input style={S.ffInput} placeholder="4242 4242 4242 4242" maxLength={19} />
@@ -386,11 +386,10 @@ const S: Record<string, React.CSSProperties> = {
   shRuta: { fontFamily: 'var(--font-cormorant)', fontSize: '1.05rem', fontWeight: 600 },
   shFecha: { fontSize: '.68rem', letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--dorado)', background: 'rgba(201,168,76,.08)', border: '1px solid var(--borde)', padding: '3px 12px' },
   shEdit: { fontSize: '.68rem', letterSpacing: 1, textTransform: 'uppercase', color: 'var(--blanco3)', textDecoration: 'underline', marginLeft: 'auto', cursor: 'pointer' },
-  layout: { display: 'grid', gridTemplateColumns: '1fr 300px', gap: '1.25rem', maxWidth: 1060, margin: '1.5rem auto', padding: '0 1.5rem 4rem' },
   chips: { display: 'flex', gap: '.375rem', flexWrap: 'wrap', marginBottom: '1.25rem' },
   chip: { padding: '5px 14px', border: '1px solid var(--borde2)', background: 'transparent', fontSize: '.65rem', letterSpacing: 1.5, textTransform: 'uppercase', cursor: 'pointer', color: 'var(--blanco3)' },
   chipOn: { borderColor: 'var(--dorado)', color: 'var(--dorado)', background: 'rgba(201,168,76,.06)' },
-  tripCard: { background: 'var(--negro2)', border: '1px solid var(--borde2)', padding: '1.25rem 1.375rem', display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', alignItems: 'center', gap: '1rem', cursor: 'pointer', marginBottom: '.875rem' },
+  tripCard: { background: 'var(--negro2)', border: '1px solid var(--borde2)', padding: '1.25rem 1.375rem', cursor: 'pointer', marginBottom: '.875rem' },
   tripSel: { borderColor: 'var(--dorado)' },
   tripEmp: { fontFamily: 'var(--font-cormorant)', fontSize: '1.05rem', fontWeight: 600, marginBottom: 3 },
   tripClase: { fontSize: '.68rem', letterSpacing: 1, textTransform: 'uppercase', color: 'var(--blanco3)', display: 'flex', alignItems: 'center', gap: 5 },
@@ -426,14 +425,13 @@ const S: Record<string, React.CSSProperties> = {
   seatSel: { borderColor: 'var(--dorado)', background: 'var(--dorado)', color: 'var(--negro)', fontWeight: 600 },
   seatOcu: { background: 'var(--negro4)', color: 'rgba(245,240,232,.1)', cursor: 'not-allowed' },
   checkRow: { display: 'flex', alignItems: 'center', gap: 9, padding: '.75rem', background: 'var(--negro4)', border: '1px solid var(--borde2)', cursor: 'pointer', marginBottom: '.875rem' },
-  formGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.75rem' },
   ff: { display: 'flex', flexDirection: 'column', gap: 5 },
   ffLabel: { fontSize: '.62rem', letterSpacing: 2, textTransform: 'uppercase', color: 'var(--dorado)' },
   ffInput: { padding: '9px 12px', background: 'var(--negro4)', border: '1px solid var(--borde2)', color: 'var(--blanco)', fontSize: '.875rem', fontWeight: 300, outline: 'none' },
   metodos: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.625rem', marginBottom: '1rem' },
   metodo: { padding: '.875rem', border: '1px solid var(--borde2)', background: 'transparent', cursor: 'pointer', textAlign: 'center', fontSize: '1.1rem' },
   metodoOn: { borderColor: 'var(--dorado)', background: 'rgba(201,168,76,.06)' },
-  cardFields: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.75rem', marginTop: '.875rem' },
+  cardFields: { marginTop: '.875rem' },
   resumenBox: { background: 'var(--negro4)', border: '1px solid var(--borde2)', padding: '1rem', margin: '1rem 0' },
   resLine: { display: 'flex', justifyContent: 'space-between', fontSize: '.82rem', marginBottom: 5, color: 'var(--blanco3)' },
   resTotal: { display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-cormorant)', fontSize: '1.05rem', fontWeight: 600, paddingTop: 10, marginTop: 8, borderTop: '1px solid var(--borde2)', color: 'var(--dorado)' },

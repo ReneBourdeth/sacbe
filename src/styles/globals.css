@@ -63,3 +63,57 @@ input, select, button { font-family: var(--font-sans); }
 }
 
 .z1 { position: relative; z-index: 1; }
+
+/* ── RESPONSIVE LAYOUT ─────────────────────────────────────── */
+/* Breakpoints: ≤1024 tablet, ≤640 phone */
+
+/* Home search bar */
+.sb-search { display: grid; grid-template-columns: 1fr 36px 1fr 1fr auto; gap: .625rem; align-items: end; }
+.sb-search > *, .sb-trip > *, .sb-form2 > * { min-width: 0; }
+.sb-search select, .sb-search input, .sb-form2 input { width: 100%; min-width: 0; }
+
+/* Results: list + sidebar */
+.sb-layout { display: grid; grid-template-columns: 1fr 300px; gap: 1.25rem; max-width: 1060px; margin: 1.5rem auto; padding: 0 1.5rem 4rem; align-items: start; }
+.sb-side { position: sticky; top: 70px; }
+
+/* Trip card: company | departure | duration | arrival | price */
+.sb-trip { display: grid; grid-template-columns: 1fr auto auto auto auto; align-items: center; gap: 1rem; }
+
+.sb-form2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+
+@media (max-width: 1024px) {
+  .sb-layout { grid-template-columns: 1fr 260px; padding: 0 1rem 4rem; }
+  .sb-trip { grid-template-columns: 1fr auto auto auto; grid-template-areas: "emp sal mid lleg" "precio precio precio precio"; }
+  .sb-trip > :nth-child(1) { grid-area: emp; }
+  .sb-trip > :nth-child(2) { grid-area: sal; }
+  .sb-trip > :nth-child(3) { grid-area: mid; }
+  .sb-trip > :nth-child(4) { grid-area: lleg; }
+  .sb-trip > :nth-child(5) { grid-area: precio; flex-direction: row !important; align-items: center !important; justify-content: space-between; border-top: 1px solid var(--borde2); padding-top: .75rem; }
+}
+
+@media (max-width: 820px) {
+  .sb-layout { grid-template-columns: 1fr; }
+  /* Selection summary sticks to the bottom of the screen on tablets/phones */
+  .sb-side { top: auto; bottom: 0; z-index: 50; }
+  .sb-side > div { box-shadow: 0 -8px 24px rgba(0,0,0,.5); }
+}
+
+@media (max-width: 640px) {
+  .sb-home { padding-top: 5rem !important; justify-content: flex-start !important; }
+  .sb-search { grid-template-columns: 1fr; }
+  .sb-search > :nth-child(2) { justify-self: center; width: 36px; transform: rotate(90deg); }
+  .sb-search-box { padding: 1.25rem !important; }
+
+  .sb-header { padding: 0 1rem !important; }
+  .sb-header-links { gap: .75rem !important; }
+  .sb-hide-sm { display: none !important; }
+
+  .sb-trip { grid-template-columns: 1fr auto 1fr; grid-template-areas: "emp emp emp" "sal mid lleg" "precio precio precio"; gap: .75rem; padding: 1rem !important; }
+  .sb-trip > :nth-child(1) { text-align: left; }
+
+  .sb-overlay { align-items: flex-end !important; padding: 0 !important; }
+  .sb-modal { padding: 1.5rem 1rem 1.25rem !important; max-height: 92vh !important; }
+  .sb-form2 { grid-template-columns: 1fr; }
+
+  .sb-card-auth { margin: 2rem 1rem !important; padding: 1.5rem !important; }
+}
