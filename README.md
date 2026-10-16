@@ -12,7 +12,7 @@ Built with **Next.js 14**, **Supabase**, deployed on **Vercel**, source on **Git
 |-------|------|
 | Frontend | Next.js 14 (App Router) |
 | Database | Supabase (PostgreSQL) |
-| Auth | Supabase Auth (phone OTP) |
+| Auth | Supabase Auth (email link) |
 | Storage | Supabase Storage (QR PDFs) |
 | Hosting | Vercel |
 | Source | GitHub |
@@ -24,17 +24,20 @@ Built with **Next.js 14**, **Supabase**, deployed on **Vercel**, source on **Git
 ## Branch Strategy
 
 ```
-main          ← production (auto-deploys to Vercel)
-develop       ← integration branch
-  sprint-1    ← MVP: search, seat map, booking
-  sprint-2    ← Auth, OTP, payments
-  sprint-3    ← Company dashboard, QR validation
-  sprint-4    ← Mobile PWA, WhatsApp, reports
+main       ← production. Every push here goes live on sacbe-theta.vercel.app
+  develop  ← testing. Everything is merged here first and checked on its Vercel preview
+    sprint-2   ← current sprint's work (sprint-3, sprint-4 later)
 ```
 
-Every feature goes: `sprint-N` → PR → `develop` → PR → `main`
+**Rules**
+1. **Never commit straight to `main`.** Work happens on the sprint branch.
+2. When a feature works on `sprint-N`: open a Pull Request **`sprint-N` → `develop`**.
+   Vercel builds a preview link for it, so you can test it like the real site.
+3. When `develop` is stable: Pull Request **`develop` → `main`**. Merging it publishes the site.
+4. When a sprint is finished, tag it so you can always find that version:
+   `git tag -a v0.2-sprint-2 -m "Sprint 2 complete" && git push origin v0.2-sprint-2`
 
----
+Sprint 1 is tagged `v0.1-sprint-1`.
 
 ## Sprints
 
@@ -151,9 +154,35 @@ npm run dev
 # → http://localhost:3000
 ```
 
-### Step 5 — Workflow for each Sprint
+### Step 5 — Daily workflow
 
 ```bash
+# 1. Start from the sprint branch, up to date
+git checkout sprint-2
+git pull
+
+# 2. Work, and commit small steps with clear messages (see below)
+git add .
+git commit -m "feat: PagoExpress cash payment reference"
+git push
+
+# 3. Feature done? On GitHub: Pull requests → New → base: develop ← compare: sprint-2
+#    Check the Vercel preview link in the PR, then merge.
+
+# 4. Release: Pull request develop → main, merge → the live site updates.
+```
+
+**Commit message prefixes**
+
+| Prefix | Use for |
+|--------|---------|
+| `feat:` | a new feature |
+| `fix:` | a bug fix |
+| `refactor:` | reorganizing code without changing behavior |
+| `style:` | look and layout |
+| `docs:` | README, comments |
+| `chore:` | setup, dependencies, config |
+
 # Start Sprint 2 work
 git checkout sprint-2
 git pull origin develop
@@ -193,26 +222,41 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 sacbe/
 ├── src/
-│   ├── app/                  # Next.js App Router pages
-│   │   ├── page.tsx          # Homepage
-│   │   ├── resultados/       # Search results
-│   │   ├── mis-viajes/       # My tickets
-│   │   └── empresas/         # Company dashboard
-│   ├── components/           # Shared UI components
-│   ├── lib/
-│   │   ├── supabase.ts       # Supabase client
-│   │   └── api.ts            # API helpers
-│   └── styles/
-│       └── globals.css       # Global styles + CSS vars
+│   ├── app/                      # Pages (Next.js App Router: folder = URL)
+│   │   ├── page.tsx              # /            Home + trip search
+│   │   ├── resultados/           # /resultados  Search results + booking
+│   │   │   ├── ResultadosClient  #   list, filters, layout
+│   │   │   ├── TarjetaViaje      #   one trip card
+│   │   │   ├── ResumenSeleccion  #   "Tu selección" price box
+│   │   │   ├── ModalCompra       #   4-step booking window
+│   │   │   ├── MapaAsientos      #   bus seat map
+│   │   │   ├── useAsientos       #   loads seats + live updates
+│   │   │   └── estilos.ts        #   shared styles
+│   │   ├── entrar/               # /entrar      Email sign-in (+ /callback)
+│   │   └── mis-viajes/           # /mis-viajes  My tickets
+│   ├── components/               # Shared UI: SiteHeader, AuthLink, LangToggle
+│   ├── lib/                      # Logic with no UI
+│   │   ├── api.ts                #   every Supabase query/booking call
+│   │   ├── supabase.ts           #   client + database types
+│   │   ├── i18n.tsx              #   Spanish/English texts
+│   │   ├── fecha.ts              #   Honduras time helpers
+│   │   ├── terminales.ts         #   terminal codes → city names
+│   │   ├── precios.ts            #   service fee
+│   │   ├── qr.ts                 #   QR image generation
+│   │   └── navegacion.ts         #   safe redirects
+│   └── styles/globals.css        # Colors, fonts, responsive layout (sb-* classes)
 ├── docs/
-│   └── schema.sql            # Full database schema
-├── .github/
-│   └── workflows/
-│       └── ci.yml            # GitHub Actions CI
-├── .env.example
-└── README.md
+│   ├── schema.sql                # Tables, RLS policies
+│   ├── sprint1-reservas.sql      # reservar_asiento() booking function
+│   └── asientos-trigger.sql      # auto-create seats for new trips
+└── .github/workflows/ci.yml      # Lint + build on every push
 ```
 
----
+**Coding conventions**
+- Data access only through `src/lib/api.ts` — pages never write queries.
+- Anything that changes data runs as a database function (safe, atomic); the browser is never trusted with prices or user IDs.
+- One component, one job. If a file grows past ~250 lines, split it.
+- Every text the user sees goes in `i18n.tsx` (both `es` and `en`).
+- Comments explain **why**, not what.
 
 ## Sacbé · Honduras → Centroamérica
