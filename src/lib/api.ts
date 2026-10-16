@@ -1,67 +1,84 @@
-import { createClient } from './supabase'
+// All reads/writes to Supabase live here, so pages never build queries themselves.
+// Security note: the browser only has the public key. Row Level Security
+// (docs/schema.sql) decides what it may read, and anything that changes data
+// goes through database functions like reservar_asiento.
 
-// Honduras is UTC-6 year-round (no DST)
-const HN_OFFSET = '-06:00'
+import { createClient, type Asiento, type Viaje } from './supabase'
+import { OFFSET_HONDURAS } from './fecha'
 
-// ── Today's date (YYYY-MM-DD) in Honduras, not UTC
-export function hoyHonduras() {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Tegucigalpa' }).format(new Date())
-}
+/** Trips for a route on a given day (YYYY-MM-DD, Honduras time), earliest first. */
+export async function getViajes(origen: string, destino: string, fecha: string): Promise<Viaje[]> {
+  // `salida` is a timestamp with timezone. Without the offset Postgres would read
+  // these as UTC and drop every trip leaving after 6 PM Honduras time.
+  const desde = `${fecha}T00:00:00${OFFSET_HONDURAS}`
+  const hasta = `${fecha}T23:59:59${OFFSET_HONDURAS}`
 
-// ── Search trips
-export async function getViajes(origen: string, destino: string, fecha: string) {
-  const supabase = createClient()
-  // salida is timestamptz — without an offset Postgres reads these as UTC,
-  // which drops every trip departing after 6 PM Honduras time
-  const fechaStart = `${fecha}T00:00:00${HN_OFFSET}`
-  const fechaEnd   = `${fecha}T23:59:59${HN_OFFSET}`
-
-  const { data, error } = await supabase
-    .from('v_viajes_disponibles')
+  const { data, error } = await createClient()
+    .from('v_viajes_disponibles') // view: only future, scheduled trips with free seats
     .select('*')
     .eq('origen_codigo', origen)
     .eq('destino_codigo', destino)
-    .gte('salida', fechaStart)
-    .lte('salida', fechaEnd)
+    .gte('salida', desde)
+    .lte('salida', hasta)
     .order('salida', { ascending: true })
 
   if (error) throw new Error(error.message)
-  return data
+  return data ?? []
 }
 
-// ── Get seats for a trip
-export async function getAsientos(viajeId: string) {
-  const supabase = createClient()
-  const { data, error } = await supabase
+/** All seats of a trip, front to back. */
+export async function getAsientos(viajeId: string): Promise<Asiento[]> {
+  const { data, error } = await createClient()
     .from('asientos')
     .select('*')
     .eq('viaje_id', viajeId)
     .order('fila', { ascending: true })
+    .order('columna', { ascending: true })
 
   if (error) throw new Error(error.message)
-  return data
+  return data ?? []
 }
 
-// ── Reserve a seat (atomic — prevents double-booking)
-export async function reservarAsiento(
-  viajeId: string,
-  asientoId: string,
-  pasajero: {
-    nombre: string
-    identidad: string
-    esMenor: boolean
-    tutorNombre?: string
-    tutorIdentidad?: string
-  }
-) {
+/**
+ * Calls `onChange` with the fresh seat list whenever any seat of the trip changes
+ * (e.g. someone else books one). Returns a function that stops listening.
+ */
+export function escucharAsientos(viajeId: string, onChange: (asientos: Asiento[]) => void) {
   const supabase = createClient()
+  const canal = supabase
+    .channel(`asientos-${viajeId}`)
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'asientos',
+      filter: `viaje_id=eq.${viajeId}`,
+    }, async () => onChange(await getAsientos(viajeId)))
+    .subscribe()
 
-  // Generate unique QR code
-  const codigoQr = `SCB-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2,6).toUpperCase()}`
+  return () => { supabase.removeChannel(canal) }
+}
 
-  // RPC does the whole booking atomically (see docs/sprint1-reservas.sql):
-  // price comes from the DB and the user comes from the session, not the browser
-  const { data, error } = await supabase.rpc('reservar_asiento', {
+export type DatosPasajero = {
+  nombre: string
+  identidad: string
+  esMenor: boolean
+  tutorNombre?: string
+  tutorIdentidad?: string
+}
+
+/**
+ * Books a seat. The database function does it all in one transaction:
+ * claims the seat only if still free, creates the ticket and lowers the
+ * seat count (see docs/sprint1-reservas.sql). Price and user are taken
+ * from the database/session, never from the browser.
+ *
+ * Throws an Error whose message contains ASIENTO_OCUPADO if someone else
+ * took the seat first.
+ */
+export async function reservarAsiento(viajeId: string, asientoId: string, pasajero: DatosPasajero) {
+  const codigoQr = generarCodigoBoleto()
+
+  const { data, error } = await createClient().rpc('reservar_asiento', {
     p_viaje_id:        viajeId,
     p_asiento_id:      asientoId,
     p_codigo_qr:       codigoQr,
@@ -76,10 +93,9 @@ export async function reservarAsiento(
   return { boletoId: data as string, codigoQr }
 }
 
-// ── Get user tickets
+/** Tickets of the logged-in user, newest first (RLS only returns their own). */
 export async function getMisBoletos(usuarioId: string) {
-  const supabase = createClient()
-  const { data, error } = await supabase
+  const { data, error } = await createClient()
     .from('boletos')
     .select(`
       *,
@@ -101,45 +117,15 @@ export async function getMisBoletos(usuarioId: string) {
   return data
 }
 
-// ── Validate QR (for bus company staff)
-export async function validarQR(codigoQr: string) {
-  const supabase = createClient()
-  const { data, error } = await supabase
-    .from('boletos')
-    .select(`
-      *,
-      viajes ( salida, rutas ( empresas(nombre), origen:terminales!rutas_origen_id_fkey(nombre), destino:terminales!rutas_destino_id_fkey(nombre) ) ),
-      asientos ( numero )
-    `)
-    .eq('codigo_qr', codigoQr)
-    .single()
+// ── Helpers ────────────────────────────────────────────────
 
-  if (error || !data) return { valid: false, error: 'Boleto no encontrado' }
-  if (data.estado === 'usado')     return { valid: false, error: 'Boleto ya utilizado', boleto: data }
-  if (data.estado === 'cancelado') return { valid: false, error: 'Boleto cancelado' }
-
-  // Mark as used
-  await supabase
-    .from('boletos')
-    .update({ estado: 'usado' })
-    .eq('codigo_qr', codigoQr)
-
-  return { valid: true, boleto: data }
+/** Short, readable, practically unique ticket code, e.g. SCB-MVA72JCP-RPPS. */
+function generarCodigoBoleto() {
+  const tiempo = Date.now().toString(36).toUpperCase()
+  const azar = Math.random().toString(36).slice(2, 6).toUpperCase()
+  return `SCB-${tiempo}-${azar}`
 }
 
-// ── Subscribe to seat changes in real-time
-export function subscribeAsientos(viajeId: string, callback: (asientos: any[]) => void) {
-  const supabase = createClient()
-  return supabase
-    .channel(`asientos-${viajeId}`)
-    .on('postgres_changes', {
-      event: '*',
-      schema: 'public',
-      table: 'asientos',
-      filter: `viaje_id=eq.${viajeId}`,
-    }, async () => {
-      const asientos = await getAsientos(viajeId)
-      callback(asientos || [])
-    })
-    .subscribe()
-}
+// NOTE: QR validation for bus staff (marking a ticket as used) belongs to
+// Sprint 3. It must run as a database function restricted to staff accounts,
+// so it is intentionally not implemented in the browser.

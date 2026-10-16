@@ -3,16 +3,19 @@
 import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import { useLang, LangToggle } from '@/lib/i18n'
+import { useLang } from '@/lib/i18n'
+import { rutaInternaSegura } from '@/lib/navegacion'
+import SiteHeader from '@/components/SiteHeader'
 
-// Only allow redirects back into this site
-function destinoSeguro(next: string | null) {
-  return next && next.startsWith('/') && !next.startsWith('//') ? next : '/mis-viajes'
-}
-
+/**
+ * /entrar?next=/mis-viajes — passwordless sign-in by email.
+ * Step 1: user types their email and Supabase emails them a sign-in link
+ *         (it lands on /entrar/callback). A new email creates an account.
+ * Step 2: optional code box, for when the email template includes a code.
+ */
 function EntrarInner() {
   const router = useRouter()
-  const next = destinoSeguro(useSearchParams().get('next'))
+  const next = rutaInternaSegura(useSearchParams().get('next'))
   const { t } = useLang()
 
   const [email, setEmail] = useState('')
@@ -54,10 +57,7 @@ function EntrarInner() {
 
   return (
     <main style={S.main}>
-      <header className="sb-header" style={S.header}>
-        <a href="/" style={S.logo}>SAC<span style={{ color: 'var(--dorado)' }}>BÉ</span></a>
-        <LangToggle />
-      </header>
+      <SiteHeader />
 
       <div className="sb-card-auth" style={S.card}>
         <div style={S.eyebrow}>{t.entrar}</div>
@@ -96,6 +96,7 @@ function EntrarInner() {
   )
 }
 
+// useSearchParams needs a Suspense boundary in Next.js 14
 export default function EntrarPage() {
   return (
     <Suspense fallback={null}>
@@ -106,8 +107,6 @@ export default function EntrarPage() {
 
 const S: Record<string, React.CSSProperties> = {
   main: { minHeight: '100vh', position: 'relative', zIndex: 1 },
-  header: { borderBottom: '1px solid var(--borde)', height: 54, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem' },
-  logo: { fontFamily: 'var(--font-cormorant)', fontSize: '1.25rem', fontWeight: 600, letterSpacing: 4, textTransform: 'uppercase', color: 'var(--blanco)', textDecoration: 'none' },
   card: { maxWidth: 420, margin: '4rem auto', padding: '2rem', background: 'var(--negro2)', border: '1px solid var(--borde2)' },
   eyebrow: { fontSize: '.62rem', letterSpacing: 3, textTransform: 'uppercase', color: 'var(--dorado)', marginBottom: '.5rem' },
   title: { fontFamily: 'var(--font-cormorant)', fontSize: '1.75rem', fontWeight: 600, marginBottom: '.5rem' },

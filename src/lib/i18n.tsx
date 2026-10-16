@@ -1,5 +1,10 @@
 'use client'
 
+// Spanish/English text for the whole site.
+// Usage in a component:  const { t, locale } = useLang();  then  {t.buscar}
+// To add text: add the same key to BOTH `es` and `en` below — TypeScript will
+// complain if one language is missing a key that the other has.
+
 import { createContext, useContext, useEffect, useState } from 'react'
 
 export type Lang = 'es' | 'en'
@@ -197,6 +202,8 @@ const dict = {
 
 export type Dict = typeof dict.es
 
+// `locale` is for number/date formatting (es-HN or en-US)
+
 const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: Dict; locale: string }>({
   lang: 'es', setLang: () => {}, t: dict.es, locale: 'es-HN',
 })
@@ -226,22 +233,7 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
+/** Current language, its texts (`t`) and a setter. */
 export function useLang() {
   return useContext(LangContext)
-}
-
-// ── ES | EN switch
-export function LangToggle({ style }: { style?: React.CSSProperties }) {
-  const { lang, setLang } = useLang()
-  const btn = (l: Lang): React.CSSProperties => ({
-    background: lang === l ? '#C9A84C' : 'transparent',
-    color: lang === l ? '#0C0B09' : '#C8BFB0',
-    border: 'none', padding: '4px 9px', fontSize: '.62rem', letterSpacing: 1.5, cursor: 'pointer',
-  })
-  return (
-    <div style={{ display: 'inline-flex', border: '1px solid rgba(201,168,76,.3)', ...style }} aria-label="Language">
-      <button style={btn('es')} onClick={() => setLang('es')}>ES</button>
-      <button style={btn('en')} onClick={() => setLang('en')}>EN</button>
-    </div>
-  )
 }

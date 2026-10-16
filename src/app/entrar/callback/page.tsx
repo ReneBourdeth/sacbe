@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { useLang } from '@/lib/i18n'
+import { rutaInternaSegura } from '@/lib/navegacion'
 
 // Landing page for the link in Supabase's sign-in email.
 // The Supabase browser client exchanges the ?code=... in the URL by itself
@@ -16,8 +17,7 @@ function CallbackInner() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    const next = params.get('next')
-    const destino = next && next.startsWith('/') && !next.startsWith('//') ? next : '/mis-viajes'
+    const destino = rutaInternaSegura(params.get('next'))
 
     // Supabase reports link problems (e.g. otp_expired) in the query or the hash
     const hash = new URLSearchParams(window.location.hash.slice(1))
