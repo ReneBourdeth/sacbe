@@ -27,7 +27,11 @@ function EntrarInner() {
     setError('')
     const { error } = await createClient().auth.signInWithOtp({
       email: email.trim(),
-      options: { shouldCreateUser: true },
+      options: {
+        shouldCreateUser: true,
+        // The default Supabase email contains a link; it lands on /entrar/callback
+        emailRedirectTo: `${location.origin}/entrar/callback?next=${encodeURIComponent(next)}`,
+      },
     })
     setCargando(false)
     if (error) return setError(t.errorEnvio)
@@ -72,6 +76,7 @@ function EntrarInner() {
         ) : (
           <form onSubmit={verificar}>
             <p style={S.sub}>{t.codigoEnviado(email.trim())}</p>
+            <p style={{ ...S.sub, fontSize: '.75rem' }}>{t.oCodigo}</p>
             <label style={S.label}>{t.codigo6}</label>
             <input style={{ ...S.input, letterSpacing: 8, fontSize: '1.25rem', textAlign: 'center' }}
               inputMode="numeric" autoComplete="one-time-code" maxLength={8} required autoFocus
