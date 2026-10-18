@@ -33,6 +33,7 @@ export default function MisViajesPage() {
   const router = useRouter()
   const { t, locale } = useLang()
   const [boletos, setBoletos] = useState<BoletoFila[] | null>(null)
+  const [error, setError] = useState(false)
   const [qrs, setQrs] = useState<Record<string, string>>({})
   const [email, setEmail] = useState('')
 
@@ -41,7 +42,8 @@ export default function MisViajesPage() {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return router.replace('/entrar?next=/mis-viajes')
       setEmail(user.email || '')
-      const data = ((await getMisBoletos(user.id)) || []) as unknown as BoletoFila[]
+      const data = (await getMisBoletos(user.id).catch(() => null)) as unknown as BoletoFila[] | null
+      if (!data) return setError(true)
       setBoletos(data)
       const imgs: Record<string, string> = {}
       for (const b of data) {
@@ -66,7 +68,9 @@ export default function MisViajesPage() {
       <div style={S.wrap}>
         <h1 style={S.title}>{t.misBoletos}</h1>
 
-        {boletos === null ? (
+        {error ? (
+          <p style={S.muted}>{t.errorViajes} · <a href="/mis-viajes" style={{ color: 'var(--dorado)' }}>{t.intentarDeNuevo}</a></p>
+        ) : boletos === null ? (
           <p style={S.muted}>{t.cargando}</p>
         ) : boletos.length === 0 ? (
           <div style={S.empty}>

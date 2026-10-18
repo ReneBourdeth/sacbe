@@ -87,7 +87,7 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
     // Clicking the dark background closes the window; clicks inside don't
     <div className="sb-overlay" style={S.overlay} onClick={onCerrar}>
       <div className="sb-modal" role="dialog" aria-modal style={S.modal} onClick={e => e.stopPropagation()}>
-        <button style={S.modalX} onClick={onCerrar} aria-label="Cerrar">✕</button>
+        <button style={S.modalX} onClick={onCerrar} aria-label={t.cerrar}>✕</button>
 
         {/* Progress bar */}
         <div style={S.stepBar}>

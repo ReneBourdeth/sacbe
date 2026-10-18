@@ -18,6 +18,8 @@ const dict = {
     destino: 'Destino',
     fecha: 'Fecha',
     buscar: 'Buscar →',
+    intercambiar: 'Intercambiar origen y destino',
+    cerrar: 'Cerrar',
     footer: 'Sacbé — Conectando destinos, uniendo personas.',
     origenDestinoIguales: 'Origen y destino deben ser distintos',
 
@@ -112,6 +114,8 @@ const dict = {
     destino: 'To',
     fecha: 'Date',
     buscar: 'Search →',
+    intercambiar: 'Swap origin and destination',
+    cerrar: 'Close',
     footer: 'Sacbé — Connecting destinations, bringing people together.',
     origenDestinoIguales: 'Origin and destination must be different',
 

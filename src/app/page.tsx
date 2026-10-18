@@ -51,7 +51,7 @@ export default function HomePage() {
             </select>
           </div>
 
-          <button onClick={intercambiar} style={S.intercambiar} aria-label="⇄">⇄</button>
+          <button onClick={intercambiar} style={S.intercambiar} aria-label={t.intercambiar}>⇄</button>
 
           <div style={S.campo}>
             <label htmlFor="destino" style={S.label}>{t.destino}</label>

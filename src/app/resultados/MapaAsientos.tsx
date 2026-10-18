@@ -19,20 +19,17 @@ type Props = {
 export default function MapaAsientos({ asientos, cargado, seleccionado, onSeleccionar }: Props) {
   const { t } = useLang()
 
-  // Front row first, then left to right
-  const ordenados = [...asientos].sort((a, b) => a.fila - b.fila || a.columna.localeCompare(b.columna))
-
   return (
     <div style={S.busShell}>
       <div style={S.busFront}>
         <span style={S.busFrontText}>{t.frente}</span>
       </div>
 
-      {/* 5-column grid: 2 seats, aisle, 2 seats */}
+      {/* 5-column grid: 2 seats, aisle, 2 seats. getAsientos already sorts front to back, left to right */}
       <div style={S.busGrid}>
-        {ordenados.length === 0 ? (
+        {asientos.length === 0 ? (
           <p style={S.busVacio}>{cargado ? t.sinAsientos : t.cargandoAsientos}</p>
-        ) : ordenados.flatMap(asiento => {
+        ) : asientos.flatMap(asiento => {
           const libre = asiento.estado === 'disponible'
           const celda = (
             <button key={asiento.id} type="button" disabled={!libre}
