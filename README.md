@@ -234,7 +234,7 @@ sacbe/
 │   │   │   └── estilos.ts        #   shared styles
 │   │   ├── entrar/               # /entrar      Email sign-in (+ /callback)
 │   │   └── mis-viajes/           # /mis-viajes  My tickets
-│   ├── components/               # Shared UI: SiteHeader, AuthLink, LangToggle
+│   ├── components/               # Shared UI: SiteHeader, AuthLink, LangToggle, Simbolos (macaw + Copán drawings)
 │   ├── lib/                      # Logic with no UI
 │   │   ├── api.ts                #   every Supabase query/booking call
 │   │   ├── supabase.ts           #   client + database types
@@ -244,7 +244,7 @@ sacbe/
 │   │   ├── precios.ts            #   service fee
 │   │   ├── qr.ts                 #   QR image generation
 │   │   └── navegacion.ts         #   safe redirects
-│   └── styles/globals.css        # Colors, fonts, responsive layout (sb-* classes)
+│   └── styles/globals.css        # Honduran palette, fonts, motifs, responsive layout (sb-* classes)
 ├── docs/
 │   ├── schema.sql                # Tables, RLS policies
 │   ├── sprint1-reservas.sql      # reservar_asiento() booking function

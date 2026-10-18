@@ -19,7 +19,7 @@ export default function AuthLink({ style }: { style?: React.CSSProperties }) {
 
   return (
     <Link href={logueado ? '/mis-viajes' : '/entrar?next=/mis-viajes'}
-      style={{ fontSize: '.68rem', letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--blanco3)', textDecoration: 'none', ...style }}>
+      style={{ fontSize: '.95rem', fontWeight: 500, color: 'var(--tinta)', ...style }}>
       {logueado ? t.misBoletos : t.entrar}
     </Link>
   )

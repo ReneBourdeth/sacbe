@@ -39,7 +39,7 @@ function ResultadosInner() {
     return (
       <div style={{ ...S.pantalla, flexDirection: 'column', gap: '1rem' }}>
         <p>{t.errorViajes}</p>
-        <p style={{ color: 'var(--blanco3)', fontSize: '.9rem', letterSpacing: 0 }}>{error}</p>
+        <p style={{ color: 'var(--tenue)', fontSize: '.95rem', fontFamily: 'var(--font-sans)', fontWeight: 400 }}>{error}</p>
       </div>
     )
   }
@@ -57,5 +57,5 @@ export default function ResultadosPage() {
 }
 
 const S: Record<string, React.CSSProperties> = {
-  pantalla: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '2rem', color: 'var(--dorado)', fontFamily: 'serif', fontSize: '1.2rem', letterSpacing: 2 },
+  pantalla: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '2rem', color: 'var(--tinta)', fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800 },
 }

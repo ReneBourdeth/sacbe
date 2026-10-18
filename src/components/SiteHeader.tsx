@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import AuthLink from './AuthLink'
 import LangToggle from './LangToggle'
+import { MarcaGuacamaya } from './Simbolos'
 
 /**
  * Top bar used on every inner page: logo on the left, sign-in link and
@@ -9,19 +10,33 @@ import LangToggle from './LangToggle'
  */
 export default function SiteHeader({ children }: { children?: React.ReactNode }) {
   return (
-    <header className="sb-header" style={S.header}>
-      <Link href="/" style={S.logo}>SAC<span style={{ color: 'var(--dorado)' }}>BÉ</span></Link>
-      <nav className="sb-header-links" style={S.links}>
-        {children}
-        <AuthLink />
-        <LangToggle />
-      </nav>
-    </header>
+    <div style={S.pegado}>
+      <div className="sb-plumas" />
+      <header className="sb-header" style={S.header}>
+        <Logo />
+        <nav className="sb-header-links" style={S.links}>
+          {children}
+          <AuthLink />
+          <LangToggle />
+        </nav>
+      </header>
+    </div>
+  )
+}
+
+/** Macaw mark + "Sacbé" wordmark, linking home. */
+export function Logo() {
+  return (
+    <Link href="/" style={S.logo}>
+      <MarcaGuacamaya size={26} />
+      Sacbé
+    </Link>
   )
 }
 
 const S: Record<string, React.CSSProperties> = {
-  header: { background: 'rgba(12,11,9,.9)', borderBottom: '1px solid var(--borde)', height: 54, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', position: 'sticky', top: 0, zIndex: 200, backdropFilter: 'blur(20px)' },
-  logo: { fontFamily: 'var(--font-cormorant)', fontSize: '1.25rem', fontWeight: 600, letterSpacing: 4, textTransform: 'uppercase', color: 'var(--blanco)', textDecoration: 'none' },
-  links: { display: 'flex', alignItems: 'center', gap: '1rem' },
+  pegado: { position: 'sticky', top: 0, zIndex: 200 },
+  header: { background: 'rgba(237, 239, 231, .94)', borderBottom: '1px solid var(--borde2)', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', backdropFilter: 'blur(12px)' },
+  logo: { display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 800, color: 'var(--tinta)' },
+  links: { display: 'flex', alignItems: 'center', gap: '1.25rem' },
 }
