@@ -40,12 +40,12 @@ function CallbackInner() {
     <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '2rem', position: 'relative', zIndex: 1 }}>
       {error ? (
         <div>
-          <p style={{ color: 'var(--dorado)', marginBottom: '.5rem' }}>{t.errorEnlace}</p>
-          <p style={{ color: 'var(--blanco3)', fontSize: '.75rem', marginBottom: '1rem' }}>{error}</p>
-          <a href="/entrar" style={{ color: 'var(--blanco3)', fontSize: '.85rem', textDecoration: 'underline' }}>{t.intentarDeNuevo}</a>
+          <p style={{ color: 'var(--rojo)', fontWeight: 700, marginBottom: '.5rem' }}>{t.errorEnlace}</p>
+          <p style={{ color: 'var(--tenue)', fontSize: '.9rem', marginBottom: '1rem' }}>{error}</p>
+          <a href="/entrar" style={{ color: 'var(--turquesa)', textDecoration: 'underline' }}>{t.intentarDeNuevo}</a>
         </div>
       ) : (
-        <p style={{ color: 'var(--dorado)', letterSpacing: 2 }}>{t.verificando}</p>
+        <p style={{ color: 'var(--tenue)', fontSize: '1.1rem' }}>{t.verificando}</p>
       )}
     </main>
   )

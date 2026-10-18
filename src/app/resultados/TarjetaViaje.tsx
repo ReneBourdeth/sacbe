@@ -8,9 +8,9 @@ import { S } from './estilos'
 
 // Dot color per travel class
 const COLOR_CLASE: Record<Viaje['clase'], string> = {
-  economica: 'var(--dorado3)',
-  ejecutivo: 'var(--dorado)',
-  primera: '#a78bfa',
+  economica: 'var(--toba)',
+  ejecutivo: 'var(--turquesa)',
+  primera: 'var(--amarillo)',
 }
 
 // Fewer free seats than this shows a red "almost full" warning
@@ -57,10 +57,10 @@ export default function TarjetaViaje({ viaje, elegido, onElegir }: Props) {
 
       <div style={S.precioCol}>
         <div style={S.precio}>L. {viaje.precio}</div>
-        <div style={{ fontSize: '.68rem', color: casiLleno ? 'var(--rojo)' : 'var(--dorado3)' }}>
+        <div style={{ fontSize: '.85rem', fontWeight: casiLleno ? 700 : 400, color: casiLleno ? 'var(--rojo)' : 'var(--tenue)' }}>
           {casiLleno ? t.asientosPocos(viaje.asientos_disp) : t.asientosDisp(viaje.asientos_disp)}
         </div>
-        <button style={{ ...S.btnSel, ...(elegido ? S.btnSelOn : {}) }}
+        <button className={elegido ? undefined : 'sb-btn'} style={{ ...S.btnSel, ...(elegido ? S.btnSelOn : {}) }}
           onClick={e => { e.stopPropagation(); onElegir() }}>
           {elegido ? t.elegido : t.elegir}
         </button>

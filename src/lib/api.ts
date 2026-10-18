@@ -46,7 +46,8 @@ export async function getAsientos(viajeId: string): Promise<Asiento[]> {
 export function escucharAsientos(viajeId: string, onChange: (asientos: Asiento[]) => void) {
   const supabase = createClient()
   const canal = supabase
-    .channel(`asientos-${viajeId}`)
+    // Unique name: Supabase reuses a same-named channel that may still be closing
+    .channel(`asientos-${viajeId}-${Math.random().toString(36).slice(2)}`)
     .on('postgres_changes', {
       event: '*',
       schema: 'public',

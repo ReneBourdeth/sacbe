@@ -10,6 +10,7 @@ import { nombreTerminal } from '@/lib/terminales'
 import { qrComoImagen } from '@/lib/qr'
 import { useAsientos } from './useAsientos'
 import MapaAsientos from './MapaAsientos'
+import { MarcaGuacamaya } from '@/components/Simbolos'
 import { S } from './estilos'
 
 // 1 seat → 2 passenger → 3 payment → 4 confirmation
@@ -87,7 +88,7 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
     // Clicking the dark background closes the window; clicks inside don't
     <div className="sb-overlay" style={S.overlay} onClick={onCerrar}>
       <div className="sb-modal" role="dialog" aria-modal style={S.modal} onClick={e => e.stopPropagation()}>
-        <button style={S.modalX} onClick={onCerrar} aria-label="Cerrar">✕</button>
+        <button style={S.modalX} onClick={onCerrar} aria-label={t.cerrar}>✕</button>
 
         {/* Progress bar */}
         <div style={S.stepBar}>
@@ -102,7 +103,7 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
             <div style={S.mSub}>{viaje.empresa} · {formatoHora(viaje.salida, locale)}</div>
             <MapaAsientos asientos={asientos} cargado={cargado} seleccionado={asiento} onSeleccionar={setAsiento} />
             <div style={{ textAlign: 'right', marginTop: '1rem' }}>
-              <button style={S.btnPagar} onClick={irAPasajero}>{t.continuar}</button>
+              <button className="sb-btn" style={S.btnPagar} onClick={irAPasajero}>{t.continuar}</button>
             </div>
           </div>
         )}
@@ -112,15 +113,15 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
           <div>
             <div style={S.mEyebrow}>{t.paso(2)}</div>
             <div style={S.mTitle}>{t.datosPasajero}</div>
-            <div style={S.mSub}>{t.asiento}: <strong style={{ color: 'var(--dorado)' }}>{asiento?.numero}</strong></div>
+            <div style={S.mSub}>{t.asiento}: <strong>{asiento?.numero}</strong></div>
             {!logueado && (
               <a href={`/entrar?next=${encodeURIComponent(location.pathname + location.search)}`} style={S.loginHint}>
-                {t.loginHint} →
+                {t.loginHint}
               </a>
             )}
             <label style={S.checkRow}>
-              <input type="checkbox" checked={esMenor} onChange={e => setEsMenor(e.target.checked)} style={{ accentColor: 'var(--dorado)', width: 16, height: 16 }} />
-              <span style={{ fontSize: '.82rem', fontWeight: 300, color: 'var(--blanco3)' }}>{t.esMenor}</span>
+              <input type="checkbox" checked={esMenor} onChange={e => setEsMenor(e.target.checked)} style={{ accentColor: 'var(--guacamaya)', width: 18, height: 18 }} />
+              <span>{t.esMenor}</span>
             </label>
             <div className="sb-form2">
               <div style={{ ...S.ff, gridColumn: '1/-1' }}>
@@ -139,7 +140,7 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
             </div>
             <div style={{ display: 'flex', gap: '.5rem', marginTop: '1rem' }}>
               <button style={S.btnBack} onClick={() => setPaso(1)}>{t.atras}</button>
-              <button style={{ ...S.btnPagar, flex: 1 }} onClick={irAPago}>{t.continuar}</button>
+              <button className="sb-btn" style={{ ...S.btnPagar, flex: 1 }} onClick={irAPago}>{t.continuar}</button>
             </div>
           </div>
         )}
@@ -153,7 +154,7 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
               {(['tarjeta', 'efectivo'] as const).map(m => (
                 <button key={m} style={{ ...S.metodo, ...(metodo === m ? S.metodoOn : {}) }} onClick={() => setMetodo(m)}>
                   <div>{m === 'tarjeta' ? '💳' : '💵'}</div>
-                  <div style={{ fontSize: '.68rem', letterSpacing: 1, textTransform: 'uppercase', color: metodo === m ? 'var(--dorado)' : 'var(--blanco3)' }}>
+                  <div style={{ fontSize: '.95rem', fontWeight: 500, color: 'var(--tinta)' }}>
                     {m === 'tarjeta' ? t.tarjeta : t.efectivo}
                   </div>
                 </button>
@@ -174,7 +175,7 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
             )}
             {metodo === 'efectivo' && (
               <div style={S.infoEfectivo}>
-                {t.efectivoInfoA} <strong style={{ color: 'var(--blanco)' }}>PagoExpress</strong>.
+                {t.efectivoInfoA} <strong style={{ color: 'var(--tinta)' }}>PagoExpress</strong>.
               </div>
             )}
 
@@ -185,7 +186,7 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
             </div>
             <div style={{ display: 'flex', gap: '.5rem' }}>
               <button style={S.btnBack} onClick={() => setPaso(2)}>{t.atras}</button>
-              <button style={{ ...S.btnPagar, flex: 1, opacity: enviando ? .7 : 1 }} onClick={confirmarCompra} disabled={enviando}>
+              <button className="sb-btn" style={{ ...S.btnPagar, flex: 1, opacity: enviando ? .7 : 1 }} onClick={confirmarCompra} disabled={enviando}>
                 {enviando ? t.procesando : t.confirmarPagar}
               </button>
             </div>
@@ -195,10 +196,10 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
         {/* ── STEP 4: CONFIRMATION ── */}
         {paso === 4 && boleto && (
           <div style={{ textAlign: 'center' }}>
-            <div style={S.confIcono}>✦</div>
+            <div style={S.confIcono}><MarcaGuacamaya size={56} /></div>
             <div style={S.confTitulo}>{t.boletoConfirmado}</div>
             <p style={S.confSub}>{t.caminoBlanco}</p>
-            <div style={{ background: 'white', padding: 12, display: 'inline-block', marginBottom: '1rem' }}>
+            <div style={{ background: 'white', padding: 12, display: 'inline-block', marginBottom: '1rem', border: '1px solid var(--borde)', borderRadius: 8 }}>
               {/* eslint-disable-next-line @next/next/no-img-element -- local data: URL, nothing to optimize */}
               <img src={boleto.qr} alt="QR" style={{ display: 'block', width: 180, height: 180 }} />
             </div>
@@ -212,12 +213,12 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
                 [t.codigo, boleto.codigo],
               ].map(([etiqueta, valor]) => (
                 <div key={etiqueta} style={S.confFila}>
-                  <span style={{ color: 'var(--blanco3)', fontWeight: 300 }}>{etiqueta}</span>
-                  <span style={etiqueta === t.asiento ? { color: 'var(--dorado)' } : {}}>{valor}</span>
+                  <span style={{ color: 'var(--tenue)' }}>{etiqueta}</span>
+                  <span style={etiqueta === t.asiento ? { fontWeight: 700 } : {}}>{valor}</span>
                 </div>
               ))}
             </div>
-            <button style={{ ...S.btnPagar, marginBottom: '.5rem', background: '#25D366' }} onClick={compartirWhatsApp}>
+            <button style={{ ...S.btnPagar, marginBottom: '.5rem', background: '#25D366', color: 'var(--tinta)' }} onClick={compartirWhatsApp}>
               {t.whatsapp}
             </button>
             <a href="/mis-viajes" style={{ ...S.btnPagar, ...S.btnSecundario }}>{t.verBoletos}</a>

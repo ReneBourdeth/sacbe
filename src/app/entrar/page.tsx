@@ -69,19 +69,19 @@ function EntrarInner() {
             <label style={S.label}>{t.correo}</label>
             <input style={S.input} type="email" required autoFocus value={email}
               onChange={e => setEmail(e.target.value)} placeholder="tu@correo.com" />
-            <button style={{ ...S.btn, opacity: cargando ? .7 : 1 }} disabled={cargando}>
+            <button className="sb-btn" style={{ ...S.btn, opacity: cargando ? .7 : 1 }} disabled={cargando}>
               {cargando ? t.enviando : t.enviarCodigo}
             </button>
           </form>
         ) : (
           <form onSubmit={verificar}>
             <p style={S.sub}>{t.codigoEnviado(email.trim())}</p>
-            <p style={{ ...S.sub, fontSize: '.75rem' }}>{t.oCodigo}</p>
+            <p style={{ ...S.sub, fontSize: '.9rem' }}>{t.oCodigo}</p>
             <label style={S.label}>{t.codigo6}</label>
             <input style={{ ...S.input, letterSpacing: 8, fontSize: '1.25rem', textAlign: 'center' }}
               inputMode="numeric" autoComplete="one-time-code" maxLength={8} required autoFocus
               value={codigo} onChange={e => setCodigo(e.target.value.replace(/\D/g, ''))} placeholder="123456" />
-            <button style={{ ...S.btn, opacity: cargando ? .7 : 1 }} disabled={cargando}>
+            <button className="sb-btn" style={{ ...S.btn, opacity: cargando ? .7 : 1 }} disabled={cargando}>
               {cargando ? t.verificando : t.verificar}
             </button>
             <button type="button" style={S.link} onClick={() => { setEnviado(false); setCodigo(''); setError('') }}>
@@ -107,13 +107,13 @@ export default function EntrarPage() {
 
 const S: Record<string, React.CSSProperties> = {
   main: { minHeight: '100vh', position: 'relative', zIndex: 1 },
-  card: { maxWidth: 420, margin: '4rem auto', padding: '2rem', background: 'var(--negro2)', border: '1px solid var(--borde2)' },
-  eyebrow: { fontSize: '.62rem', letterSpacing: 3, textTransform: 'uppercase', color: 'var(--dorado)', marginBottom: '.5rem' },
-  title: { fontFamily: 'var(--font-cormorant)', fontSize: '1.75rem', fontWeight: 600, marginBottom: '.5rem' },
-  sub: { fontSize: '.85rem', fontWeight: 300, color: 'var(--blanco3)', marginBottom: '1.25rem' },
-  label: { display: 'block', fontSize: '.62rem', letterSpacing: 2, textTransform: 'uppercase', color: 'var(--dorado)', marginBottom: 6 },
-  input: { width: '100%', padding: '10px 13px', background: 'var(--negro4)', border: '1px solid var(--borde2)', color: 'var(--blanco)', fontSize: '.95rem', outline: 'none', marginBottom: '1rem' },
-  btn: { width: '100%', background: 'var(--dorado)', color: 'var(--negro)', border: 'none', padding: 13, fontSize: '.7rem', letterSpacing: 2, textTransform: 'uppercase', cursor: 'pointer' },
-  link: { display: 'block', margin: '1rem auto 0', background: 'none', border: 'none', color: 'var(--blanco3)', fontSize: '.75rem', textDecoration: 'underline', cursor: 'pointer' },
-  error: { marginTop: '1rem', color: 'var(--rojo)', fontSize: '.82rem', textAlign: 'center' },
+  card: { maxWidth: 420, margin: '4rem auto', padding: '2rem', background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 12 },
+  eyebrow: { color: 'var(--tenue)', marginBottom: '.25rem' },
+  title: { fontSize: '2rem', marginBottom: '.5rem' },
+  sub: { color: 'var(--tenue)', marginBottom: '1.25rem' },
+  label: { display: 'block', fontSize: '.9rem', fontWeight: 500, color: 'var(--tenue)', marginBottom: 6 },
+  input: { width: '100%', height: 46, padding: '0 13px', background: 'var(--superficie)', border: '1px solid var(--borde)', marginBottom: '1rem' },
+  btn: { width: '100%', background: 'var(--guacamaya)', color: '#FFFFFF', border: 'none', padding: 13, fontWeight: 700, cursor: 'pointer' },
+  link: { display: 'block', margin: '1rem auto 0', background: 'none', border: 'none', color: 'var(--turquesa)', fontSize: '.95rem', textDecoration: 'underline', cursor: 'pointer' },
+  error: { marginTop: '1rem', color: 'var(--rojo)', fontSize: '.95rem', fontWeight: 700, textAlign: 'center' },
 }

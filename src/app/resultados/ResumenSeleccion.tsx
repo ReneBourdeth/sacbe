@@ -27,7 +27,7 @@ export default function ResumenSeleccion({ viaje, onComprar }: Props) {
           <div style={S.sbLine}><span>{t.boleto}</span><strong>L. {viaje.precio}</strong></div>
           <div style={S.sbLine}><span>{t.cargoServicio}</span><strong>L. {CARGO_SERVICIO}</strong></div>
           <div style={S.sbTotal}><span>{t.total}</span><span>L. {totalConCargo(viaje.precio)}</span></div>
-          <button style={S.btnComprar} onClick={onComprar}>{t.comprarBoleto}</button>
+          <button className="sb-btn" style={S.btnComprar} onClick={onComprar}>{t.comprarBoleto}</button>
         </>
       )}
     </div>
