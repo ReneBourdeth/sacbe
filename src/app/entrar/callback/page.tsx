@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { useLang } from '@/lib/i18n'
+import { rutaInternaSegura } from '@/lib/navegacion'
 
 // Landing page for the link in Supabase's sign-in email.
 // The Supabase browser client exchanges the ?code=... in the URL by itself
@@ -16,8 +17,7 @@ function CallbackInner() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    const next = params.get('next')
-    const destino = next && next.startsWith('/') && !next.startsWith('//') ? next : '/mis-viajes'
+    const destino = rutaInternaSegura(params.get('next'))
 
     // Supabase reports link problems (e.g. otp_expired) in the query or the hash
     const hash = new URLSearchParams(window.location.hash.slice(1))
@@ -40,12 +40,12 @@ function CallbackInner() {
     <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '2rem', position: 'relative', zIndex: 1 }}>
       {error ? (
         <div>
-          <p style={{ color: 'var(--dorado)', marginBottom: '.5rem' }}>{t.errorEnlace}</p>
-          <p style={{ color: 'var(--blanco3)', fontSize: '.75rem', marginBottom: '1rem' }}>{error}</p>
-          <a href="/entrar" style={{ color: 'var(--blanco3)', fontSize: '.85rem', textDecoration: 'underline' }}>{t.intentarDeNuevo}</a>
+          <p style={{ color: 'var(--rojo)', fontWeight: 700, marginBottom: '.5rem' }}>{t.errorEnlace}</p>
+          <p style={{ color: 'var(--tenue)', fontSize: '.9rem', marginBottom: '1rem' }}>{error}</p>
+          <a href="/entrar" style={{ color: 'var(--turquesa)', textDecoration: 'underline' }}>{t.intentarDeNuevo}</a>
         </div>
       ) : (
-        <p style={{ color: 'var(--dorado)', letterSpacing: 2 }}>{t.verificando}</p>
+        <p style={{ color: 'var(--tenue)', fontSize: '1.1rem' }}>{t.verificando}</p>
       )}
     </main>
   )

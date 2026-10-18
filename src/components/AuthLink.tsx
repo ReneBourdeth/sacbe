@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { useLang } from '@/lib/i18n'
 
-// "Entrar" when logged out, "Mis boletos" when logged in
+/** Shows "Entrar" when logged out and "Mis boletos" when logged in. Updates live on sign-in/out. */
 export default function AuthLink({ style }: { style?: React.CSSProperties }) {
   const { t } = useLang()
   const [logueado, setLogueado] = useState(false)
@@ -12,14 +13,14 @@ export default function AuthLink({ style }: { style?: React.CSSProperties }) {
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getSession().then(({ data }) => setLogueado(!!data.session))
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => setLogueado(!!session))
+    const { data: sub } = supabase.auth.onAuthStateChange((_evento, sesion) => setLogueado(!!sesion))
     return () => sub.subscription.unsubscribe()
   }, [])
 
   return (
-    <a href={logueado ? '/mis-viajes' : `/entrar?next=${encodeURIComponent('/mis-viajes')}`}
-      style={{ fontSize: '.68rem', letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--blanco3)', textDecoration: 'none', ...style }}>
+    <Link href={logueado ? '/mis-viajes' : '/entrar?next=/mis-viajes'}
+      style={{ fontSize: '.95rem', fontWeight: 500, color: 'var(--tinta)', ...style }}>
       {logueado ? t.misBoletos : t.entrar}
-    </a>
+    </Link>
   )
 }

@@ -2,81 +2,106 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { hoyHonduras } from '@/lib/api'
-import { useLang, LangToggle } from '@/lib/i18n'
+import { useLang } from '@/lib/i18n'
+import { hoyHonduras } from '@/lib/fecha'
+import { TERMINALES } from '@/lib/terminales'
 import AuthLink from '@/components/AuthLink'
+import LangToggle from '@/components/LangToggle'
+import { Logo } from '@/components/SiteHeader'
+import { EstampaCopan } from '@/components/Simbolos'
 
-const TERMINALES = [
-    { codigo: 'SPS', nombre: 'San Pedro Sula' },
-    { codigo: 'TGU', nombre: 'Tegucigalpa' },
-    { codigo: 'CEI', nombre: 'La Ceiba' },
-    { codigo: 'CMG', nombre: 'Comayagua' },
-    { codigo: 'CHO', nombre: 'Choluteca' },
-    { codigo: 'CPN', nombre: 'Copán Ruinas' },
-    { codigo: 'ROA', nombre: 'Roatán' },
-]
-
-const NOM: Record<string, string> = Object.fromEntries(
-    TERMINALES.map(t => [t.codigo, t.nombre])
-)
-
+/** Home: hero text and illustration, then the trip search (from, to, date). */
 export default function HomePage() {
-    const router = useRouter()
-    const { t } = useLang()
-    const today = hoyHonduras()
-    const [origen, setOrigen] = useState('SPS')
-    const [destino, setDestino] = useState('TGU')
-    const [fecha, setFecha] = useState(today)
+  const router = useRouter()
+  const { t } = useLang()
+  const hoy = hoyHonduras()
+  const [origen, setOrigen] = useState('SPS')
+  const [destino, setDestino] = useState('TGU')
+  const [fecha, setFecha] = useState(hoy)
 
-    function swap() { setOrigen(destino); setDestino(origen) }
+  function intercambiar() {
+    setOrigen(destino)
+    setDestino(origen)
+  }
 
-    function buscar() {
-        if (origen === destino) return alert(t.origenDestinoIguales)
-        router.push(`/resultados?origen=${origen}&destino=${destino}&fecha=${fecha}`)
-    }
+  function buscar() {
+    if (origen === destino) return alert(t.origenDestinoIguales)
+    const params = new URLSearchParams({ origen, destino, fecha })
+    router.push(`/resultados?${params}`)
+  }
 
-    return (
-        <main className="sb-home" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative', zIndex: 1 }}>
-            <div style={{ position: 'absolute', top: '1.25rem', right: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <AuthLink />
-                <LangToggle />
-            </div>
-            <div style={{ fontFamily: 'serif', fontSize: '.7rem', letterSpacing: 4, textTransform: 'uppercase', color: '#C9A84C', marginBottom: '1rem' }}>
-                {t.tagline}
-            </div>
-            <h1 style={{ fontFamily: 'serif', fontSize: 'clamp(2.5rem,6vw,5rem)', fontWeight: 600, lineHeight: 1, textAlign: 'center', marginBottom: '2rem', color: '#F5F0E8' }}>
-                {t.heroA}<br />
-                <em style={{ color: '#C9A84C' }}>{t.heroB}</em>
-            </h1>
+  return (
+    <main style={S.main}>
+      <div className="sb-plumas" />
+      <div style={S.barra}>
+        <Logo />
+        <div style={S.esquina}>
+          <AuthLink />
+          <LangToggle />
+        </div>
+      </div>
 
-            <div className="sb-search-box" style={{ background: '#1C1A16', border: '1px solid rgba(201,168,76,.18)', padding: '1.75rem', width: '100%', maxWidth: 700 }}>
-                <div className="sb-search">
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                        <label style={{ fontSize: '.62rem', letterSpacing: 2, textTransform: 'uppercase', color: '#C9A84C' }}>{t.origen}</label>
-                        <select value={origen} onChange={e => setOrigen(e.target.value)} style={{ padding: '10px 13px', background: '#252219', border: '1px solid rgba(245,240,232,.08)', color: '#F5F0E8', fontSize: '.875rem', outline: 'none' }}>
-                            {TERMINALES.map(t => <option key={t.codigo} value={t.codigo}>{t.nombre}</option>)}
-                        </select>
-                    </div>
-                    <button onClick={swap} style={{ height: 32, border: '1px solid rgba(201,168,76,.18)', background: 'transparent', color: '#C9A84C', cursor: 'pointer', fontSize: '1rem', alignSelf: 'end' }}>⇄</button>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                        <label style={{ fontSize: '.62rem', letterSpacing: 2, textTransform: 'uppercase', color: '#C9A84C' }}>{t.destino}</label>
-                        <select value={destino} onChange={e => setDestino(e.target.value)} style={{ padding: '10px 13px', background: '#252219', border: '1px solid rgba(245,240,232,.08)', color: '#F5F0E8', fontSize: '.875rem', outline: 'none' }}>
-                            {TERMINALES.map(t => <option key={t.codigo} value={t.codigo}>{t.nombre}</option>)}
-                        </select>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                        <label style={{ fontSize: '.62rem', letterSpacing: 2, textTransform: 'uppercase', color: '#C9A84C' }}>{t.fecha}</label>
-                        <input type="date" value={fecha} min={today} onChange={e => setFecha(e.target.value)} style={{ padding: '10px 13px', background: '#252219', border: '1px solid rgba(245,240,232,.08)', color: '#F5F0E8', fontSize: '.875rem', outline: 'none' }} />
-                    </div>
-                    <button onClick={buscar} style={{ background: '#C9A84C', color: '#0C0B09', border: 'none', padding: '11px 20px', fontSize: '.7rem', letterSpacing: 2, textTransform: 'uppercase', cursor: 'pointer', alignSelf: 'end' }}>
-                        {t.buscar}
-                    </button>
-                </div>
+      <div className="sb-home" style={S.contenido}>
+        <div className="sb-hero">
+          <div>
+            <p style={S.tagline}>{t.tagline}</p>
+            <h1 style={S.titulo}>{t.heroA}</h1>
+            <p style={S.sub}>{t.heroB}</p>
+          </div>
+          <EstampaCopan etiqueta={t.ilustracion} />
+        </div>
+
+        <div className="sb-search-box" style={S.caja}>
+          {/* The order of these 5 children matters: globals.css stacks them on phones */}
+          <div className="sb-search">
+            <div style={S.campo}>
+              <label htmlFor="origen" style={S.label}>{t.origen}</label>
+              <select id="origen" value={origen} onChange={e => setOrigen(e.target.value)} style={S.input}>
+                {TERMINALES.map(term => <option key={term.codigo} value={term.codigo}>{term.nombre}</option>)}
+              </select>
             </div>
 
-            <p style={{ marginTop: '2rem', fontFamily: 'serif', fontStyle: 'italic', color: '#C8BFB0', fontSize: '.9rem' }}>
-                {t.footer}
-            </p>
-        </main>
-    )
+            <button onClick={intercambiar} style={S.intercambiar} aria-label={t.intercambiar}>⇄</button>
+
+            <div style={S.campo}>
+              <label htmlFor="destino" style={S.label}>{t.destino}</label>
+              <select id="destino" value={destino} onChange={e => setDestino(e.target.value)} style={S.input}>
+                {TERMINALES.map(term => <option key={term.codigo} value={term.codigo}>{term.nombre}</option>)}
+              </select>
+            </div>
+
+            <div style={S.campo}>
+              <label htmlFor="fecha" style={S.label}>{t.fecha}</label>
+              {/* min = today: no searching for trips in the past */}
+              <input id="fecha" type="date" value={fecha} min={hoy} onChange={e => setFecha(e.target.value)} style={S.input} />
+            </div>
+
+            <button className="sb-btn" onClick={buscar} style={S.buscar}>{t.buscar}</button>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div className="sb-greca" />
+        <p style={S.pie}>{t.footer}</p>
+      </footer>
+    </main>
+  )
+}
+
+const S: Record<string, React.CSSProperties> = {
+  main: { minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 1 },
+  barra: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.5rem' },
+  esquina: { display: 'flex', alignItems: 'center', gap: '1.25rem' },
+  contenido: { flex: 1, width: '100%', maxWidth: 1000, margin: '0 auto', padding: '2rem 1.5rem 3rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '1.5rem' },
+  tagline: { color: 'var(--tenue)', marginBottom: '.75rem' },
+  titulo: { fontSize: 'clamp(2.4rem, 6vw, 4.25rem)', maxWidth: '13ch', marginBottom: '1rem' },
+  sub: { fontSize: '1.15rem', color: 'var(--tenue)', maxWidth: '36ch' },
+  caja: { background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 12, padding: '1.25rem', boxShadow: '0 12px 32px -20px rgba(18, 51, 43, .35)' },
+  campo: { display: 'flex', flexDirection: 'column', gap: 6 },
+  label: { fontSize: '.9rem', fontWeight: 500, color: 'var(--tenue)' },
+  input: { height: 44, padding: '0 12px', background: 'var(--superficie)', border: '1px solid var(--borde)' },
+  intercambiar: { height: 44, border: '1px solid var(--borde)', background: 'var(--hundido)', color: 'var(--tinta)', cursor: 'pointer', fontSize: '1.1rem' },
+  buscar: { height: 44, background: 'var(--guacamaya)', color: '#FFFFFF', border: 'none', padding: '0 22px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' },
+  pie: { padding: '1rem 1.5rem 1.5rem', textAlign: 'center', color: 'var(--tenue)', fontSize: '.95rem' },
 }

@@ -2,11 +2,17 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import ResultadosClient from './ResultadosClient'
-import { getViajes, hoyHonduras } from '@/lib/api'
-import type { Viaje } from '@/lib/supabase'
+import { getViajes } from '@/lib/api'
+import { hoyHonduras } from '@/lib/fecha'
 import { useLang } from '@/lib/i18n'
+import type { Viaje } from '@/lib/supabase'
+import ResultadosClient from './ResultadosClient'
 
+/**
+ * /resultados?origen=SPS&destino=TGU&fecha=2026-10-15
+ * Reads the search from the URL, loads matching trips, then hands them to
+ * ResultadosClient. Shows a loading or error screen in between.
+ */
 function ResultadosInner() {
   const searchParams = useSearchParams()
   const { t } = useLang()
@@ -15,55 +21,41 @@ function ResultadosInner() {
   const fecha = searchParams.get('fecha') || hoyHonduras()
 
   const [viajes, setViajes] = useState<Viaje[]>([])
-  const [loading, setLoading] = useState(true)
+  const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    setLoading(true)
+    setCargando(true)
     setError('')
     getViajes(origen, destino, fecha)
-      .then(data => setViajes(data || []))
+      .then(setViajes)
       .catch(err => setError(err.message))
-      .finally(() => setLoading(false))
+      .finally(() => setCargando(false))
   }, [origen, destino, fecha])
 
-  if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C9A84C', fontFamily: 'serif', fontSize: '1.2rem', letterSpacing: 2 }}>
-        {t.buscando}
-      </div>
-    )
-  }
+  if (cargando) return <div style={S.pantalla}>{t.buscando}</div>
 
   if (error) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F5F0E8' }}>
-        <div style={{ textAlign: 'center' }}>
-          <p style={{ color: '#C9A84C', marginBottom: '1rem' }}>{t.errorViajes}</p>
-          <p style={{ color: '#C8BFB0', fontSize: '.9rem' }}>{error}</p>
-        </div>
+      <div style={{ ...S.pantalla, flexDirection: 'column', gap: '1rem' }}>
+        <p>{t.errorViajes}</p>
+        <p style={{ color: 'var(--tenue)', fontSize: '.95rem', fontFamily: 'var(--font-sans)', fontWeight: 400 }}>{error}</p>
       </div>
     )
   }
 
-  return (
-    <ResultadosClient
-      viajes={viajes}
-      origen={origen}
-      destino={destino}
-      fecha={fecha}
-    />
-  )
+  return <ResultadosClient viajes={viajes} origen={origen} destino={destino} fecha={fecha} />
 }
 
+// useSearchParams needs a Suspense boundary in Next.js 14, or the build fails
 export default function ResultadosPage() {
   return (
-    <Suspense fallback={
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C9A84C', fontFamily: 'serif', fontSize: '1.2rem', letterSpacing: 2 }}>
-        Cargando...
-      </div>
-    }>
+    <Suspense fallback={<div style={S.pantalla}>…</div>}>
       <ResultadosInner />
     </Suspense>
   )
+}
+
+const S: Record<string, React.CSSProperties> = {
+  pantalla: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '2rem', color: 'var(--tinta)', fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800 },
 }
