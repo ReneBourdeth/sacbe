@@ -6,12 +6,18 @@
 import { createClient, type Asiento, type Viaje } from './supabase'
 import { OFFSET_HONDURAS } from './fecha'
 
+/**
+ * Start and end of a day (YYYY-MM-DD) in Honduras time, for filtering `salida`.
+ * `salida` is a timestamp with timezone: without the offset Postgres would read
+ * these as UTC and drop every trip leaving after 6 PM Honduras time.
+ */
+function rangoDia(fecha: string) {
+  return { desde: `${fecha}T00:00:00${OFFSET_HONDURAS}`, hasta: `${fecha}T23:59:59${OFFSET_HONDURAS}` }
+}
+
 /** Trips for a route on a given day (YYYY-MM-DD, Honduras time), earliest first. */
 export async function getViajes(origen: string, destino: string, fecha: string): Promise<Viaje[]> {
-  // `salida` is a timestamp with timezone. Without the offset Postgres would read
-  // these as UTC and drop every trip leaving after 6 PM Honduras time.
-  const desde = `${fecha}T00:00:00${OFFSET_HONDURAS}`
-  const hasta = `${fecha}T23:59:59${OFFSET_HONDURAS}`
+  const { desde, hasta } = rangoDia(fecha)
 
   const { data, error } = await createClient()
     .from('v_viajes_disponibles') // view: only future, scheduled trips with free seats
@@ -113,6 +119,43 @@ export async function getMisBoletos(usuarioId: string) {
     `)
     .eq('usuario_id', usuarioId)
     .order('created_at', { ascending: false })
+
+  if (error) throw new Error(error.message)
+  return data
+}
+
+// ── Bus company panel (/panel) ─────────────────────────────
+// Staff rows are only visible to staff of that company (docs/panel-empresa.sql).
+
+/** Company the logged-in user manages, or null if they are not staff. */
+export async function getMiEmpresa() {
+  const { data, error } = await createClient()
+    .from('empresa_usuarios')
+    .select('empresa_id, empresas ( nombre )')
+    .maybeSingle()
+
+  if (error) throw new Error(error.message)
+  return data as { empresa_id: string; empresas: { nombre: string } | null } | null
+}
+
+/** A company's trips on one day, with the passenger list of each, earliest first. */
+export async function getViajesEmpresa(empresaId: string, fecha: string) {
+  const { desde, hasta } = rangoDia(fecha)
+  const { data, error } = await createClient()
+    .from('viajes')
+    .select(`
+      id, salida, clase, capacidad, asientos_disp, estado,
+      rutas!inner (
+        empresa_id,
+        origen:terminales!rutas_origen_id_fkey ( codigo ),
+        destino:terminales!rutas_destino_id_fkey ( codigo )
+      ),
+      boletos ( id, nombre_pasajero, identidad_pas, estado, codigo_qr, precio_final, asientos ( numero ) )
+    `)
+    .eq('rutas.empresa_id', empresaId)
+    .gte('salida', desde)
+    .lte('salida', hasta)
+    .order('salida', { ascending: true })
 
   if (error) throw new Error(error.message)
   return data

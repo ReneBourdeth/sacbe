@@ -83,7 +83,7 @@ export default function HomePage() {
 
       <footer>
         <div className="sb-greca" />
-        <p style={S.pie}>{t.footer}</p>
+        <p style={S.pie}>{t.footer} · <a href="/panel" style={{ textDecoration: 'underline' }}>{t.panelEmpresas}</a></p>
       </footer>
     </main>
   )
