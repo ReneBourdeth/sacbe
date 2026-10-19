@@ -69,7 +69,7 @@ Sprint 1 is tagged `v0.1-sprint-1`.
 - [ ] Push notifications
 - [ ] Guatemala / El Salvador routes
 - [ ] Multi-currency
-- [ ] AI customer support (Claude API)
+- [ ] AI customer support
 
 ---
 

@@ -3,24 +3,26 @@
    cities. The palette comes from that road, Copán's green volcanic stone,
    the jungle around it and the scarlet macaw (Honduras' national bird). */
 :root {
-  --fondo:      #EDEFE7;  /* sascab: the white limestone of the road */
-  --superficie: #FFFFFF;  /* cards, boxes, modal */
-  --hundido:    #E3E6DB;  /* inputs and inner panels */
-  --tinta:      #12332B;  /* selva: main text */
-  --tenue:      #4A5644;  /* secondary text */
-  --toba:       #6E7863;  /* Copán's volcanic tuff: borders, stone shapes */
-  --guacamaya:  #C8202F;  /* macaw red: the one action color */
-  --guacamaya2: #A3141F;  /* hover / pressed */
-  --amarillo:   #F2B20F;  /* macaw yellow */
-  --turquesa:   #0A6FA8;  /* flag turquoise, deep enough for text and focus */
-  --rojo:       #A3141F;  /* errors */
-  --verde:      #1E6B45;  /* paid / success */
+  /* Black background with near-white text for maximum contrast (≈19:1). */
+  color-scheme: dark;     /* native date pickers, selects and scrollbars go dark too */
+  --fondo:      #000000;  /* night over the white road */
+  --superficie: #141414;  /* cards, boxes, modal */
+  --hundido:    #1F1F1F;  /* inputs and inner panels */
+  --tinta:      #FFFFFF;  /* main text */
+  --tenue:      #C9CFC2;  /* secondary text, still ≈13:1 on black */
+  --toba:       #8E9884;  /* Copán's volcanic tuff: borders, stone shapes */
+  --guacamaya:  #D7263D;  /* macaw red: the one action color (white text on it ≈5:1) */
+  --guacamaya2: #B01D30;  /* hover / pressed */
+  --amarillo:   #FFC21A;  /* macaw yellow */
+  --turquesa:   #4DB8FF;  /* flag turquoise, bright enough for links and focus on black */
+  --rojo:       #FF6B6B;  /* errors and warnings, readable as text on black */
+  --verde:      #4ADE80;  /* paid / success */
 
   --font-display: var(--font-alegreya), Georgia, serif;
   --font-sans:    var(--font-alegreya-sans), system-ui, sans-serif;
 
-  --borde:  #C3C9B8;
-  --borde2: #D5D9CC;
+  --borde:  #4A4F45;
+  --borde2: #2E322B;
   --radio:  8px;
 }
 
@@ -118,7 +120,7 @@ button { border-radius: 6px; }
   .sb-layout { grid-template-columns: 1fr; }
   /* Selection summary sticks to the bottom of the screen on tablets/phones */
   .sb-side { top: auto; bottom: 0; z-index: 50; }
-  .sb-side > div { box-shadow: 0 -6px 20px rgba(18, 51, 43, .18); }
+  .sb-side > div { box-shadow: 0 -6px 20px rgba(0, 0, 0, .6); }
 }
 
 @media (max-width: 640px) {

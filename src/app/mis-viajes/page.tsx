@@ -119,5 +119,5 @@ const S: Record<string, React.CSSProperties> = {
   ruta: { fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800 },
   fila: { display: 'flex', justifyContent: 'space-between', gap: '1rem', fontSize: '.95rem', marginBottom: 3, color: 'var(--tenue)' },
   estado: { display: 'inline-block', marginTop: '.5rem', fontSize: '.9rem', fontWeight: 500, padding: '2px 12px', borderRadius: 999, background: 'var(--hundido)', color: 'var(--tinta)' },
-  estadoOk: { background: '#DCEEDF', color: 'var(--verde)' },
+  estadoOk: { background: 'rgba(74, 222, 128, .15)', color: 'var(--verde)' },
 }

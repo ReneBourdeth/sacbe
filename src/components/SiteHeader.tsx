@@ -36,7 +36,7 @@ export function Logo() {
 
 const S: Record<string, React.CSSProperties> = {
   pegado: { position: 'sticky', top: 0, zIndex: 200 },
-  header: { background: 'rgba(237, 239, 231, .94)', borderBottom: '1px solid var(--borde2)', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', backdropFilter: 'blur(12px)' },
+  header: { background: 'rgba(0, 0, 0, .92)', borderBottom: '1px solid var(--borde2)', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', backdropFilter: 'blur(12px)' },
   logo: { display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 800, color: 'var(--tinta)' },
   links: { display: 'flex', alignItems: 'center', gap: '1.25rem' },
 }
