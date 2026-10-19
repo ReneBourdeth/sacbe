@@ -218,7 +218,7 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
                 </div>
               ))}
             </div>
-            <button style={{ ...S.btnPagar, marginBottom: '.5rem', background: '#25D366', color: 'var(--tinta)' }} onClick={compartirWhatsApp}>
+            <button style={{ ...S.btnPagar, marginBottom: '.5rem', background: '#25D366', color: '#000000' }} onClick={compartirWhatsApp}>
               {t.whatsapp}
             </button>
             <a href="/mis-viajes" style={{ ...S.btnPagar, ...S.btnSecundario }}>{t.verBoletos}</a>

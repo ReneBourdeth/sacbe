@@ -83,7 +83,7 @@ export default function HomePage() {
 
       <footer>
         <div className="sb-greca" />
-        <p style={S.pie}>{t.footer}</p>
+        <p style={S.pie}>{t.footer} · <a href="/panel" style={{ textDecoration: 'underline' }}>{t.panelEmpresas}</a></p>
       </footer>
     </main>
   )
@@ -97,7 +97,7 @@ const S: Record<string, React.CSSProperties> = {
   tagline: { color: 'var(--tenue)', marginBottom: '.75rem' },
   titulo: { fontSize: 'clamp(2.4rem, 6vw, 4.25rem)', maxWidth: '13ch', marginBottom: '1rem' },
   sub: { fontSize: '1.15rem', color: 'var(--tenue)', maxWidth: '36ch' },
-  caja: { background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 12, padding: '1.25rem', boxShadow: '0 12px 32px -20px rgba(18, 51, 43, .35)' },
+  caja: { background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 12, padding: '1.25rem', boxShadow: '0 12px 32px -20px rgba(0, 0, 0, .8)' },
   campo: { display: 'flex', flexDirection: 'column', gap: 6 },
   label: { fontSize: '.9rem', fontWeight: 500, color: 'var(--tenue)' },
   input: { height: 44, padding: '0 12px', background: 'var(--superficie)', border: '1px solid var(--borde)' },
