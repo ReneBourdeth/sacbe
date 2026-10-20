@@ -30,6 +30,7 @@ export default function PanelPage() {
   const [logueado, setLogueado] = useState(false)
   const [empresa, setEmpresa] = useState<{ id: string; nombre: string } | null>(null)
   const [sinAcceso, setSinAcceso] = useState(false)
+  const [errorCarga, setErrorCarga] = useState(false)
   const [email, setEmail] = useState('')
   const [contrasena, setContrasena] = useState('')
   const [enviando, setEnviando] = useState(false)
@@ -38,9 +39,14 @@ export default function PanelPage() {
   const [viajes, setViajes] = useState<ViajeEmpresa[] | null>(null)
 
   async function cargarEmpresa() {
-    const fila = await getMiEmpresa().catch(() => null)
-    if (fila) setEmpresa({ id: fila.empresa_id, nombre: fila.empresas?.nombre ?? '' })
-    else setSinAcceso(true)
+    // Only an empty answer means "not staff"; a failed request is shown as an error
+    try {
+      const fila = await getMiEmpresa()
+      if (fila) setEmpresa({ id: fila.empresa_id, nombre: fila.empresas?.nombre ?? '' })
+      else setSinAcceso(true)
+    } catch {
+      setErrorCarga(true)
+    }
   }
 
   // Already signed in from an earlier visit?
@@ -53,10 +59,12 @@ export default function PanelPage() {
 
   useEffect(() => {
     if (!empresa) return
+    let activo = true // drop answers for a date that is no longer selected
     setViajes(null)
     getViajesEmpresa(empresa.id, fecha)
-      .then(data => setViajes(data as unknown as ViajeEmpresa[]))
-      .catch(() => setViajes([]))
+      .then(data => { if (activo) setViajes(data as unknown as ViajeEmpresa[]) })
+      .catch(() => { if (activo) setViajes([]) })
+    return () => { activo = false }
   }, [empresa, fecha])
 
   async function entrar(e: React.FormEvent) {
@@ -75,7 +83,7 @@ export default function PanelPage() {
 
   async function salir() {
     await createClient().auth.signOut()
-    setLogueado(false); setEmpresa(null); setSinAcceso(false); setViajes(null); setContrasena('')
+    setLogueado(false); setEmpresa(null); setSinAcceso(false); setErrorCarga(false); setViajes(null); setContrasena('')
   }
 
   return (
@@ -100,6 +108,11 @@ export default function PanelPage() {
           </button>
           {error && <p role="alert" style={S.error}>{error}</p>}
         </form>
+      ) : errorCarga ? (
+        <div style={S.card}>
+          <p style={S.error}>{t.errorViajes}</p>
+          <p style={{ textAlign: 'center', marginTop: '.5rem' }}><a href="/panel" style={{ color: 'var(--turquesa)', textDecoration: 'underline' }}>{t.intentarDeNuevo}</a></p>
+        </div>
       ) : sinAcceso ? (
         <div style={S.card}><p style={S.error}>{t.sinAcceso}</p></div>
       ) : empresa && (

@@ -115,7 +115,8 @@ const dict = {
     errorCodigo: 'Código incorrecto o vencido.',
     sinBoletos: 'Aún no tienes boletos.',
     buscarViaje: 'Buscar un viaje',
-    loginHint: 'Inicia sesión para guardar este boleto en tu cuenta.',
+    loginHint: 'Inicia sesión para comprar tu boleto.',
+    limiteAsientos: 'Puedes reservar hasta 6 asientos por viaje.',
     estados: { reservado: 'Reservado', pagado: 'Pagado', usado: 'Usado', cancelado: 'Cancelado', expirado: 'Expirado' },
   },
   en: {
@@ -223,7 +224,8 @@ const dict = {
     errorCodigo: 'Wrong or expired code.',
     sinBoletos: "You don't have any tickets yet.",
     buscarViaje: 'Find a trip',
-    loginHint: 'Sign in to save this ticket to your account.',
+    loginHint: 'Sign in to buy your ticket.',
+    limiteAsientos: 'You can book up to 6 seats per trip.',
     estados: { reservado: 'Reserved', pagado: 'Paid', usado: 'Used', cancelado: 'Cancelled', expirado: 'Expired' },
   },
 } satisfies Record<Lang, Record<string, unknown>>
