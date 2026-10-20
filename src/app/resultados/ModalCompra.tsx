@@ -53,6 +53,7 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
   }
 
   function irAPago() {
+    if (!logueado) return alert(t.loginHint) // the database refuses guest bookings
     if (!nombre.trim() || !identidad.trim()) return alert(t.alertDatos)
     setPaso(3)
   }
@@ -70,6 +71,10 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
         alert(t.asientoOcupado)
         setAsiento(null)
         setPaso(1)
+      } else if (e instanceof Error && e.message.includes('LIMITE_ASIENTOS')) {
+        alert(t.limiteAsientos)
+      } else if (e instanceof Error && e.message.includes('LOGIN_REQUERIDO')) {
+        alert(t.loginHint)
       } else {
         alert(t.errorCompra)
       }

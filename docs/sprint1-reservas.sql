@@ -23,6 +23,17 @@ declare
   v_precio numeric(8,2);
   v_boleto uuid;
 begin
+  -- Only signed-in users can book, and at most 6 seats per trip each,
+  -- so nobody can block a whole bus with a script.
+  if auth.uid() is null then
+    raise exception 'LOGIN_REQUERIDO';
+  end if;
+  if (select count(*) from boletos
+      where usuario_id = auth.uid() and viaje_id = p_viaje_id
+        and estado in ('reservado', 'pagado')) >= 6 then
+    raise exception 'LIMITE_ASIENTOS';
+  end if;
+
   if coalesce(trim(p_nombre_pasajero), '') = '' or coalesce(trim(p_identidad_pas), '') = '' then
     raise exception 'DATOS_INCOMPLETOS';
   end if;
@@ -54,7 +65,7 @@ begin
     nombre_pasajero, identidad_pas, es_menor,
     tutor_nombre, tutor_identidad, precio_final, estado
   ) values (
-    auth.uid(),            -- null until login exists (Sprint 2)
+    auth.uid(),            -- always set: guests are refused above
     p_viaje_id, p_asiento_id, p_codigo_qr,
     trim(p_nombre_pasajero), trim(p_identidad_pas), p_es_menor,
     p_tutor_nombre, p_tutor_identidad, v_precio, 'reservado'
