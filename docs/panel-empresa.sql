@@ -74,6 +74,45 @@ $$;
 revoke execute on function marcar_boleto_pagado(uuid) from public, anon;
 grant execute on function marcar_boleto_pagado(uuid) to authenticated;
 
+-- 7) Boarding check: staff scan a ticket's QR code. A paid ticket of their own
+--    company becomes "usado" (used) and the passenger details come back.
+--    Other companies' codes look the same as unknown codes (no data leak).
+create or replace function validar_boleto(p_codigo text) returns json
+language plpgsql security definer set search_path = public as $$
+declare
+  v_boleto boletos%rowtype;
+begin
+  select b.* into v_boleto
+  from boletos b join viajes v on v.id = b.viaje_id join rutas r on r.id = v.ruta_id
+  where b.codigo_qr = trim(p_codigo) and r.empresa_id = mi_empresa()
+  for update of b;
+
+  if not found then raise exception 'NO_ENCONTRADO'; end if;
+  if v_boleto.estado = 'usado' then raise exception 'YA_USADO'; end if;
+  if v_boleto.estado = 'reservado' then raise exception 'NO_PAGADO'; end if;
+  if v_boleto.estado <> 'pagado' then raise exception 'NO_VALIDO'; end if;
+
+  update boletos set estado = 'usado' where id = v_boleto.id;
+
+  return (
+    select json_build_object(
+      'nombre', v_boleto.nombre_pasajero,
+      'asiento', a.numero,
+      'salida', v.salida,
+      'origen', o.codigo,
+      'destino', d.codigo)
+    from viajes v
+    join rutas r on r.id = v.ruta_id
+    join terminales o on o.id = r.origen_id
+    join terminales d on d.id = r.destino_id
+    join asientos a on a.id = v_boleto.asiento_id
+    where v.id = v_boleto.viaje_id
+  );
+end;
+$$;
+revoke execute on function validar_boleto(text) from public, anon;
+grant execute on function validar_boleto(text) to authenticated;
+
 -- ── GIVE A LOGIN ACCESS ──────────────────────────────────────
 -- First create the login: Authentication → Users → Add user → Create new user
 -- (email + password, tick "Auto Confirm User"). Then run, with that email:

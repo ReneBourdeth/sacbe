@@ -161,6 +161,15 @@ export async function getViajesEmpresa(empresaId: string, fecha: string) {
   return data
 }
 
+export type BoletoValidado = { nombre: string; asiento: string; salida: string; origen: string; destino: string }
+
+/** Boarding check: marks a paid ticket of the staff's company as used. Errors: NO_ENCONTRADO, YA_USADO, NO_PAGADO, NO_VALIDO. */
+export async function validarBoleto(codigo: string): Promise<BoletoValidado> {
+  const { data, error } = await createClient().rpc('validar_boleto', { p_codigo: codigo.trim() })
+  if (error) throw new Error(error.message)
+  return data as BoletoValidado
+}
+
 /** Staff confirm a cash payment. The database refuses other companies' tickets. */
 export async function marcarPagado(boletoId: string) {
   const { error } = await createClient().rpc('marcar_boleto_pagado', { p_boleto_id: boletoId })
