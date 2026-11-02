@@ -50,19 +50,21 @@ Sprint 1 is tagged `v0.1-sprint-1`.
 - [x] QR generation
 
 ### Sprint 2 — Auth & Payments (Week 4–6)
-- [x] Supabase Auth with email OTP (phone/WhatsApp later — paid)
+- [x] Supabase Auth with email sign-in link (phone/WhatsApp sign-in would need a paid SMS service)
 - [x] User registration / login
 - [ ] Stripe card payments
-- [ ] PagoExpress cash flow
+- [x] PagoExpress cash flow (payment code; staff confirm in the panel)
 - [x] My tickets page
-- [ ] WhatsApp notifications (Twilio)
+- [ ] WhatsApp notifications — free "share via WhatsApp" button done; automatic messages need a paid service
 
 ### Sprint 3 — Company Dashboard (Week 7–9)
-- [ ] Company admin panel
+- [x] Company admin panel (`/panel`: password login, trips per day, passenger list, mark cash payments)
 - [ ] Route & schedule management
-- [ ] QR validation scanner
+- [x] QR validation scanner (camera or typed code; marks tickets as used)
 - [ ] Revenue reports
 - [ ] Cancellations & refunds
+
+**Also done:** Spanish/English switch, phone and tablet layout, black high-contrast theme, sign-in required to book (max 6 seats per trip).
 
 ### Sprint 4 — Scale (Week 10–12)
 - [ ] PWA (installable app)
