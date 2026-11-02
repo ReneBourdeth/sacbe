@@ -78,3 +78,27 @@ $$;
 
 revoke all on function reservar_asiento(uuid, uuid, text, text, text, boolean, text, text) from public;
 grant execute on function reservar_asiento(uuid, uuid, text, text, text, boolean, text, text) to authenticated;  -- guests can't book
+
+-- ── SEVERAL SEATS IN ONE PURCHASE ────────────────────────────
+-- Book several seats on one trip in one go (max 6). Runs as a single statement,
+-- so it is all-or-nothing: if any seat is already taken, nothing is booked.
+-- p_reservas: [{"asiento_id": uuid, "codigo_qr": text, "nombre": text, "identidad": text, "es_menor": bool}, ...]
+create or replace function reservar_varios(p_viaje_id uuid, p_reservas jsonb)
+returns setof uuid
+language plpgsql security definer set search_path = public as $$
+declare
+  r jsonb;
+begin
+  if jsonb_typeof(p_reservas) <> 'array' or jsonb_array_length(p_reservas) not between 1 and 6 then
+    raise exception 'LIMITE_ASIENTOS';
+  end if;
+  for r in select * from jsonb_array_elements(p_reservas) loop
+    -- reservar_asiento does all the checks (sign-in, 6-per-trip limit, free seat, price)
+    return next reservar_asiento(
+      p_viaje_id, (r->>'asiento_id')::uuid, r->>'codigo_qr',
+      r->>'nombre', r->>'identidad', coalesce((r->>'es_menor')::boolean, false));
+  end loop;
+end;
+$$;
+revoke execute on function reservar_varios(uuid, jsonb) from public, anon;
+grant execute on function reservar_varios(uuid, jsonb) to authenticated;

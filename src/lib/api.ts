@@ -66,38 +66,32 @@ export function escucharAsientos(viajeId: string, onChange: (asientos: Asiento[]
 }
 
 export type DatosPasajero = {
+  asientoId: string
   nombre: string
   identidad: string
   esMenor: boolean
-  tutorNombre?: string
-  tutorIdentidad?: string
 }
 
 /**
- * Books a seat. The database function does it all in one transaction:
- * claims the seat only if still free, creates the ticket and lowers the
- * seat count (see docs/sprint1-reservas.sql). Price and user are taken
+ * Books one or more seats (max 6) on a trip, all-or-nothing: the database
+ * function reservar_varios books every seat in one transaction, checking that
+ * each seat is still free (see docs/sprint1-reservas.sql). Price and user come
  * from the database/session, never from the browser.
  *
- * Throws an Error whose message contains ASIENTO_OCUPADO if someone else
- * took the seat first.
+ * Throws an Error whose message contains ASIENTO_OCUPADO if any seat was taken
+ * first, LIMITE_ASIENTOS over 6 per trip, LOGIN_REQUERIDO for guests.
  */
-export async function reservarAsiento(viajeId: string, asientoId: string, pasajero: DatosPasajero) {
-  const codigoQr = generarCodigoBoleto()
-
-  const { data, error } = await createClient().rpc('reservar_asiento', {
-    p_viaje_id:        viajeId,
-    p_asiento_id:      asientoId,
-    p_codigo_qr:       codigoQr,
-    p_nombre_pasajero: pasajero.nombre,
-    p_identidad_pas:   pasajero.identidad,
-    p_es_menor:        pasajero.esMenor,
-    p_tutor_nombre:    pasajero.tutorNombre || null,
-    p_tutor_identidad: pasajero.tutorIdentidad || null,
+export async function reservarAsientos(viajeId: string, pasajeros: DatosPasajero[]) {
+  const reservas = pasajeros.map(p => ({ ...p, codigoQr: generarCodigoBoleto() }))
+  const { error } = await createClient().rpc('reservar_varios', {
+    p_viaje_id: viajeId,
+    p_reservas: reservas.map(r => ({
+      asiento_id: r.asientoId, codigo_qr: r.codigoQr,
+      nombre: r.nombre.trim(), identidad: r.identidad.trim(), es_menor: r.esMenor,
+    })),
   })
-
   if (error) throw new Error(error.message)
-  return { boletoId: data as string, codigoQr }
+  return reservas
 }
 
 /** Tickets of the logged-in user, newest first (RLS only returns their own). */
@@ -150,7 +144,7 @@ export async function getViajesEmpresa(empresaId: string, fecha: string) {
         origen:terminales!rutas_origen_id_fkey ( codigo ),
         destino:terminales!rutas_destino_id_fkey ( codigo )
       ),
-      boletos ( id, nombre_pasajero, identidad_pas, estado, codigo_qr, precio_final, asientos ( numero ) )
+      boletos ( id, nombre_pasajero, identidad_pas, estado, codigo_qr, precio_final, reembolso, reembolsado_at, asientos ( numero ) )
     `)
     .eq('rutas.empresa_id', empresaId)
     .gte('salida', desde)
@@ -234,6 +228,19 @@ export async function getIngresos(desde: string, hasta: string): Promise<FilaIng
   if (error) throw new Error(error.message)
   // numeric columns arrive as strings
   return (data ?? []).map((f: FilaIngresos) => ({ ...f, ingresos: Number(f.ingresos), monto_pendiente: Number(f.monto_pendiente) }))
+}
+
+/** Passenger cancels their own ticket before departure. Returns the refund owed (0 if it wasn't paid). */
+export async function cancelarBoleto(boletoId: string): Promise<number> {
+  const { data, error } = await createClient().rpc('cancelar_boleto', { p_boleto_id: boletoId })
+  if (error) throw new Error(error.message)
+  return Number(data)
+}
+
+/** Staff confirm they paid a cancelled ticket's refund back (own company only). */
+export async function marcarReembolsado(boletoId: string) {
+  const { error } = await createClient().rpc('marcar_reembolsado', { p_boleto_id: boletoId })
+  if (error) throw new Error(error.message)
 }
 
 /** Staff confirm a cash payment. The database refuses other companies' tickets. */

@@ -82,6 +82,9 @@ export const S: Record<string, React.CSSProperties> = {
   sideHoras: { fontSize: '.95rem', color: 'var(--tenue)', marginBottom: 12 },
 
   // Booking window: cash info + confirmation step
+  pasajeroCaja: { border: '1px solid var(--borde2)', borderRadius: 8, padding: '.75rem 1rem 1rem', marginBottom: '.75rem' },
+  pasajeroTitulo: { padding: '0 .4rem', fontWeight: 700 },
+  boletoListo: { display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--hundido)', border: '1px solid var(--borde2)', borderRadius: 10, padding: '.75rem', marginBottom: '.75rem' },
   infoEfectivo: { ...panel, padding: '1rem', color: 'var(--tenue)', marginTop: '.875rem' },
   confIcono: { display: 'flex', justifyContent: 'center', marginBottom: '.75rem' },
   confTitulo: { fontFamily: 'var(--font-display)', fontSize: '1.9rem', fontWeight: 800, marginBottom: '.25rem' },
