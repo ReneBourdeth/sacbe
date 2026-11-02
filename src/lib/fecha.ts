@@ -13,6 +13,21 @@ export function hoyHonduras() {
   return new Intl.DateTimeFormat('en-CA', { timeZone: ZONA_HONDURAS }).format(new Date())
 }
 
+/** A Honduras date (YYYY-MM-DD) + time (HH:MM) as an exact timestamp for the database. */
+export function instanteHonduras(fecha: string, hora: string) {
+  return `${fecha}T${hora}:00${OFFSET_HONDURAS}`
+}
+
+/** "20:11": 24-hour time in Honduras, the format <input type="time"> uses. */
+export function hora24Honduras(iso: string) {
+  return new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: ZONA_HONDURAS }).format(new Date(iso))
+}
+
+/** "2026-11-02": the Honduras calendar day of a timestamp. */
+export function diaHonduras(iso: string) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: ZONA_HONDURAS }).format(new Date(iso))
+}
+
 /** "08:11 p. m." / "08:11 PM" */
 export function formatoHora(iso: string, locale: string) {
   return new Date(iso).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: ZONA_HONDURAS })

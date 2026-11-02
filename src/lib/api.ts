@@ -3,7 +3,7 @@
 // (docs/schema.sql) decides what it may read, and anything that changes data
 // goes through database functions like reservar_asiento.
 
-import { createClient, type Asiento, type Viaje } from './supabase'
+import { createClient, type Asiento, type Clase, type Viaje } from './supabase'
 import { OFFSET_HONDURAS } from './fecha'
 
 /**
@@ -144,9 +144,9 @@ export async function getViajesEmpresa(empresaId: string, fecha: string) {
   const { data, error } = await createClient()
     .from('viajes')
     .select(`
-      id, salida, clase, capacidad, asientos_disp, estado,
+      id, salida, clase, precio, capacidad, asientos_disp, estado,
       rutas!inner (
-        empresa_id,
+        empresa_id, duracion_min,
         origen:terminales!rutas_origen_id_fkey ( codigo ),
         destino:terminales!rutas_destino_id_fkey ( codigo )
       ),
@@ -168,6 +168,58 @@ export async function validarBoleto(codigo: string): Promise<BoletoValidado> {
   const { data, error } = await createClient().rpc('validar_boleto', { p_codigo: codigo.trim() })
   if (error) throw new Error(error.message)
   return data as BoletoValidado
+}
+
+export type RutaEmpresa = {
+  id: string
+  duracion_min: number
+  precio_base: number
+  origen: { codigo: string } | null
+  destino: { codigo: string } | null
+}
+
+/** All routes of a company (RLS: staff only see their own). */
+export async function getRutasEmpresa(empresaId: string): Promise<RutaEmpresa[]> {
+  const { data, error } = await createClient()
+    .from('rutas')
+    .select('id, duracion_min, precio_base, origen:terminales!rutas_origen_id_fkey ( codigo ), destino:terminales!rutas_destino_id_fkey ( codigo )')
+    .eq('empresa_id', empresaId)
+  if (error) throw new Error(error.message)
+  return (data ?? []) as unknown as RutaEmpresa[]
+}
+
+/** New route for the staff member's company. The database refuses other companies. */
+export async function crearRuta(empresaId: string, origen: string, destino: string, duracionMin: number, precioBase: number) {
+  const supabase = createClient()
+  const { data: terminales, error: e1 } = await supabase.from('terminales').select('id, codigo').in('codigo', [origen, destino])
+  if (e1) throw new Error(e1.message)
+  const id = (codigo: string) => terminales?.find(t => t.codigo === codigo)?.id
+  const { error } = await supabase.from('rutas').insert({
+    empresa_id: empresaId, origen_id: id(origen), destino_id: id(destino), duracion_min: duracionMin, precio_base: precioBase,
+  })
+  if (error) throw new Error(error.message)
+}
+
+/** New trip on one of the company's routes. Seats are created by a database trigger. */
+export async function crearViaje(rutaId: string, salida: string, duracionMin: number, clase: Clase, precio: number) {
+  const { error } = await createClient().from('viajes').insert({
+    ruta_id: rutaId, salida, llegada_est: llegada(salida, duracionMin), clase, precio,
+  })
+  if (error) throw new Error(error.message)
+}
+
+/** Change a trip's departure time and price; arrival moves with it. */
+export async function editarViaje(viajeId: string, salida: string, duracionMin: number, precio: number) {
+  const { data, error } = await createClient().from('viajes')
+    .update({ salida, llegada_est: llegada(salida, duracionMin), precio })
+    .eq('id', viajeId)
+    .select('id')
+  if (error) throw new Error(error.message)
+  if (!data?.length) throw new Error('NO_PERMITIDO') // RLS hid the row: not this company's trip
+}
+
+function llegada(salida: string, duracionMin: number) {
+  return new Date(new Date(salida).getTime() + duracionMin * 60_000).toISOString()
 }
 
 /** Staff confirm a cash payment. The database refuses other companies' tickets. */

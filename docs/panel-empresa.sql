@@ -113,6 +113,35 @@ $$;
 revoke execute on function validar_boleto(text) from public, anon;
 grant execute on function validar_boleto(text) to authenticated;
 
+-- 8) Staff manage their own company's routes and trips from /panel.
+--    The WITH CHECK rules stop them from writing rows for another company.
+drop policy if exists "staff lee sus rutas" on rutas;
+create policy "staff lee sus rutas" on rutas for select using (empresa_id = (select mi_empresa()));
+drop policy if exists "staff crea rutas" on rutas;
+create policy "staff crea rutas" on rutas for insert
+  with check (empresa_id = (select mi_empresa()) and origen_id <> destino_id and duracion_min > 0 and precio_base > 0);
+drop policy if exists "staff edita rutas" on rutas;
+create policy "staff edita rutas" on rutas for update
+  using (empresa_id = (select mi_empresa()))
+  with check (empresa_id = (select mi_empresa()) and duracion_min > 0 and precio_base > 0);
+
+drop policy if exists "staff crea viajes" on viajes;
+create policy "staff crea viajes" on viajes for insert with check (
+  exists (select 1 from rutas r where r.id = viajes.ruta_id and r.empresa_id = (select mi_empresa()))
+  and salida > now() and llegada_est > salida and precio > 0
+);
+drop policy if exists "staff edita viajes" on viajes;
+create policy "staff edita viajes" on viajes for update
+  using (exists (select 1 from rutas r where r.id = viajes.ruta_id and r.empresa_id = (select mi_empresa())))
+  with check (
+    exists (select 1 from rutas r where r.id = viajes.ruta_id and r.empresa_id = (select mi_empresa()))
+    and llegada_est > salida and precio > 0
+  );
+
+-- New trips get their seats from this trigger; it must be allowed to write seats
+-- even when a staff member (not the owner) inserts the trip.
+alter function crear_asientos_viaje() security definer;
+
 -- ── GIVE A LOGIN ACCESS ──────────────────────────────────────
 -- First create the login: Authentication → Users → Add user → Create new user
 -- (email + password, tick "Auto Confirm User"). Then run, with that email:
