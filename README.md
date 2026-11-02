@@ -59,7 +59,7 @@ Sprint 1 is tagged `v0.1-sprint-1`.
 
 ### Sprint 3 — Company Dashboard (Week 7–9)
 - [x] Company admin panel (`/panel`: password login, trips per day, passenger list, mark cash payments)
-- [ ] Route & schedule management
+- [x] Route & schedule management (add routes and trips, change a trip's time or price)
 - [x] QR validation scanner (camera or typed code; marks tickets as used)
 - [ ] Revenue reports
 - [ ] Cancellations & refunds
