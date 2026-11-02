@@ -111,16 +111,25 @@ git push origin sprint-1
 #    Password: (save this, it's your DB password)
 #    Region: US East (closest to Honduras)
 
-# 2. Once created, go to SQL Editor
-#    Paste the contents of /docs/schema.sql and run it
+# 2. Once created, go to SQL Editor and run these files IN THIS ORDER
+#    (paste each one, Run, wait for "Success"):
+#      1. docs/schema.sql            tables and basic security rules
+#      2. docs/sprint1-reservas.sql  safe booking (one or several seats)
+#      3. docs/asientos-trigger.sql  seats are created for every new trip
+#      4. docs/panel-empresa.sql     bus company panel and its rules
+#      5. docs/cancelaciones.sql     cancellations and refunds
+#      6. docs/viajes-demo.sql       demo trips for the next 30 days (optional)
+#    Then run docs/pruebas.sql: every row must say ok = true.
+#    Run docs/pruebas.sql again after ANY database change.
 
-# 3. Go to Project Settings → API
-#    Copy: Project URL  → NEXT_PUBLIC_SUPABASE_URL
-#    Copy: anon key     → NEXT_PUBLIC_SUPABASE_ANON_KEY
-#    Copy: service_role → SUPABASE_SERVICE_ROLE_KEY
+# 3. Go to Project Settings → API Keys
+#    Copy: Project URL     → NEXT_PUBLIC_SUPABASE_URL
+#    Copy: publishable key → NEXT_PUBLIC_SUPABASE_ANON_KEY
+#    Never copy the secret / service_role key into the app or the repo.
 
-# 4. Go to Authentication → Providers → Phone
-#    Enable it, paste your Twilio credentials
+# 4. Go to Authentication → URL Configuration
+#    Site URL: your Vercel address; Redirect URLs: <that address>/** and http://localhost:3000/**
+#    (sign-in uses an email link, no SMS service needed)
 ```
 
 ### Step 3 — Vercel
