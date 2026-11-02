@@ -6,6 +6,7 @@
 create or replace function crear_asientos_viaje()
 returns trigger
 language plpgsql
+set search_path = public
 as $$
 declare
   f int;

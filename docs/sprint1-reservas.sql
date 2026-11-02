@@ -77,4 +77,4 @@ end;
 $$;
 
 revoke all on function reservar_asiento(uuid, uuid, text, text, text, boolean, text, text) from public;
-grant execute on function reservar_asiento(uuid, uuid, text, text, text, boolean, text, text) to anon, authenticated;
+grant execute on function reservar_asiento(uuid, uuid, text, text, text, boolean, text, text) to authenticated;  -- guests can't book
