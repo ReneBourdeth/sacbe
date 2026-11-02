@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useLang } from '@/lib/i18n'
-import { reservarAsiento } from '@/lib/api'
+import { reservarAsientos } from '@/lib/api'
 import { createClient, type Asiento, type Viaje } from '@/lib/supabase'
 import { formatoFechaHora, formatoHora } from '@/lib/fecha'
 import { CARGO_SERVICIO, totalConCargo } from '@/lib/precios'
@@ -13,9 +13,15 @@ import MapaAsientos from './MapaAsientos'
 import { MarcaGuacamaya } from '@/components/Simbolos'
 import { S } from './estilos'
 
-// 1 seat → 2 passenger → 3 payment → 4 confirmation
+// 1 seats → 2 passengers → 3 payment → 4 confirmation
 type Paso = 1 | 2 | 3 | 4
 type MetodoPago = 'tarjeta' | 'efectivo'
+type Pasajero = { nombre: string; identidad: string; esMenor: boolean }
+type BoletoListo = { numero: string; nombre: string; codigo: string; qr: string }
+
+// Same limit the database enforces per person and trip
+const MAX_ASIENTOS = 6
+const VACIO: Pasajero = { nombre: '', identidad: '', esMenor: false }
 
 type Props = {
   viaje: Viaje
@@ -23,57 +29,71 @@ type Props = {
 }
 
 /**
- * Booking window for one trip. It owns all booking state, so closing it
- * (which unmounts it) automatically resets everything for the next time.
+ * Booking window for one trip: up to 6 seats in one purchase, one passenger per seat.
+ * It owns all booking state, so closing it (which unmounts it) resets everything.
  */
 export default function ModalCompra({ viaje, onCerrar }: Props) {
   const { t, locale } = useLang()
   const { asientos, cargado } = useAsientos(viaje.id)
 
   const [paso, setPaso] = useState<Paso>(1)
-  const [asiento, setAsiento] = useState<Asiento | null>(null)
-  const [nombre, setNombre] = useState('')
-  const [identidad, setIdentidad] = useState('')
-  const [esMenor, setEsMenor] = useState(false)
+  const [elegidos, setElegidos] = useState<Asiento[]>([])
+  const [pasajeros, setPasajeros] = useState<Record<string, Pasajero>>({}) // by seat id
   const [metodo, setMetodo] = useState<MetodoPago>('tarjeta')
   const [enviando, setEnviando] = useState(false)
   const [logueado, setLogueado] = useState(true) // assume yes until checked, to avoid a flash
-  const [boleto, setBoleto] = useState<{ codigo: string; qr: string } | null>(null)
+  const [boletos, setBoletos] = useState<BoletoListo[]>([])
 
-  // Logged-out users get a hint to sign in, so the ticket is saved to their account
+  // Logged-out users get a hint to sign in; the database refuses guest bookings
   useEffect(() => {
     createClient().auth.getSession().then(({ data }) => setLogueado(!!data.session))
   }, [])
 
   const ruta = `${nombreTerminal(viaje.origen_codigo)} → ${nombreTerminal(viaje.destino_codigo)}`
+  const total = elegidos.length * totalConCargo(viaje.precio)
+  const pasajeroDe = (a: Asiento) => pasajeros[a.id] ?? VACIO
+  const cambiar = (a: Asiento, cambio: Partial<Pasajero>) =>
+    setPasajeros(p => ({ ...p, [a.id]: { ...pasajeroDe(a), ...cambio } }))
 
-  function irAPasajero() {
-    if (!asiento) return alert(t.alertAsiento)
+  // Click a seat to add it, click again to remove it; seats stay front-to-back ordered
+  function alternar(a: Asiento) {
+    if (elegidos.some(x => x.id === a.id)) return setElegidos(e => e.filter(x => x.id !== a.id))
+    if (elegidos.length >= MAX_ASIENTOS) return alert(t.limiteAsientos)
+    setElegidos(e => asientos.filter(x => x.id === a.id || e.some(y => y.id === x.id)))
+  }
+
+  function irAPasajeros() {
+    if (elegidos.length === 0) return alert(t.alertAsiento)
     setPaso(2)
   }
 
   function irAPago() {
-    if (!logueado) return alert(t.loginHint) // the database refuses guest bookings
-    if (!nombre.trim() || !identidad.trim()) return alert(t.alertDatos)
+    if (!logueado) return alert(t.loginHint)
+    if (elegidos.some(a => !pasajeroDe(a).nombre.trim() || !pasajeroDe(a).identidad.trim())) return alert(t.alertDatos)
     setPaso(3)
   }
 
   async function confirmarCompra() {
-    if (!asiento) return
     setEnviando(true)
     try {
-      const { codigoQr } = await reservarAsiento(viaje.id, asiento.id, { nombre, identidad, esMenor })
-      setBoleto({ codigo: codigoQr, qr: await qrComoImagen(codigoQr) })
+      const reservas = await reservarAsientos(viaje.id, elegidos.map(a => ({ asientoId: a.id, ...pasajeroDe(a) })))
+      setBoletos(await Promise.all(reservas.map(async r => ({
+        numero: elegidos.find(a => a.id === r.asientoId)?.numero ?? '',
+        nombre: r.nombre,
+        codigo: r.codigoQr,
+        qr: await qrComoImagen(r.codigoQr, 150),
+      }))))
       setPaso(4)
     } catch (e) {
-      // Someone else booked the seat while this user was filling in the form
-      if (e instanceof Error && e.message.includes('ASIENTO_OCUPADO')) {
+      const msg = e instanceof Error ? e.message : ''
+      if (msg.includes('ASIENTO_OCUPADO')) {
+        // Someone took one of the seats meanwhile; nothing was booked, pick again
         alert(t.asientoOcupado)
-        setAsiento(null)
+        setElegidos([])
         setPaso(1)
-      } else if (e instanceof Error && e.message.includes('LIMITE_ASIENTOS')) {
+      } else if (msg.includes('LIMITE_ASIENTOS')) {
         alert(t.limiteAsientos)
-      } else if (e instanceof Error && e.message.includes('LOGIN_REQUERIDO')) {
+      } else if (msg.includes('LOGIN_REQUERIDO')) {
         alert(t.loginHint)
       } else {
         alert(t.errorCompra)
@@ -84,8 +104,8 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
   }
 
   function compartirWhatsApp() {
-    if (!boleto || !asiento) return
-    const texto = `${t.whatsappMsg}\n${ruta}\n${t.asiento}: ${asiento.numero}\n${t.codigo}: ${boleto.codigo}`
+    const lineas = boletos.map(b => `${t.asiento} ${b.numero} · ${b.nombre} · ${t.codigo}: ${b.codigo}`)
+    const texto = `${t.whatsappMsg}\n${ruta}\n${formatoFechaHora(viaje.salida, locale)}\n${lineas.join('\n')}`
     window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank')
   }
 
@@ -100,49 +120,51 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
           {[1, 2, 3, 4].map(n => <div key={n} style={{ ...S.stepDot, ...(n <= paso ? S.stepDotOn : {}) }} />)}
         </div>
 
-        {/* ── STEP 1: SEAT ── */}
+        {/* ── STEP 1: SEATS ── */}
         {paso === 1 && (
           <div>
             <div style={S.mEyebrow}>{t.paso(1)}</div>
             <div style={S.mTitle}>{t.seleccionaAsiento}</div>
-            <div style={S.mSub}>{viaje.empresa} · {formatoHora(viaje.salida, locale)}</div>
-            <MapaAsientos asientos={asientos} cargado={cargado} seleccionado={asiento} onSeleccionar={setAsiento} />
-            <div style={{ textAlign: 'right', marginTop: '1rem' }}>
-              <button className="sb-btn" style={S.btnPagar} onClick={irAPasajero}>{t.continuar}</button>
+            <div style={S.mSub}>
+              {viaje.empresa} · {formatoHora(viaje.salida, locale)} · {t.hastaAsientos(MAX_ASIENTOS)}
+            </div>
+            <MapaAsientos asientos={asientos} cargado={cargado} seleccionados={elegidos} onSeleccionar={alternar} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', marginTop: '1rem' }}>
+              <span style={{ color: 'var(--tenue)' }}>{elegidos.map(a => a.numero).join(', ')}</span>
+              <button className="sb-btn" style={S.btnPagar} onClick={irAPasajeros}>{t.continuar}</button>
             </div>
           </div>
         )}
 
-        {/* ── STEP 2: PASSENGER ── */}
+        {/* ── STEP 2: ONE PASSENGER PER SEAT ── */}
         {paso === 2 && (
           <div>
             <div style={S.mEyebrow}>{t.paso(2)}</div>
             <div style={S.mTitle}>{t.datosPasajero}</div>
-            <div style={S.mSub}>{t.asiento}: <strong>{asiento?.numero}</strong></div>
             {!logueado && (
               <a href={`/entrar?next=${encodeURIComponent(location.pathname + location.search)}`} style={S.loginHint}>
                 {t.loginHint}
               </a>
             )}
-            <label style={S.checkRow}>
-              <input type="checkbox" checked={esMenor} onChange={e => setEsMenor(e.target.checked)} style={{ accentColor: 'var(--guacamaya)', width: 18, height: 18 }} />
-              <span>{t.esMenor}</span>
-            </label>
-            <div className="sb-form2">
-              <div style={{ ...S.ff, gridColumn: '1/-1' }}>
-                <label style={S.ffLabel}>{t.nombreCompleto}</label>
-                <input style={S.ffInput} value={nombre} onChange={e => setNombre(e.target.value)} placeholder="María García López" autoComplete="name" />
-              </div>
-              <div style={S.ff}>
-                <label style={S.ffLabel}>{t.identidad}</label>
-                <input style={S.ffInput} value={identidad} onChange={e => setIdentidad(e.target.value)} placeholder="0801-1990-00000" />
-              </div>
-              <div style={S.ff}>
-                {/* TODO (Sprint 2): save the phone number to send ticket reminders */}
-                <label style={S.ffLabel}>{t.telefono}</label>
-                <input style={S.ffInput} type="tel" placeholder="9999-9999" autoComplete="tel" />
-              </div>
-            </div>
+            {elegidos.map(a => (
+              <fieldset key={a.id} style={S.pasajeroCaja}>
+                <legend style={S.pasajeroTitulo}>{t.asiento} {a.numero}</legend>
+                <div className="sb-form2">
+                  <div style={S.ff}>
+                    <label style={S.ffLabel}>{t.nombreCompleto}</label>
+                    <input style={S.ffInput} value={pasajeroDe(a).nombre} onChange={e => cambiar(a, { nombre: e.target.value })} placeholder="María García López" />
+                  </div>
+                  <div style={S.ff}>
+                    <label style={S.ffLabel}>{t.identidad}</label>
+                    <input style={S.ffInput} value={pasajeroDe(a).identidad} onChange={e => cambiar(a, { identidad: e.target.value })} placeholder="0801-1990-00000" />
+                  </div>
+                </div>
+                <label style={{ ...S.checkRow, marginBottom: 0, marginTop: '.5rem' }}>
+                  <input type="checkbox" checked={pasajeroDe(a).esMenor} onChange={e => cambiar(a, { esMenor: e.target.checked })} style={{ accentColor: 'var(--guacamaya)', width: 18, height: 18 }} />
+                  <span>{t.esMenor}</span>
+                </label>
+              </fieldset>
+            ))}
             <div style={{ display: 'flex', gap: '.5rem', marginTop: '1rem' }}>
               <button style={S.btnBack} onClick={() => setPaso(1)}>{t.atras}</button>
               <button className="sb-btn" style={{ ...S.btnPagar, flex: 1 }} onClick={irAPago}>{t.continuar}</button>
@@ -185,9 +207,9 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
             )}
 
             <div style={S.resumenBox}>
-              <div style={S.resLine}><span>{t.boletoAsiento(asiento?.numero ?? '')}</span><strong>L. {viaje.precio}</strong></div>
-              <div style={S.resLine}><span>{t.cargoPorServicio}</span><strong>L. {CARGO_SERVICIO}</strong></div>
-              <div style={S.resTotal}><span>{t.total}</span><span>L. {totalConCargo(viaje.precio)}</span></div>
+              <div style={S.resLine}><span>{t.boletosPor(elegidos.length, viaje.precio)}</span><strong>L. {elegidos.length * viaje.precio}</strong></div>
+              <div style={S.resLine}><span>{t.cargoPorServicio} × {elegidos.length}</span><strong>L. {elegidos.length * CARGO_SERVICIO}</strong></div>
+              <div style={S.resTotal}><span>{t.total}</span><span>L. {total}</span></div>
             </div>
             <div style={{ display: 'flex', gap: '.5rem' }}>
               <button style={S.btnBack} onClick={() => setPaso(2)}>{t.atras}</button>
@@ -198,32 +220,29 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
           </div>
         )}
 
-        {/* ── STEP 4: CONFIRMATION ── */}
-        {paso === 4 && boleto && (
+        {/* ── STEP 4: CONFIRMATION, one QR per ticket ── */}
+        {paso === 4 && boletos.length > 0 && (
           <div style={{ textAlign: 'center' }}>
             <div style={S.confIcono}><MarcaGuacamaya size={56} /></div>
-            {/* Cash: the ticket stays "reservado" until the bus company confirms payment in /panel */}
+            {/* Cash: tickets stay "reservado" until the bus company confirms payment in /panel */}
             <div style={S.confTitulo}>{metodo === 'efectivo' ? t.reservaPendiente : t.boletoConfirmado}</div>
-            <p style={S.confSub}>{metodo === 'efectivo' ? t.pagaEnPagoExpress(totalConCargo(viaje.precio)) : t.caminoBlanco}</p>
-            <div style={{ background: 'white', padding: 12, display: 'inline-block', marginBottom: '1rem', border: '1px solid var(--borde)', borderRadius: 8 }}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- local data: URL, nothing to optimize */}
-              <img src={boleto.qr} alt="QR" style={{ display: 'block', width: 180, height: 180 }} />
-            </div>
-            <div style={S.confDatos}>
-              {[
-                [t.empresa, viaje.empresa],
-                [t.ruta, ruta],
-                [t.salida, formatoFechaHora(viaje.salida, locale)],
-                [t.asiento, asiento?.numero],
-                [t.pasajero, nombre],
-                [t.codigo, boleto.codigo],
-              ].map(([etiqueta, valor]) => (
-                <div key={etiqueta} style={S.confFila}>
-                  <span style={{ color: 'var(--tenue)' }}>{etiqueta}</span>
-                  <span style={etiqueta === t.asiento ? { fontWeight: 700 } : {}}>{valor}</span>
+            <p style={S.confSub}>{metodo === 'efectivo' ? t.pagaEnPagoExpress(total) : t.caminoBlanco}</p>
+            <p style={{ ...S.confSub, marginTop: '-.75rem' }}>{viaje.empresa} · {ruta} · {formatoFechaHora(viaje.salida, locale)}</p>
+
+            {boletos.map(b => (
+              <div key={b.codigo} style={S.boletoListo}>
+                <div style={{ background: 'white', padding: 8, borderRadius: 8 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- local data: URL, nothing to optimize */}
+                  <img src={b.qr} alt={`QR ${t.asiento} ${b.numero}`} style={{ display: 'block', width: 120, height: 120 }} />
                 </div>
-              ))}
-            </div>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{t.asiento} {b.numero}</div>
+                  <div>{b.nombre}</div>
+                  <div style={{ fontFamily: 'monospace', color: 'var(--tenue)' }}>{b.codigo}</div>
+                </div>
+              </div>
+            ))}
+
             <button style={{ ...S.btnPagar, marginBottom: '.5rem', background: '#25D366', color: '#000000' }} onClick={compartirWhatsApp}>
               {t.whatsapp}
             </button>

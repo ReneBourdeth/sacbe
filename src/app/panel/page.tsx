@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient, type Boleto, type Clase } from '@/lib/supabase'
-import { getMiEmpresa, getViajesEmpresa, marcarPagado } from '@/lib/api'
+import { getMiEmpresa, getViajesEmpresa, marcarPagado, marcarReembolsado } from '@/lib/api'
 import { useLang } from '@/lib/i18n'
 import { formatoHora, hoyHonduras } from '@/lib/fecha'
 import { nombreTerminal } from '@/lib/terminales'
@@ -20,7 +20,7 @@ type ViajeEmpresa = {
   capacidad: number
   asientos_disp: number
   rutas: { duracion_min: number; origen: { codigo: string } | null; destino: { codigo: string } | null }
-  boletos: { id: string; nombre_pasajero: string; identidad_pas: string; estado: Boleto['estado']; codigo_qr: string; asientos: { numero: string } | null }[]
+  boletos: { id: string; nombre_pasajero: string; identidad_pas: string; estado: Boleto['estado']; codigo_qr: string; reembolso: number | null; reembolsado_at: string | null; asientos: { numero: string } | null }[]
 }
 
 /**
@@ -167,7 +167,17 @@ export default function PanelPage() {
                                 <button className="sb-btn" style={S.btnPagado} onClick={async () => {
                                   try { await marcarPagado(b.id); setRecarga(n => n + 1) } catch { alert(t.errorViajes) }
                                 }}>{t.marcarPagado}</button>
-                              ) : t.estados[b.estado]}
+                              ) : b.estado === 'cancelado' && Number(b.reembolso) > 0 && !b.reembolsado_at ? (
+                                // Paid ticket cancelled by the passenger: the company owes the money back
+                                <button className="sb-btn" style={S.btnPagado} title={t.reembolsoPendiente(Number(b.reembolso))} onClick={async () => {
+                                  try { await marcarReembolsado(b.id); setRecarga(n => n + 1) } catch { alert(t.errorViajes) }
+                                }}>{t.reembolsado} · L. {Number(b.reembolso)}</button>
+                              ) : (
+                                <>
+                                  {t.estados[b.estado]}
+                                  {b.reembolsado_at && <span style={S.muted}> · {t.reembolsoHecho(Number(b.reembolso))}</span>}
+                                </>
+                              )}
                             </td>
                           </tr>
                         ))}

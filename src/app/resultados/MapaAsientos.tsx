@@ -7,16 +7,16 @@ import { S } from './estilos'
 type Props = {
   asientos: Asiento[]
   cargado: boolean
-  seleccionado: Asiento | null
+  seleccionados: Asiento[]
   onSeleccionar: (asiento: Asiento) => void
 }
 
 /**
  * Bus seat map, drawn as rows of 4 seats with an aisle in the middle:
  *   A B | C D
- * Taken seats are greyed out and can't be clicked.
+ * Taken seats are greyed out and can't be clicked. Clicking a seat toggles it.
  */
-export default function MapaAsientos({ asientos, cargado, seleccionado, onSeleccionar }: Props) {
+export default function MapaAsientos({ asientos, cargado, seleccionados, onSeleccionar }: Props) {
   const { t } = useLang()
 
   return (
@@ -33,13 +33,13 @@ export default function MapaAsientos({ asientos, cargado, seleccionado, onSelecc
           const libre = asiento.estado === 'disponible'
           const celda = (
             <button key={asiento.id} type="button" disabled={!libre}
-              aria-pressed={seleccionado?.id === asiento.id}
+              aria-pressed={seleccionados.some(x => x.id === asiento.id)}
               aria-label={`${t.asiento} ${asiento.numero}`}
               onClick={() => onSeleccionar(asiento)}
               style={{
                 ...S.seat,
                 ...(!libre ? S.seatOcu : {}),
-                ...(seleccionado?.id === asiento.id ? S.seatSel : {}),
+                ...(seleccionados.some(x => x.id === asiento.id) ? S.seatSel : {}),
               }}>
               {asiento.numero}
             </button>

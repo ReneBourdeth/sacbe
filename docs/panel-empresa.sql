@@ -171,6 +171,16 @@ $$;
 revoke execute on function reporte_ingresos(date, date) from public, anon;
 grant execute on function reporte_ingresos(date, date) to authenticated;
 
+-- 10) Staff rules only apply to signed-in users. Guests never evaluate them, so they
+--     don't need (and don't have) permission to call mi_empresa().
+alter policy "staff lee viajes de su empresa" on viajes to authenticated;
+alter policy "staff crea viajes"              on viajes to authenticated;
+alter policy "staff edita viajes"             on viajes to authenticated;
+alter policy "staff lee sus rutas"            on rutas to authenticated;
+alter policy "staff crea rutas"               on rutas to authenticated;
+alter policy "staff edita rutas"              on rutas to authenticated;
+alter policy "staff lee boletos de su empresa" on boletos to authenticated;
+
 -- ── GIVE A LOGIN ACCESS ──────────────────────────────────────
 -- First create the login: Authentication → Users → Add user → Create new user
 -- (email + password, tick "Auto Confirm User"). Then run, with that email:

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient, type Boleto } from '@/lib/supabase'
-import { getMisBoletos } from '@/lib/api'
+import { cancelarBoleto, getMisBoletos } from '@/lib/api'
 import { useLang } from '@/lib/i18n'
 import { formatoFechaHora } from '@/lib/fecha'
 import { qrComoImagen } from '@/lib/qr'
@@ -17,6 +17,8 @@ type BoletoFila = {
   nombre_pasajero: string
   estado: Boleto['estado']
   precio_final: number
+  reembolso: number | null         // refund owed after cancelling a paid ticket
+  reembolsado_at: string | null    // when the company paid it back
   viajes: {
     salida: string
     rutas: {
@@ -36,6 +38,7 @@ export default function MisViajesPage() {
   const [error, setError] = useState(false)
   const [qrs, setQrs] = useState<Record<string, string>>({})
   const [email, setEmail] = useState('')
+  const [recarga, setRecarga] = useState(0) // bump to reload after a cancel
 
   useEffect(() => {
     const supabase = createClient()
@@ -51,7 +54,18 @@ export default function MisViajesPage() {
       }
       setQrs(imgs)
     })
-  }, [router])
+  }, [router, recarga])
+
+  async function cancelar(b: BoletoFila) {
+    if (!confirm(t.confirmarCancelar)) return
+    try {
+      const reembolso = await cancelarBoleto(b.id)
+      alert(reembolso > 0 ? t.canceladoConReembolso(reembolso) : t.cancelado)
+      setRecarga(n => n + 1)
+    } catch {
+      alert(t.errorCancelar)
+    }
+  }
 
   async function salir() {
     await createClient().auth.signOut()
@@ -91,6 +105,12 @@ export default function MisViajesPage() {
                 <div style={S.fila}><span>{t.pasajero}</span><span>{b.nombre_pasajero}</span></div>
                 <div style={S.fila}><span>{t.codigo}</span><span style={{ fontFamily: 'monospace' }}>{b.codigo_qr}</span></div>
                 <span style={{ ...S.estado, ...(b.estado === 'pagado' ? S.estadoOk : {}) }}>{t.estados[b.estado]}</span>
+                {b.estado === 'cancelado' && Number(b.reembolso) > 0 && (
+                  <span style={S.muted}> · {b.reembolsado_at ? t.reembolsoHecho(Number(b.reembolso)) : t.reembolsoPendiente(Number(b.reembolso))}</span>
+                )}
+                {(b.estado === 'reservado' || b.estado === 'pagado') && b.viajes && new Date(b.viajes.salida) > new Date() && (
+                  <button style={S.cancelar} onClick={() => cancelar(b)}>{t.cancelarBoleto}</button>
+                )}
               </div>
               {qrs[b.id] && (
                 <div style={{ background: 'white', padding: 8, alignSelf: 'center' }}>
@@ -109,6 +129,7 @@ export default function MisViajesPage() {
 const S: Record<string, React.CSSProperties> = {
   main: { minHeight: '100vh', position: 'relative', zIndex: 1 },
   email: { fontSize: '.9rem', color: 'var(--tenue)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 },
+  cancelar: { display: 'block', marginTop: '.75rem', background: 'none', border: '1px solid var(--rojo)', color: 'var(--rojo)', padding: '6px 12px', fontWeight: 700, cursor: 'pointer' },
   salir: { background: 'none', border: 'none', color: 'var(--tinta)', fontWeight: 500, cursor: 'pointer', textDecoration: 'underline' },
   wrap: { maxWidth: 720, margin: '2rem auto', padding: '0 1.5rem 4rem' },
   title: { fontSize: '2.4rem', marginBottom: '1.25rem' },
