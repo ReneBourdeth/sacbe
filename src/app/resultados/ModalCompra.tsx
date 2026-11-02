@@ -202,8 +202,9 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
         {paso === 4 && boleto && (
           <div style={{ textAlign: 'center' }}>
             <div style={S.confIcono}><MarcaGuacamaya size={56} /></div>
-            <div style={S.confTitulo}>{t.boletoConfirmado}</div>
-            <p style={S.confSub}>{t.caminoBlanco}</p>
+            {/* Cash: the ticket stays "reservado" until the bus company confirms payment in /panel */}
+            <div style={S.confTitulo}>{metodo === 'efectivo' ? t.reservaPendiente : t.boletoConfirmado}</div>
+            <p style={S.confSub}>{metodo === 'efectivo' ? t.pagaEnPagoExpress(totalConCargo(viaje.precio)) : t.caminoBlanco}</p>
             <div style={{ background: 'white', padding: 12, display: 'inline-block', marginBottom: '1rem', border: '1px solid var(--borde)', borderRadius: 8 }}>
               {/* eslint-disable-next-line @next/next/no-img-element -- local data: URL, nothing to optimize */}
               <img src={boleto.qr} alt="QR" style={{ display: 'block', width: 180, height: 180 }} />

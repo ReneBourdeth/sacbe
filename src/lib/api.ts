@@ -161,6 +161,12 @@ export async function getViajesEmpresa(empresaId: string, fecha: string) {
   return data
 }
 
+/** Staff confirm a cash payment. The database refuses other companies' tickets. */
+export async function marcarPagado(boletoId: string) {
+  const { error } = await createClient().rpc('marcar_boleto_pagado', { p_boleto_id: boletoId })
+  if (error) throw new Error(error.message)
+}
+
 // ── Helpers ────────────────────────────────────────────────
 
 /** Short, readable, practically unique ticket code, e.g. SCB-MVA72JCP-RPPS. */

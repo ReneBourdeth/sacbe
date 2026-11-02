@@ -49,6 +49,31 @@ alter table notificaciones enable row level security;
 drop policy if exists "users read own notificaciones" on notificaciones;
 create policy "users read own notificaciones" on notificaciones for select using (auth.uid() = usuario_id);
 
+-- 6) Staff confirm a cash (PagoExpress) payment: reserved ticket → paid, seat → sold.
+--    Only for trips of the staff member's own company.
+create or replace function marcar_boleto_pagado(p_boleto_id uuid) returns void
+language plpgsql security definer set search_path = public as $$
+declare
+  v_asiento uuid;
+begin
+  update boletos b set estado = 'pagado'
+   from viajes v join rutas r on r.id = v.ruta_id
+  where b.id = p_boleto_id
+    and v.id = b.viaje_id
+    and r.empresa_id = mi_empresa()
+    and b.estado = 'reservado'
+  returning b.asiento_id into v_asiento;
+
+  if v_asiento is null then
+    raise exception 'NO_PERMITIDO';  -- not this company's ticket, or not reserved
+  end if;
+
+  update asientos set estado = 'vendido' where id = v_asiento;
+end;
+$$;
+revoke execute on function marcar_boleto_pagado(uuid) from public, anon;
+grant execute on function marcar_boleto_pagado(uuid) to authenticated;
+
 -- ── GIVE A LOGIN ACCESS ──────────────────────────────────────
 -- First create the login: Authentication → Users → Add user → Create new user
 -- (email + password, tick "Auto Confirm User"). Then run, with that email:
