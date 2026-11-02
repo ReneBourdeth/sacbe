@@ -142,6 +142,35 @@ create policy "staff edita viajes" on viajes for update
 -- even when a staff member (not the owner) inserts the trip.
 alter function crear_asientos_viaje() security definer;
 
+-- 9) Revenue per route for the staff member's company, for trips leaving between
+--    two Honduras dates (inclusive). Runs with the caller's rights, so the usual
+--    rules apply: a company only ever counts its own tickets.
+--    Paid = 'pagado' or 'usado' (boarded); pending = 'reservado' (cash not yet paid).
+create or replace function reporte_ingresos(p_desde date, p_hasta date)
+returns table (
+  origen text, destino text,
+  boletos_pagados bigint, ingresos numeric,
+  boletos_pendientes bigint, monto_pendiente numeric
+)
+language sql stable security invoker set search_path = public as $$
+  select o.codigo, d.codigo,
+         count(*) filter (where b.estado in ('pagado', 'usado')),
+         coalesce(sum(b.precio_final) filter (where b.estado in ('pagado', 'usado')), 0),
+         count(*) filter (where b.estado = 'reservado'),
+         coalesce(sum(b.precio_final) filter (where b.estado = 'reservado'), 0)
+  from boletos b
+  join viajes v on v.id = b.viaje_id
+  join rutas r on r.id = v.ruta_id
+  join terminales o on o.id = r.origen_id
+  join terminales d on d.id = r.destino_id
+  where r.empresa_id = (select mi_empresa())
+    and (v.salida at time zone 'America/Tegucigalpa')::date between p_desde and p_hasta
+  group by o.codigo, d.codigo
+  order by 3 desc, 5 desc
+$$;
+revoke execute on function reporte_ingresos(date, date) from public, anon;
+grant execute on function reporte_ingresos(date, date) to authenticated;
+
 -- ── GIVE A LOGIN ACCESS ──────────────────────────────────────
 -- First create the login: Authentication → Users → Add user → Create new user
 -- (email + password, tick "Auto Confirm User"). Then run, with that email:
