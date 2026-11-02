@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient, type Boleto, type Clase } from '@/lib/supabase'
-import { getMiEmpresa, getViajesEmpresa } from '@/lib/api'
+import { getMiEmpresa, getViajesEmpresa, marcarPagado } from '@/lib/api'
 import { useLang } from '@/lib/i18n'
 import { formatoHora, hoyHonduras } from '@/lib/fecha'
 import { nombreTerminal } from '@/lib/terminales'
@@ -37,6 +37,7 @@ export default function PanelPage() {
   const [error, setError] = useState('')
   const [fecha, setFecha] = useState(hoyHonduras())
   const [viajes, setViajes] = useState<ViajeEmpresa[] | null>(null)
+  const [recarga, setRecarga] = useState(0) // bump to reload the list after a change
 
   async function cargarEmpresa() {
     // Only an empty answer means "not staff"; a failed request is shown as an error
@@ -65,7 +66,7 @@ export default function PanelPage() {
       .then(data => { if (activo) setViajes(data as unknown as ViajeEmpresa[]) })
       .catch(() => { if (activo) setViajes([]) })
     return () => { activo = false }
-  }, [empresa, fecha])
+  }, [empresa, fecha, recarga])
 
   async function entrar(e: React.FormEvent) {
     e.preventDefault()
@@ -153,7 +154,13 @@ export default function PanelPage() {
                             <td style={S.td}>{b.nombre_pasajero}</td>
                             <td style={S.td}>{b.identidad_pas}</td>
                             <td style={{ ...S.td, fontFamily: 'monospace' }}>{b.codigo_qr}</td>
-                            <td style={S.td}>{t.estados[b.estado]}</td>
+                            <td style={S.td}>
+                              {b.estado === 'reservado' ? (
+                                <button className="sb-btn" style={S.btnPagado} onClick={async () => {
+                                  try { await marcarPagado(b.id); setRecarga(n => n + 1) } catch { alert(t.errorViajes) }
+                                }}>{t.marcarPagado}</button>
+                              ) : t.estados[b.estado]}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -188,5 +195,6 @@ const S: Record<string, React.CSSProperties> = {
   summary: { cursor: 'pointer', color: 'var(--turquesa)', fontWeight: 500, marginBottom: '.5rem' },
   tabla: { width: '100%', borderCollapse: 'collapse', fontSize: '.95rem' },
   th: { textAlign: 'left', color: 'var(--tenue)', fontWeight: 500, padding: '6px 8px', borderBottom: '1px solid var(--borde)' },
+  btnPagado: { background: 'var(--guacamaya)', color: '#FFFFFF', border: 'none', padding: '5px 10px', fontSize: '.85rem', fontWeight: 700, cursor: 'pointer' },
   td: { padding: '6px 8px', borderBottom: '1px solid var(--borde2)' },
 }
