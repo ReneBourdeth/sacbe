@@ -9,6 +9,7 @@ import { nombreTerminal } from '@/lib/terminales'
 import SiteHeader from '@/components/SiteHeader'
 import Escaner from './Escaner'
 import Horarios, { EditarViaje } from './Horarios'
+import Ingresos from './Ingresos'
 
 // Shape returned by getViajesEmpresa
 type ViajeEmpresa = {
@@ -124,6 +125,7 @@ export default function PanelPage() {
         <div style={S.wrap}>
           <h1 style={S.title}>{empresa.nombre}</h1>
           <Escaner onValidado={() => setRecarga(n => n + 1)} />
+          <Ingresos recarga={recarga} />
           <Horarios empresaId={empresa.id} fecha={fecha} onCambio={() => setRecarga(n => n + 1)} />
           <div style={S.barra}>
             <h2 style={{ fontSize: '1.4rem' }}>{t.viajesDelDia}</h2>

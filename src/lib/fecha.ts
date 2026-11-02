@@ -28,6 +28,13 @@ export function diaHonduras(iso: string) {
   return new Intl.DateTimeFormat('en-CA', { timeZone: ZONA_HONDURAS }).format(new Date(iso))
 }
 
+/** First and last day (YYYY-MM-DD) of the month that `dia` falls in. */
+export function mesDe(dia: string) {
+  const [anio, mes] = dia.split('-').map(Number)
+  const ultimo = new Date(Date.UTC(anio, mes, 0)).getUTCDate() // day 0 of next month = last day of this one
+  return { desde: `${dia.slice(0, 7)}-01`, hasta: `${dia.slice(0, 7)}-${String(ultimo).padStart(2, '0')}` }
+}
+
 /** "08:11 p. m." / "08:11 PM" */
 export function formatoHora(iso: string, locale: string) {
   return new Date(iso).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: ZONA_HONDURAS })

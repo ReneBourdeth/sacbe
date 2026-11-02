@@ -222,6 +222,20 @@ function llegada(salida: string, duracionMin: number) {
   return new Date(new Date(salida).getTime() + duracionMin * 60_000).toISOString()
 }
 
+export type FilaIngresos = {
+  origen: string; destino: string
+  boletos_pagados: number; ingresos: number
+  boletos_pendientes: number; monto_pendiente: number
+}
+
+/** Revenue per route between two Honduras dates (YYYY-MM-DD, inclusive), own company only. */
+export async function getIngresos(desde: string, hasta: string): Promise<FilaIngresos[]> {
+  const { data, error } = await createClient().rpc('reporte_ingresos', { p_desde: desde, p_hasta: hasta })
+  if (error) throw new Error(error.message)
+  // numeric columns arrive as strings
+  return (data ?? []).map((f: FilaIngresos) => ({ ...f, ingresos: Number(f.ingresos), monto_pendiente: Number(f.monto_pendiente) }))
+}
+
 /** Staff confirm a cash payment. The database refuses other companies' tickets. */
 export async function marcarPagado(boletoId: string) {
   const { error } = await createClient().rpc('marcar_boleto_pagado', { p_boleto_id: boletoId })

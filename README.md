@@ -61,7 +61,7 @@ Sprint 1 is tagged `v0.1-sprint-1`.
 - [x] Company admin panel (`/panel`: password login, trips per day, passenger list, mark cash payments)
 - [x] Route & schedule management (add routes and trips, change a trip's time or price)
 - [x] QR validation scanner (camera or typed code; marks tickets as used)
-- [ ] Revenue reports
+- [x] Revenue reports (paid and unpaid tickets per route, any date range)
 - [ ] Cancellations & refunds
 
 **Also done:** Spanish/English switch, phone and tablet layout, black high-contrast theme, sign-in required to book (max 6 seats per trip).
