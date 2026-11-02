@@ -18,6 +18,8 @@ create or replace function mi_empresa() returns uuid
 language sql stable security definer set search_path = public as $$
   select empresa_id from empresa_usuarios where usuario_id = auth.uid()
 $$;
+revoke execute on function mi_empresa() from public, anon;
+grant execute on function mi_empresa() to authenticated;
 
 -- 2) Staff read all trips of their company (the public rule only shows scheduled ones)
 drop policy if exists "staff lee viajes de su empresa" on viajes;
