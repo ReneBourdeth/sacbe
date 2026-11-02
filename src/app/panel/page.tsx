@@ -8,15 +8,17 @@ import { formatoHora, hoyHonduras } from '@/lib/fecha'
 import { nombreTerminal } from '@/lib/terminales'
 import SiteHeader from '@/components/SiteHeader'
 import Escaner from './Escaner'
+import Horarios, { EditarViaje } from './Horarios'
 
 // Shape returned by getViajesEmpresa
 type ViajeEmpresa = {
   id: string
   salida: string
   clase: Clase
+  precio: number
   capacidad: number
   asientos_disp: number
-  rutas: { origen: { codigo: string } | null; destino: { codigo: string } | null }
+  rutas: { duracion_min: number; origen: { codigo: string } | null; destino: { codigo: string } | null }
   boletos: { id: string; nombre_pasajero: string; identidad_pas: string; estado: Boleto['estado']; codigo_qr: string; asientos: { numero: string } | null }[]
 }
 
@@ -122,6 +124,7 @@ export default function PanelPage() {
         <div style={S.wrap}>
           <h1 style={S.title}>{empresa.nombre}</h1>
           <Escaner onValidado={() => setRecarga(n => n + 1)} />
+          <Horarios empresaId={empresa.id} fecha={fecha} onCambio={() => setRecarga(n => n + 1)} />
           <div style={S.barra}>
             <h2 style={{ fontSize: '1.4rem' }}>{t.viajesDelDia}</h2>
             <input type="date" aria-label={t.fecha} value={fecha} onChange={e => setFecha(e.target.value)} style={{ ...S.input, width: 'auto', marginBottom: 0 }} />
@@ -139,6 +142,7 @@ export default function PanelPage() {
                 <span style={S.muted}>{t[v.clase]}</span>
                 <span style={S.vendidos}>{t.vendidos(v.capacidad - v.asientos_disp, v.capacidad)}</span>
               </div>
+              <EditarViaje key={v.salida + v.precio} viaje={{ id: v.id, salida: v.salida, precio: v.precio, duracion_min: v.rutas.duracion_min }} onCambio={() => setRecarga(n => n + 1)} />
               <details>
                 <summary style={S.summary}>{t.pasajeros} ({v.boletos.length})</summary>
                 {v.boletos.length === 0 ? (
