@@ -112,7 +112,7 @@ export default function MisViajesPage() {
                   <button style={S.cancelar} onClick={() => cancelar(b)}>{t.cancelarBoleto}</button>
                 )}
               </div>
-              {qrs[b.id] && (
+              {qrs[b.id] && b.estado !== 'cancelado' && ( // a cancelled ticket can't board, so don't offer its QR
                 <div style={{ background: 'white', padding: 8, alignSelf: 'center' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element -- local data: URL */}
                   <img src={qrs[b.id]} alt="QR" width={110} height={110} style={{ display: 'block' }} />
