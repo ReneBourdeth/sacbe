@@ -23,6 +23,7 @@ declare
                       and v.salida > now() + interval '1 day' and v.asientos_disp = 40 limit 1);
   a   uuid[] := array(select id from asientos where viaje_id = v_viaje order by fila, columna limit 9);
   ids uuid[];
+  v_nuevo uuid;
   txt text;
   n   int;
 
@@ -75,6 +76,16 @@ begin
 
   begin perform cancelar_boleto(ids[2]); txt := 'cancelled again'; exception when others then txt := sqlerrm; end;
   insert into _pruebas (prueba, esperado, obtenido) values ('cancel the same ticket twice', 'NO_CANCELABLE', txt);
+
+  -- Attacks a signed-in passenger might try straight against the database
+  select count(*)::text into txt from boletos where usuario_id is distinct from pasajero;
+  insert into _pruebas (prueba, esperado, obtenido) values ('passenger sees no one else''s tickets', '0', txt);
+  update boletos set estado = 'pagado' where id = ids[3]; get diagnostics n = row_count;
+  insert into _pruebas (prueba, esperado, obtenido) values ('passenger cannot mark own ticket paid', '0', n::text);
+  update viajes set precio = 1 where id = v_viaje; get diagnostics n = row_count;
+  insert into _pruebas (prueba, esperado, obtenido) values ('passenger cannot change a price', '0', n::text);
+  begin select comision_pct::text into txt from empresas limit 1; txt := 'readable'; exception when others then txt := 'hidden'; end;
+  insert into _pruebas (prueba, esperado, obtenido) values ('company commission and tax ID are hidden', 'hidden', txt);
   reset role;
 
   -- ── Staff ──
@@ -106,6 +117,13 @@ begin
     txt := 'created';
   exception when others then txt := 'refused'; end;
   insert into _pruebas (prueba, esperado, obtenido) values ('staff cannot add trips for another company', 'refused', txt);
+
+  insert into viajes (ruta_id, salida, llegada_est, clase, precio)
+  select r.id, now() + interval '3 days', now() + interval '3 days 4 hours', 'economica', 200
+  from rutas r where r.empresa_id = empresa limit 1
+  returning id into v_nuevo;
+  select count(*)::text into txt from asientos where viaje_id = v_nuevo;
+  insert into _pruebas (prueba, esperado, obtenido) values ('staff add a trip: its 40 seats are created', '40', txt);
   reset role;
 end $$;
 
