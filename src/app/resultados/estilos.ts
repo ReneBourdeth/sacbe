@@ -22,7 +22,7 @@ export const S: Record<string, React.CSSProperties> = {
   tripEmp: { fontFamily: 'var(--font-display)', fontSize: '1.2rem', fontWeight: 800, marginBottom: 2 },
   tripClase: { fontSize: '.9rem', color: 'var(--tenue)', display: 'flex', alignItems: 'center', gap: 6 },
   dot: { width: 9, height: 9, borderRadius: '50%', display: 'inline-block' },
-  hora: { fontFamily: 'var(--font-display)', fontSize: '1.6rem', fontWeight: 800, lineHeight: 1 },
+  hora: { fontFamily: 'var(--font-display)', fontSize: 'clamp(1.15rem, 5vw, 1.45rem)', fontWeight: 800, lineHeight: 1, whiteSpace: 'nowrap' },
   ciudadLabel: { fontSize: '.85rem', color: 'var(--tenue)', marginTop: 4 },
   rutaMid: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '0 .5rem' },
   duracion: { fontSize: '.85rem', color: 'var(--tenue)' },

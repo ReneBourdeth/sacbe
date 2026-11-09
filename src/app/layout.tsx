@@ -1,21 +1,11 @@
 import type { Metadata } from 'next'
-import { Alegreya, Alegreya_Sans } from 'next/font/google'
+import { Archivo } from 'next/font/google'
 import '../styles/globals.css'
 import { LangProvider } from '@/lib/i18n'
 
-// Alegreya: a calligraphic serif by Latin American type designer Juan Pablo del Peral.
-// Its carved, hand-made feel suits Maya stone; the sans sibling keeps the UI readable.
-const alegreya = Alegreya({
-  subsets: ['latin'],
-  weight: ['500', '800'],
-  variable: '--font-alegreya',
-})
-
-const alegreyaSans = Alegreya_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  variable: '--font-alegreya-sans',
-})
+// Archivo: a heavy, wide grotesk for the big poster-style headlines and a
+// readable UI. Variable font, so every weight comes in one file.
+const archivo = Archivo({ subsets: ['latin'], variable: '--font-archivo' })
 
 export const metadata: Metadata = {
   title: 'Sacbé — Plataforma Nacional de Transporte',
@@ -31,7 +21,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${alegreya.variable} ${alegreyaSans.variable}`}>
+    <html lang="es" className={archivo.variable}>
       <body><LangProvider>{children}</LangProvider></body>
     </html>
   )
