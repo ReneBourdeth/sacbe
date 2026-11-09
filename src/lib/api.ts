@@ -251,11 +251,12 @@ export async function marcarPagado(boletoId: string) {
 
 // ── Helpers ────────────────────────────────────────────────
 
-/** Short, readable, practically unique ticket code, e.g. SCB-MVA72JCP-RPPS. */
+/** Unguessable ticket code, e.g. SCB-7Q2K-M9XD-4TFA (60 random bits from the secure generator). */
 function generarCodigoBoleto() {
-  const tiempo = Date.now().toString(36).toUpperCase()
-  const azar = Math.random().toString(36).slice(2, 6).toUpperCase()
-  return `SCB-${tiempo}-${azar}`
+  const letras = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ' // no 0/O or 1/I, easy to read aloud and type
+  const azar = crypto.getRandomValues(new Uint8Array(12))
+  const texto = Array.from(azar, b => letras[b % 32]).join('') // 256 % 32 = 0, so every letter is equally likely
+  return `SCB-${texto.slice(0, 4)}-${texto.slice(4, 8)}-${texto.slice(8, 12)}`
 }
 
 // NOTE: QR validation for bus staff (marking a ticket as used) belongs to

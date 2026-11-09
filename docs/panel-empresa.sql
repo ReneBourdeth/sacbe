@@ -181,6 +181,14 @@ alter policy "staff crea rutas"               on rutas to authenticated;
 alter policy "staff edita rutas"              on rutas to authenticated;
 alter policy "staff lee boletos de su empresa" on boletos to authenticated;
 
+-- 11) The public may only read a company's id, name and logo, not its commission,
+--     tax ID (RTN), email, phone or plan.
+revoke select on empresas from anon, authenticated;
+grant select (id, nombre, logo_url, activa) on empresas to anon, authenticated;
+
+-- The seat trigger only runs when a trip is added; nobody needs to call it directly.
+revoke execute on function crear_asientos_viaje() from public, anon, authenticated;
+
 -- ── GIVE A LOGIN ACCESS ──────────────────────────────────────
 -- First create the login: Authentication → Users → Add user → Create new user
 -- (email + password, tick "Auto Confirm User"). Then run, with that email:
