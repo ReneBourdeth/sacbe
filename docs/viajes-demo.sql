@@ -1,7 +1,8 @@
 -- ── DEMO TRIPS ───────────────────────────────────────────────
 -- Fake trips for testing: every day for the next 30 days, 4 departures a day,
--- on 7 routes in both directions. Seats are created automatically by the
--- trigger in docs/asientos-trigger.sql.
+-- connecting every pair of mainland cities (15 pairs, busiest ones by 2-3
+-- companies), in both directions. Roatán is an island, so no buses go there.
+-- Seats are created automatically by the trigger in docs/asientos-trigger.sql.
 -- Run in Supabase → SQL Editor. Safe to run again: it only adds what is missing,
 -- so re-running later extends the trips another 30 days from that day.
 
@@ -15,7 +16,19 @@ from (values
   ('Cotuc',          'SPS', 'CPN', 180, 300),
   ('Saenz',          'TGU', 'CHO', 150, 200),
   ('El Rey Express', 'TGU', 'CMG',  90, 120),
-  ('Viana',          'SPS', 'CMG', 150, 180)
+  ('Viana',          'SPS', 'CMG', 150, 180),
+  ('El Rey Express', 'SPS', 'TGU', 270, 300),
+  ('Hedman Alas',    'SPS', 'CEI', 180, 330),
+  ('Hedman Alas',    'TGU', 'CEI', 390, 520),
+  ('Viana',          'TGU', 'CEI', 390, 470),
+  ('Viana',          'SPS', 'CHO', 420, 450),
+  ('Saenz',          'CMG', 'CHO', 210, 260),
+  ('Cotuc',          'TGU', 'CPN', 480, 520),
+  ('Cotuc',          'CEI', 'CPN', 420, 500),
+  ('El Rey Express', 'CEI', 'CMG', 300, 330),
+  ('Saenz',          'CEI', 'CHO', 600, 600),
+  ('Cotuc',          'CMG', 'CPN', 330, 380),
+  ('Saenz',          'CPN', 'CHO', 600, 620)
 ) as r(empresa, desde, hasta, minutos, precio)
 join empresas e on e.nombre = r.empresa
 -- each route in both directions
