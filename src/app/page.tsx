@@ -16,7 +16,7 @@ const COMMONS = 'https://upload.wikimedia.org/wikipedia/commons/thumb/'
 const FOTOS = [
   // Same photo as every page's background (globals.css), so the site opens on it
   { archivo: '0/04/CPN_BallCourt_01.jpg', lugar: 'Copán Ruinas', origen: 'SPS', destino: 'CPN',
-    autor: 'Talk2winik', licencia: 'dominio público', pagina: 'File:CPN_BallCourt_01.jpg' },
+    autor: 'Talk2winik', licencia: 'Public domain', pagina: 'File:CPN_BallCourt_01.jpg' },
   { archivo: 'a/ab/West_Bay_Beach_-Roatan_-Honduras-23May2009.jpg', lugar: 'Roatán', origen: 'SPS', destino: 'CEI', // ferry leaves from La Ceiba
     autor: 'Adalberto Hernandez Vega', licencia: 'CC BY 2.0', pagina: 'File:West_Bay_Beach_-Roatan_-Honduras-23May2009.jpg' },
   { archivo: '4/4a/Cumulus_clouds_over_Tegucigalpa%2C_Honduras.jpg', lugar: 'Tegucigalpa', origen: 'SPS', destino: 'TGU',
@@ -28,18 +28,27 @@ const foto = (archivo: string, ancho: number) => `${COMMONS}${archivo}/${ancho}p
 export default function HomePage() {
   const router = useRouter()
   const { t } = useLang()
-  const hoy = hoyHonduras()
   const [origen, setOrigen] = useState('SPS')
   const [destino, setDestino] = useState('TGU')
-  const [fecha, setFecha] = useState(hoy)
+  const [fecha, setFecha] = useState('')
   const [actual, setActual] = useState(0)
 
-  // Next photo every 7 s, unless the visitor asked their device for less motion
+  // This page is built once per release, so "today" must be read in the
+  // visitor's browser, not at build time (it would stay on the release day).
+  const [hoy, setHoy] = useState('')
+  useEffect(() => {
+    const dia = hoyHonduras()
+    setHoy(dia)
+    setFecha(f => f || dia)
+  }, [])
+
+  // Next photo 7 s after the last change (also after a manual pick), unless the
+  // visitor asked their device for less motion
   useEffect(() => {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const id = setInterval(() => setActual(i => (i + 1) % FOTOS.length), 7000)
-    return () => clearInterval(id)
-  }, [])
+    const id = setTimeout(() => setActual(i => (i + 1) % FOTOS.length), 7000)
+    return () => clearTimeout(id)
+  }, [actual])
 
   function intercambiar() {
     setOrigen(destino)
@@ -84,7 +93,8 @@ export default function HomePage() {
             ))}
           </div>
 
-          <Link className="sb-destacada" href={`/resultados?${new URLSearchParams({ origen: f.origen, destino: f.destino, fecha: hoy })}`}>
+          {/* No date: the results page uses today, read in the visitor's browser */}
+          <Link className="sb-destacada" href={`/resultados?${new URLSearchParams({ origen: f.origen, destino: f.destino })}`}>
             <span style={S.cardFila}><span>{t.rutaDestacada}</span><span>{f.lugar}</span></span>
             <strong style={S.cardRuta}>{nombreTerminal(f.origen)} → {nombreTerminal(f.destino)}</strong>
             <span style={S.cardLink}>{t.verHorarios}</span>
