@@ -20,10 +20,11 @@ type Props = {
   origen: string   // terminal code, e.g. 'SPS'
   destino: string
   fecha: string    // YYYY-MM-DD
+  proximoDia: string | null // next day with buses when `viajes` is empty, null if the route has none
 }
 
 /** Results screen: trip list with class filters, selection summary and the booking window. */
-export default function ResultadosClient({ viajes, origen, destino, fecha }: Props) {
+export default function ResultadosClient({ viajes, origen, destino, fecha, proximoDia }: Props) {
   const { t, locale } = useLang()
   const [filtro, setFiltro] = useState<Filtro>('todos')
   const [elegido, setElegido] = useState<Viaje | null>(null)
@@ -58,7 +59,12 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
           {visibles.length === 0 ? (
             <div style={S.noResults}>
               <div style={S.noResultsTitulo}>{t.sinResultados}</div>
-              <p style={S.noResultsSub}>{t.otraFecha}</p>
+              {viajes.length > 0 ? <p style={S.noResultsSub}>{t.otraFecha}</p>
+                : proximoDia ? (
+                  <Link href={`/resultados?${new URLSearchParams({ origen, destino, fecha: proximoDia })}`} style={S.proximoDia}>
+                    {t.proximoDia(formatoDia(proximoDia, locale))}
+                  </Link>
+                ) : <p style={S.noResultsSub}>{t.sinRuta}</p>}
             </div>
           ) : visibles.map(v => (
             <TarjetaViaje key={v.id} viaje={v} elegido={elegido?.id === v.id} onElegir={() => setElegido(v)} />

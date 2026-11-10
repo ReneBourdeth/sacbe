@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useLang } from '@/lib/i18n'
+import { getRutasActivas } from '@/lib/api'
 import { hoyHonduras } from '@/lib/fecha'
 import { TERMINALES, nombreTerminal } from '@/lib/terminales'
 import AuthLink from '@/components/AuthLink'
@@ -41,6 +42,19 @@ export default function HomePage() {
     setHoy(dia)
     setFecha(f => f || dia)
   }, [])
+
+  // Only offer cities that actually have buses. Until the routes load (or if
+  // loading fails) every city is shown, as before.
+  const [rutas, setRutas] = useState<Set<string> | null>(null)
+  useEffect(() => { getRutasActivas().then(setRutas).catch(() => {}) }, [])
+  const hayBus = (o: string, d: string) => !rutas || rutas.has(`${o}-${d}`)
+  const origenes = TERMINALES.filter(o => TERMINALES.some(d => hayBus(o.codigo, d.codigo)))
+  const destinos = TERMINALES.filter(d => d.codigo !== origen && hayBus(origen, d.codigo))
+
+  function cambiarOrigen(o: string) {
+    setOrigen(o)
+    if (!hayBus(o, destino)) setDestino(TERMINALES.find(d => d.codigo !== o && hayBus(o, d.codigo))?.codigo ?? destino)
+  }
 
   // Next photo 7 s after the last change (also after a manual pick), unless the
   // visitor asked their device for less motion
@@ -112,8 +126,8 @@ export default function HomePage() {
             <div className="sb-search">
               <div style={S.campo}>
                 <label htmlFor="origen" style={S.label}>{t.origen}</label>
-                <select id="origen" value={origen} onChange={e => setOrigen(e.target.value)} style={S.input}>
-                  {TERMINALES.map(term => <option key={term.codigo} value={term.codigo}>{term.nombre}</option>)}
+                <select id="origen" value={origen} onChange={e => cambiarOrigen(e.target.value)} style={S.input}>
+                  {origenes.map(term => <option key={term.codigo} value={term.codigo}>{term.nombre}</option>)}
                 </select>
               </div>
 
@@ -122,7 +136,7 @@ export default function HomePage() {
               <div style={S.campo}>
                 <label htmlFor="destino" style={S.label}>{t.destino}</label>
                 <select id="destino" value={destino} onChange={e => setDestino(e.target.value)} style={S.input}>
-                  {TERMINALES.map(term => <option key={term.codigo} value={term.codigo}>{term.nombre}</option>)}
+                  {destinos.map(term => <option key={term.codigo} value={term.codigo}>{term.nombre}</option>)}
                 </select>
               </div>
 
