@@ -40,13 +40,13 @@ body {
   overflow-x: hidden;
 }
 
-/* Every page sits on a darkened photo of Tegucigalpa (CC0, Straggles, Wikimedia
-   Commons, so no credit is required). A fixed layer instead of
-   background-attachment: fixed, which iOS ignores. */
+/* Every page sits on the same darkened photo of Copán's ball court (public
+   domain, Talk2winik, Wikimedia Commons). It is also the home's first slide.
+   A fixed layer instead of background-attachment: fixed, which iOS ignores. */
 body::before {
   content: ''; position: fixed; inset: 0; z-index: -1;
-  background: linear-gradient(rgba(0,0,0,.78), rgba(0,0,0,.9)),
-    url("https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Cumulus_clouds_over_Tegucigalpa%2C_Honduras.jpg/1280px-Cumulus_clouds_over_Tegucigalpa%2C_Honduras.jpg") center / cover;
+  background: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.88)),
+    url("https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/CPN_BallCourt_01.jpg/1920px-CPN_BallCourt_01.jpg") center / cover;
 }
 
 /* Panels that float over moving content get a frosted blur too */

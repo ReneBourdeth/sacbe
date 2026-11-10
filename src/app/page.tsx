@@ -14,8 +14,9 @@ import { Logo } from '@/components/SiteHeader'
 // CC BY licences require the credit shown in the footer.
 const COMMONS = 'https://upload.wikimedia.org/wikipedia/commons/thumb/'
 const FOTOS = [
-  { archivo: 'c/ca/Honduras-0162_%282214381528%29.jpg', lugar: 'Copán Ruinas', origen: 'SPS', destino: 'CPN',
-    autor: 'Dennis G. Jarvis', licencia: 'CC BY-SA 2.0', pagina: 'File:Honduras-0162_(2214381528).jpg' },
+  // Same photo as every page's background (globals.css), so the site opens on it
+  { archivo: '0/04/CPN_BallCourt_01.jpg', lugar: 'Copán Ruinas', origen: 'SPS', destino: 'CPN',
+    autor: 'Talk2winik', licencia: 'dominio público', pagina: 'File:CPN_BallCourt_01.jpg' },
   { archivo: 'a/ab/West_Bay_Beach_-Roatan_-Honduras-23May2009.jpg', lugar: 'Roatán', origen: 'SPS', destino: 'CEI', // ferry leaves from La Ceiba
     autor: 'Adalberto Hernandez Vega', licencia: 'CC BY 2.0', pagina: 'File:West_Bay_Beach_-Roatan_-Honduras-23May2009.jpg' },
   { archivo: '4/4a/Cumulus_clouds_over_Tegucigalpa%2C_Honduras.jpg', lugar: 'Tegucigalpa', origen: 'SPS', destino: 'TGU',
