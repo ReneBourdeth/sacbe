@@ -38,6 +38,7 @@ export default function MisViajesPage() {
   const [error, setError] = useState(false)
   const [qrs, setQrs] = useState<Record<string, string>>({})
   const [email, setEmail] = useState('')
+  const [porConfirmar, setPorConfirmar] = useState<string | null>(null) // guest who hasn't confirmed their email yet
   const [recarga, setRecarga] = useState(0) // bump to reload after a cancel
 
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function MisViajesPage() {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return router.replace('/entrar?next=/mis-viajes')
       setEmail(user.email || '')
+      if (user.is_anonymous) setPorConfirmar(user.new_email ?? '')
       const data = (await getMisBoletos(user.id).catch(() => null)) as unknown as BoletoFila[] | null
       if (!data) return setError(true)
       setBoletos(data)
@@ -81,6 +83,7 @@ export default function MisViajesPage() {
 
       <div style={S.wrap}>
         <h1 className="sb-titulo-pagina" style={S.title}>{t.misBoletos}</h1>
+        {porConfirmar !== null && <p style={S.aviso}>✉ {t.confirmaCorreo(porConfirmar)}</p>}
 
         {error ? (
           <p style={S.muted}>{t.errorViajes} · <a href="/mis-viajes" style={{ color: 'var(--turquesa)', textDecoration: 'underline' }}>{t.intentarDeNuevo}</a></p>
@@ -134,6 +137,7 @@ const S: Record<string, React.CSSProperties> = {
   wrap: { maxWidth: 720, margin: '2rem auto', padding: '0 1.5rem 4rem' },
   title: { marginBottom: '1.5rem' },
   muted: { color: 'var(--tenue)', marginBottom: '.75rem' },
+  aviso: { background: 'var(--superficie)', border: '1px solid var(--amarillo)', borderRadius: 'var(--radio)', padding: '.875rem 1rem', marginBottom: '1.25rem' },
   empty: { background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 'var(--radio)', padding: '3rem', textAlign: 'center', color: 'var(--tenue)' },
   btn: { display: 'inline-block', background: 'var(--guacamaya)', color: '#FFFFFF', borderRadius: 'var(--radio)', padding: '11px 22px', fontWeight: 700 },
   card: { display: 'flex', gap: '1.25rem', flexWrap: 'wrap', background: 'var(--superficie)', border: '1px solid var(--borde2)', borderTop: '5px solid var(--guacamaya)', borderRadius: 'var(--radio)', padding: '1.25rem', marginBottom: '1rem' },
