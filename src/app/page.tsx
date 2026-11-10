@@ -151,7 +151,7 @@ const S: Record<string, React.CSSProperties> = {
   cardFila: { display: 'flex', justifyContent: 'space-between', fontSize: '.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--tenue)' },
   cardRuta: { fontSize: '1.5rem', fontWeight: 800, lineHeight: 1.1, letterSpacing: '-.02em' },
   cardLink: { fontWeight: 600, color: 'var(--tinta)' },
-  caja: { background: 'var(--superficie)', border: '1px solid var(--borde)', padding: '1.25rem', maxWidth: 1000 },
+  caja: { background: 'var(--superficie)', border: '1px solid var(--borde)', borderRadius: 'var(--radio)', padding: '1.25rem', maxWidth: 1000 },
   campo: { display: 'flex', flexDirection: 'column', gap: 6 },
   label: { fontSize: '.9rem', fontWeight: 500, color: 'var(--tenue)' },
   input: { height: 44, padding: '0 12px', background: 'var(--superficie)', border: '1px solid var(--borde)' },

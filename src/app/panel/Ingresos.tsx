@@ -81,7 +81,7 @@ export default function Ingresos({ recarga }: { recarga: number }) {
 }
 
 const S: Record<string, React.CSSProperties> = {
-  caja: { background: 'var(--superficie)', border: '1px solid var(--borde2)', padding: '1rem 1.25rem', marginBottom: '1.5rem' },
+  caja: { background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 'var(--radio)', padding: '1rem 1.25rem', marginBottom: '1.5rem' },
   barra: { display: 'flex', flexWrap: 'wrap', alignItems: 'end', gap: '1rem', marginBottom: '.75rem' },
   campo: { display: 'flex', flexDirection: 'column', gap: 4, fontSize: '.85rem', color: 'var(--tenue)' },
   input: { height: 40, padding: '0 10px', background: 'var(--hundido)', border: '1px solid var(--borde)' },
