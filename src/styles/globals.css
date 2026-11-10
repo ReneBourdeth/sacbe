@@ -72,6 +72,13 @@ input, select, button { font-family: var(--font-sans); font-size: 1rem; }
 input, select { color: var(--tinta); }
 button, input, select { border-radius: var(--radio); }
 
+/* iPhone/iPad Safari gives date and time fields a fixed minimum width, so they
+   stick out of narrow boxes. Only iOS matches this @supports test. */
+@supports (-webkit-touch-callout: none) {
+  input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: none; min-width: 0; max-width: 100%; }
+  input::-webkit-date-and-time-value { text-align: left; }
+}
+
 :focus-visible { outline: 3px solid var(--turquesa) !important; outline-offset: 2px; }
 
 /* Utility classes */
