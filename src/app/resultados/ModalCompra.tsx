@@ -42,9 +42,11 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
   const [metodo, setMetodo] = useState<MetodoPago>('tarjeta')
   const [enviando, setEnviando] = useState(false)
   const [logueado, setLogueado] = useState(true) // assume yes until checked, to avoid a flash
+  const [correo, setCorreo] = useState('')       // guests only: where the confirmation goes
+  const [correoEnviado, setCorreoEnviado] = useState('')
   const [boletos, setBoletos] = useState<BoletoListo[]>([])
 
-  // Logged-out users get a hint to sign in; the database refuses guest bookings
+  // Signed-in users buy as themselves; guests buy with an email instead (see comprarComoInvitado)
   useEffect(() => {
     createClient().auth.getSession().then(({ data }) => setLogueado(!!data.session))
   }, [])
@@ -68,14 +70,41 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
   }
 
   function irAPago() {
-    if (!logueado) return alert(t.loginHint)
+    if (!logueado && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.trim())) return alert(t.alertCorreo)
     if (elegidos.some(a => !pasajeroDe(a).nombre.trim() || !pasajeroDe(a).identidad.trim())) return alert(t.alertDatos)
     setPaso(3)
+  }
+
+  /**
+   * Guest checkout without a sign-in screen: an invisible anonymous Supabase
+   * session (so the database rules work as for anyone else), then the guest's
+   * email is attached to it. Supabase emails a confirmation link; opening it
+   * turns the guest into a normal account that keeps these tickets.
+   * The email goes out before any seat is taken, so every guest gets one.
+   * Returns false when the purchase must stop.
+   */
+  async function comprarComoInvitado() {
+    const supabase = createClient()
+    const { error: e1 } = await supabase.auth.signInAnonymously()
+    if (e1) { alert(t.errorInvitado); return false }
+    const { error: e2 } = await supabase.auth.updateUser(
+      { email: correo.trim() },
+      { emailRedirectTo: `${location.origin}/entrar/callback?next=/mis-viajes` },
+    )
+    if (e2) {
+      await supabase.auth.signOut() // drop the empty guest session
+      alert(e2.code === 'email_exists' || /already/i.test(e2.message) ? t.correoConCuenta : t.errorInvitado)
+      return false
+    }
+    setCorreoEnviado(correo.trim())
+    setLogueado(true) // a retry (e.g. seat taken) reuses this session and email
+    return true
   }
 
   async function confirmarCompra() {
     setEnviando(true)
     try {
+      if (!logueado && !(await comprarComoInvitado())) return
       const reservas = await reservarAsientos(viaje.id, elegidos.map(a => ({ asientoId: a.id, ...pasajeroDe(a) })))
       setBoletos(await Promise.all(reservas.map(async r => ({
         numero: elegidos.find(a => a.id === r.asientoId)?.numero ?? '',
@@ -142,9 +171,17 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
             <div style={S.mEyebrow}>{t.paso(2)}</div>
             <div style={S.mTitle}>{t.datosPasajero}</div>
             {!logueado && (
-              <a href={`/entrar?next=${encodeURIComponent(location.pathname + location.search)}`} style={S.loginHint}>
-                {t.loginHint}
-              </a>
+              <div style={S.pasajeroCaja}>
+                <div style={S.ff}>
+                  <label htmlFor="correo-invitado" style={S.ffLabel}>{t.correoConfirmacion}</label>
+                  <input id="correo-invitado" type="email" autoComplete="email" required style={S.ffInput}
+                    value={correo} onChange={e => setCorreo(e.target.value)} placeholder="tu@correo.com" />
+                </div>
+                <p style={{ color: 'var(--tenue)', fontSize: '.9rem', margin: '.5rem 0' }}>{t.correoInvitadoInfo}</p>
+                <a href={`/entrar?next=${encodeURIComponent(location.pathname + location.search)}`} style={S.loginHint}>
+                  {t.loginHint}
+                </a>
+              </div>
             )}
             {elegidos.map(a => (
               <fieldset key={a.id} style={S.pasajeroCaja}>
@@ -228,6 +265,7 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
             <div style={S.confTitulo}>{metodo === 'efectivo' ? t.reservaPendiente : t.boletoConfirmado}</div>
             <p style={S.confSub}>{metodo === 'efectivo' ? t.pagaEnPagoExpress(total) : t.caminoBlanco}</p>
             <p style={{ ...S.confSub, marginTop: '-.75rem' }}>{viaje.empresa} · {ruta} · {formatoFechaHora(viaje.salida, locale)}</p>
+            {correoEnviado && <p style={{ ...S.confSub, color: 'var(--tinta)', fontWeight: 600 }}>✉ {t.correoEnviado(correoEnviado)}</p>}
 
             {boletos.map(b => (
               <div key={b.codigo} style={S.boletoListo}>
