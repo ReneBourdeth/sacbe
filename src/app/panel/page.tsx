@@ -123,7 +123,7 @@ export default function PanelPage() {
       ) : empresa && (
         // ── Dashboard ──
         <div style={S.wrap}>
-          <h1 style={S.title}>{empresa.nombre}</h1>
+          <h1 className="sb-titulo-pagina" style={{ marginBottom: '.5rem' }}>{empresa.nombre}</h1>
           <Escaner onValidado={() => setRecarga(n => n + 1)} />
           <Ingresos recarga={recarga} />
           <Horarios empresaId={empresa.id} fecha={fecha} onCambio={() => setRecarga(n => n + 1)} />
@@ -196,7 +196,7 @@ export default function PanelPage() {
 
 const S: Record<string, React.CSSProperties> = {
   main: { minHeight: '100vh', position: 'relative', zIndex: 1 },
-  card: { maxWidth: 420, margin: '4rem auto', padding: '2rem', background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 12 },
+  card: { maxWidth: 420, margin: '4rem auto', padding: '2rem', background: 'var(--superficie)', border: '1px solid var(--borde2)' },
   title: { fontSize: '2rem', marginBottom: '.5rem' },
   sub: { color: 'var(--tenue)', marginBottom: '1.25rem' },
   label: { display: 'block', fontSize: '.9rem', fontWeight: 500, color: 'var(--tenue)', marginBottom: 6 },
@@ -207,7 +207,7 @@ const S: Record<string, React.CSSProperties> = {
   wrap: { maxWidth: 960, margin: '2rem auto', padding: '0 1.5rem 4rem' },
   barra: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', margin: '1rem 0' },
   muted: { color: 'var(--tenue)' },
-  viaje: { background: 'var(--superficie)', border: '1px solid var(--borde2)', borderLeft: '5px solid var(--guacamaya)', borderRadius: 10, padding: '1rem 1.25rem', marginBottom: '.75rem' },
+  viaje: { background: 'var(--superficie)', border: '1px solid var(--borde2)', borderLeft: '5px solid var(--guacamaya)', padding: '1rem 1.25rem', marginBottom: '.75rem' },
   viajeFila: { display: 'flex', alignItems: 'baseline', gap: '1.25rem', flexWrap: 'wrap', marginBottom: '.5rem' },
   vendidos: { marginLeft: 'auto', fontWeight: 700 },
   summary: { cursor: 'pointer', color: 'var(--turquesa)', fontWeight: 500, marginBottom: '.5rem' },

@@ -105,10 +105,10 @@ export default function Escaner({ onValidado }: { onValidado: () => void }) {
 }
 
 const S: Record<string, React.CSSProperties> = {
-  caja: { background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 10, padding: '1rem 1.25rem', marginBottom: '1.5rem' },
+  caja: { background: 'var(--superficie)', border: '1px solid var(--borde2)', padding: '1rem 1.25rem', marginBottom: '1.5rem' },
   btn: { background: 'var(--guacamaya)', color: '#FFFFFF', border: 'none', padding: '10px 16px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' },
-  video: { display: 'block', width: '100%', maxWidth: 360, aspectRatio: '1', objectFit: 'cover', borderRadius: 8, margin: '.75rem 0', background: '#000' },
+  video: { display: 'block', width: '100%', maxWidth: 360, aspectRatio: '1', objectFit: 'cover', margin: '.75rem 0', background: '#000' },
   fila: { display: 'flex', gap: '.5rem', marginTop: '.75rem' },
   input: { flex: 1, minWidth: 0, height: 44, padding: '0 12px', background: 'var(--hundido)', border: '1px solid var(--borde)', fontFamily: 'monospace' },
-  resultado: { marginTop: '1rem', padding: '.75rem 1rem', border: '2px solid', borderRadius: 8, display: 'grid', gap: 4 },
+  resultado: { marginTop: '1rem', padding: '.75rem 1rem', border: '2px solid', display: 'grid', gap: 4 },
 }

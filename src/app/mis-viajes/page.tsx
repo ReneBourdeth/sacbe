@@ -80,7 +80,7 @@ export default function MisViajesPage() {
       </SiteHeader>
 
       <div style={S.wrap}>
-        <h1 style={S.title}>{t.misBoletos}</h1>
+        <h1 className="sb-titulo-pagina" style={S.title}>{t.misBoletos}</h1>
 
         {error ? (
           <p style={S.muted}>{t.errorViajes} · <a href="/mis-viajes" style={{ color: 'var(--turquesa)', textDecoration: 'underline' }}>{t.intentarDeNuevo}</a></p>
@@ -132,13 +132,13 @@ const S: Record<string, React.CSSProperties> = {
   cancelar: { display: 'block', marginTop: '.75rem', background: 'none', border: '1px solid var(--rojo)', color: 'var(--rojo)', padding: '6px 12px', fontWeight: 700, cursor: 'pointer' },
   salir: { background: 'none', border: 'none', color: 'var(--tinta)', fontWeight: 500, cursor: 'pointer', textDecoration: 'underline' },
   wrap: { maxWidth: 720, margin: '2rem auto', padding: '0 1.5rem 4rem' },
-  title: { fontSize: '2.4rem', marginBottom: '1.25rem' },
+  title: { marginBottom: '1.5rem' },
   muted: { color: 'var(--tenue)', marginBottom: '.75rem' },
-  empty: { background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 12, padding: '3rem', textAlign: 'center', color: 'var(--tenue)' },
-  btn: { display: 'inline-block', background: 'var(--guacamaya)', color: '#FFFFFF', borderRadius: 6, padding: '11px 22px', fontWeight: 700 },
-  card: { display: 'flex', gap: '1.25rem', flexWrap: 'wrap', background: 'var(--superficie)', border: '1px solid var(--borde2)', borderTop: '5px solid var(--guacamaya)', borderRadius: 12, padding: '1.25rem', marginBottom: '1rem' },
+  empty: { background: 'var(--superficie)', border: '1px solid var(--borde2)', padding: '3rem', textAlign: 'center', color: 'var(--tenue)' },
+  btn: { display: 'inline-block', background: 'var(--guacamaya)', color: '#FFFFFF', padding: '11px 22px', fontWeight: 700 },
+  card: { display: 'flex', gap: '1.25rem', flexWrap: 'wrap', background: 'var(--superficie)', border: '1px solid var(--borde2)', borderTop: '5px solid var(--guacamaya)', padding: '1.25rem', marginBottom: '1rem' },
   ruta: { fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800 },
   fila: { display: 'flex', justifyContent: 'space-between', gap: '1rem', fontSize: '.95rem', marginBottom: 3, color: 'var(--tenue)' },
-  estado: { display: 'inline-block', marginTop: '.5rem', fontSize: '.9rem', fontWeight: 500, padding: '2px 12px', borderRadius: 999, background: 'var(--hundido)', color: 'var(--tinta)' },
+  estado: { display: 'inline-block', marginTop: '.5rem', fontSize: '.9rem', fontWeight: 500, padding: '2px 12px', background: 'var(--hundido)', color: 'var(--tinta)' },
   estadoOk: { background: 'rgba(74, 222, 128, .15)', color: 'var(--verde)' },
 }

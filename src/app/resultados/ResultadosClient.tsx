@@ -39,7 +39,7 @@ export default function ResultadosClient({ viajes, origen, destino, fecha }: Pro
 
       {/* Route and date being shown */}
       <div style={S.subhead}>
-        <span style={S.shRuta}>{nombreTerminal(origen)} — {nombreTerminal(destino)}</span>
+        <h1 className="sb-titulo-pagina" style={S.shRuta}>{nombreTerminal(origen)} → {nombreTerminal(destino)}</h1>
         <span style={S.shFecha}>{formatoDia(fecha, locale)}</span>
         <Link href="/" style={S.shEdit}>{t.editar}</Link>
       </div>
