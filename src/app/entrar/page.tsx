@@ -107,7 +107,7 @@ export default function EntrarPage() {
 
 const S: Record<string, React.CSSProperties> = {
   main: { minHeight: '100vh', position: 'relative', zIndex: 1 },
-  card: { maxWidth: 420, margin: '4rem auto', padding: '2rem', background: 'var(--superficie)', border: '1px solid var(--borde2)' },
+  card: { maxWidth: 420, margin: '4rem auto', padding: '2rem', background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 'var(--radio)' },
   eyebrow: { color: 'var(--tenue)', marginBottom: '.25rem' },
   title: { fontSize: '2rem', marginBottom: '.5rem' },
   sub: { color: 'var(--tenue)', marginBottom: '1.25rem' },

@@ -24,6 +24,7 @@
 
   --borde:  rgba(255, 255, 255, .3);
   --borde2: rgba(255, 255, 255, .16);
+  --radio:  10px; /* one corner size for every box, button and field */
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -69,7 +70,7 @@ a { color: inherit; text-decoration: none; }
 
 input, select, button { font-family: var(--font-sans); font-size: 1rem; }
 input, select { color: var(--tinta); }
-button, input, select { border-radius: 0; } /* square corners everywhere; also stops iOS rounding inputs */
+button, input, select { border-radius: var(--radio); }
 
 :focus-visible { outline: 3px solid var(--turquesa) !important; outline-offset: 2px; }
 
@@ -115,13 +116,13 @@ button, input, select { border-radius: 0; } /* square corners everywhere; also s
 
 .sb-indicadores { position: absolute !important; top: 2rem; right: 2.5rem; display: flex; gap: 6px; }
 .sb-indicadores button { width: 44px; height: 24px; background: none; border: none; cursor: pointer; display: flex; align-items: center; }
-.sb-indicadores span { display: block; width: 100%; height: 3px; background: rgba(255,255,255,.55); }
+.sb-indicadores span { display: block; width: 100%; height: 3px; border-radius: 3px; background: rgba(255,255,255,.55); }
 .sb-indicadores [aria-current="true"] span { background: var(--guacamaya); }
 
 /* Outlined "featured route" card over the photo */
 .sb-destacada {
   position: absolute !important; top: 4.5rem; right: 2.5rem; width: 290px; padding: 1.1rem 1.25rem;
-  border: 1px solid rgba(255,255,255,.75); background: rgba(0,0,0,.35);
+  border: 1px solid rgba(255,255,255,.75); border-radius: var(--radio); background: rgba(0,0,0,.35);
   display: flex; flex-direction: column; gap: .6rem;
 }
 .sb-destacada:hover { border-color: var(--guacamaya); }
@@ -185,7 +186,7 @@ button, input, select { border-radius: 0; } /* square corners everywhere; also s
   .sb-trip > :nth-child(1) { text-align: left; }
 
   .sb-overlay { align-items: flex-end !important; padding: 0 !important; }
-  .sb-modal { padding: 1.5rem 1rem 1.25rem !important; max-height: 92vh !important; }
+  .sb-modal { padding: 1.5rem 1rem 1.25rem !important; max-height: 92vh !important; border-radius: var(--radio) var(--radio) 0 0 !important; }
   .sb-form2 { grid-template-columns: 1fr; }
 
   .sb-card-auth { margin: 2rem 1rem !important; padding: 1.5rem !important; }

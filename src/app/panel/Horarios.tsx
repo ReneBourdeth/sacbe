@@ -156,7 +156,7 @@ function Campo({ label, children }: { label: string; children: React.ReactNode }
 }
 
 const S: Record<string, React.CSSProperties> = {
-  caja: { background: 'var(--superficie)', border: '1px solid var(--borde2)', padding: '1rem 1.25rem', marginBottom: '1.5rem' },
+  caja: { background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 'var(--radio)', padding: '1rem 1.25rem', marginBottom: '1.5rem' },
   muted: { color: 'var(--tenue)' },
   lista: { margin: '0 0 .75rem 1.1rem', color: 'var(--tenue)', display: 'grid', gap: 2 },
   detalle: { marginTop: '.5rem' },
