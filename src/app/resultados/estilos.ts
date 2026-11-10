@@ -75,6 +75,7 @@ export const S: Record<string, React.CSSProperties> = {
   back: { fontSize: '.95rem', fontWeight: 500, color: 'var(--tinta)' },
   noResultsTitulo: { fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, marginBottom: '.5rem' },
   noResultsSub: { color: 'var(--tenue)' },
+  proximoDia: { ...boton, display: 'inline-block', marginTop: '.75rem', padding: '11px 22px' },
 
   // Selection summary
   sideVacio: { color: 'var(--tenue)', textAlign: 'center', padding: '1rem 0' },

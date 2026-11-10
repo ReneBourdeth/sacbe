@@ -4,7 +4,7 @@
 // goes through database functions like reservar_asiento.
 
 import { createClient, type Asiento, type Clase, type Viaje } from './supabase'
-import { OFFSET_HONDURAS } from './fecha'
+import { OFFSET_HONDURAS, diaHonduras } from './fecha'
 
 /**
  * Start and end of a day (YYYY-MM-DD) in Honduras time, for filtering `salida`.
@@ -30,6 +30,31 @@ export async function getViajes(origen: string, destino: string, fecha: string):
 
   if (error) throw new Error(error.message)
   return data ?? []
+}
+
+/** First Honduras day (YYYY-MM-DD) on or after `fecha` with a bus on this route, or null if it has none. */
+export async function getProximoDia(origen: string, destino: string, fecha: string): Promise<string | null> {
+  const { data, error } = await createClient()
+    .from('v_viajes_disponibles') // only future trips with free seats
+    .select('salida')
+    .eq('origen_codigo', origen)
+    .eq('destino_codigo', destino)
+    .gte('salida', rangoDia(fecha).desde)
+    .order('salida', { ascending: true })
+    .limit(1)
+
+  if (error) throw new Error(error.message)
+  return data?.[0] ? diaHonduras(data[0].salida) : null
+}
+
+/** Every city pair with an active route, as "SPS-TGU" keys (38 rows, read once on the home page). */
+export async function getRutasActivas(): Promise<Set<string>> {
+  const { data, error } = await createClient()
+    .from('rutas') // RLS: the public only sees active routes
+    .select('origen:terminales!rutas_origen_id_fkey ( codigo ), destino:terminales!rutas_destino_id_fkey ( codigo )')
+  if (error) throw new Error(error.message)
+  const filas = (data ?? []) as unknown as { origen: { codigo: string } | null; destino: { codigo: string } | null }[]
+  return new Set(filas.map(r => `${r.origen?.codigo}-${r.destino?.codigo}`))
 }
 
 /** All seats of a trip, front to back. */

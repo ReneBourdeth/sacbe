@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { getViajes } from '@/lib/api'
+import { getProximoDia, getViajes } from '@/lib/api'
 import { hoyHonduras } from '@/lib/fecha'
 import { useLang } from '@/lib/i18n'
 import type { Viaje } from '@/lib/supabase'
@@ -21,6 +21,7 @@ function ResultadosInner() {
   const fecha = searchParams.get('fecha') || hoyHonduras()
 
   const [viajes, setViajes] = useState<Viaje[]>([])
+  const [proximoDia, setProximoDia] = useState<string | null>(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
 
@@ -28,7 +29,12 @@ function ResultadosInner() {
     setCargando(true)
     setError('')
     getViajes(origen, destino, fecha)
-      .then(setViajes)
+      .then(async v => {
+        setViajes(v)
+        // Nothing that day: find the next day with buses, so the visitor isn't left guessing.
+        // A failure here only hides that hint, it never blocks the results.
+        setProximoDia(v.length ? null : await getProximoDia(origen, destino, fecha).catch(() => null))
+      })
       .catch(err => setError(err.message))
       .finally(() => setCargando(false))
   }, [origen, destino, fecha])
@@ -44,7 +50,7 @@ function ResultadosInner() {
     )
   }
 
-  return <ResultadosClient viajes={viajes} origen={origen} destino={destino} fecha={fecha} />
+  return <ResultadosClient viajes={viajes} origen={origen} destino={destino} fecha={fecha} proximoDia={proximoDia} />
 }
 
 // useSearchParams needs a Suspense boundary in Next.js 14, or the build fails
