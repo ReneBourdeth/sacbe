@@ -6,8 +6,9 @@
   /* Black background with near-white text for maximum contrast (≈19:1). */
   color-scheme: dark;     /* native date pickers, selects and scrollbars go dark too */
   --fondo:      #000000;  /* night over the white road */
-  --superficie: #141414;  /* cards, boxes, modal */
-  --hundido:    #1F1F1F;  /* inputs and inner panels */
+  /* Glass: panels let the photo behind the page show through */
+  --superficie: rgba(12, 12, 12, .66);    /* cards, boxes, modal */
+  --hundido:    rgba(255, 255, 255, .08); /* inputs and inner panels */
   --tinta:      #FFFFFF;  /* main text */
   --tenue:      #C9CFC2;  /* secondary text, still ≈13:1 on black */
   --toba:       #8E9884;  /* Copán's volcanic tuff: borders, stone shapes */
@@ -21,9 +22,8 @@
   --font-display: var(--font-archivo), system-ui, sans-serif;
   --font-sans:    var(--font-archivo), system-ui, sans-serif;
 
-  --borde:  #4A4F45;
-  --borde2: #2E322B;
-  --radio:  8px;
+  --borde:  rgba(255, 255, 255, .3);
+  --borde2: rgba(255, 255, 255, .16);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,6 +39,20 @@ body {
   overflow-x: hidden;
 }
 
+/* Every page sits on a darkened photo of Tegucigalpa (CC0, Straggles, Wikimedia
+   Commons, so no credit is required). A fixed layer instead of
+   background-attachment: fixed, which iOS ignores. */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1;
+  background: linear-gradient(rgba(0,0,0,.78), rgba(0,0,0,.9)),
+    url("https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Cumulus_clouds_over_Tegucigalpa%2C_Honduras.jpg/1280px-Cumulus_clouds_over_Tegucigalpa%2C_Honduras.jpg") center / cover;
+}
+
+/* Panels that float over moving content get a frosted blur too */
+.sb-header, .sb-lateral, .sb-search-box, .sb-destacada, .sb-modal, .sb-side > div { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+
+option { background: #111; } /* native dropdown lists can't be see-through */
+
 h1, h2, h3 {
   font-family: var(--font-display);
   font-weight: 800;
@@ -46,12 +60,16 @@ h1, h2, h3 {
   letter-spacing: -.02em;
   color: var(--tinta);
 }
+h1 { font-weight: 900; letter-spacing: -.035em; }
+
+/* Main title of an inner page: the home headline's style, one size down */
+.sb-titulo-pagina { font-size: clamp(2.2rem, 6vw, 4.5rem); line-height: .95; }
 
 a { color: inherit; text-decoration: none; }
 
 input, select, button { font-family: var(--font-sans); font-size: 1rem; }
-input, select { border-radius: 6px; color: var(--tinta); }
-button { border-radius: 6px; }
+input, select { color: var(--tinta); }
+button, input, select { border-radius: 0; } /* square corners everywhere; also stops iOS rounding inputs */
 
 :focus-visible { outline: 3px solid var(--turquesa) !important; outline-offset: 2px; }
 
@@ -78,7 +96,7 @@ button { border-radius: 6px; }
 .sb-lateral {
   grid-row: span 3; position: sticky; top: 0; height: 100vh;
   display: flex; flex-direction: column; justify-content: space-between; gap: 2rem;
-  padding: 1.75rem 1.5rem; background: #0B0B0B; border-right: 1px solid var(--borde2);
+  padding: 1.75rem 1.5rem; background: rgba(0, 0, 0, .6); border-right: 1px solid var(--borde2);
 }
 .sb-lateral-nav { display: flex; flex-direction: column; gap: 1rem; font-size: 1.05rem; font-weight: 600; }
 .sb-lateral-nav a:hover { color: var(--guacamaya); }
@@ -103,7 +121,7 @@ button { border-radius: 6px; }
 /* Outlined "featured route" card over the photo */
 .sb-destacada {
   position: absolute !important; top: 4.5rem; right: 2.5rem; width: 290px; padding: 1.1rem 1.25rem;
-  border: 1px solid rgba(255,255,255,.75); background: rgba(0,0,0,.35); backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,.75); background: rgba(0,0,0,.35);
   display: flex; flex-direction: column; gap: .6rem;
 }
 .sb-destacada:hover { border-color: var(--guacamaya); }
@@ -167,7 +185,7 @@ button { border-radius: 6px; }
   .sb-trip > :nth-child(1) { text-align: left; }
 
   .sb-overlay { align-items: flex-end !important; padding: 0 !important; }
-  .sb-modal { padding: 1.5rem 1rem 1.25rem !important; max-height: 92vh !important; border-radius: 14px 14px 0 0 !important; }
+  .sb-modal { padding: 1.5rem 1rem 1.25rem !important; max-height: 92vh !important; }
   .sb-form2 { grid-template-columns: 1fr; }
 
   .sb-card-auth { margin: 2rem 1rem !important; padding: 1.5rem !important; }

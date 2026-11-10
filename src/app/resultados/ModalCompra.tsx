@@ -231,7 +231,7 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
 
             {boletos.map(b => (
               <div key={b.codigo} style={S.boletoListo}>
-                <div style={{ background: 'white', padding: 8, borderRadius: 8 }}>
+                <div style={{ background: 'white', padding: 8 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element -- local data: URL, nothing to optimize */}
                   <img src={b.qr} alt={`QR ${t.asiento} ${b.numero}`} style={{ display: 'block', width: 120, height: 120 }} />
                 </div>
