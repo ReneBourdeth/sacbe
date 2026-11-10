@@ -46,7 +46,7 @@ body {
 body::before {
   content: ''; position: fixed; inset: 0; z-index: -1;
   background: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.88)),
-    url("https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/CPN_BallCourt_01.jpg/1920px-CPN_BallCourt_01.jpg") center / cover;
+    url("https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/CPN_BallCourt_01.jpg/1280px-CPN_BallCourt_01.jpg") center / cover;
 }
 
 /* Panels that float over moving content get a frosted blur too */
@@ -87,8 +87,6 @@ button, input, select { border-radius: var(--radio); }
   padding: 0; margin: -1px; overflow: hidden;
   clip: rect(0,0,0,0); white-space: nowrap; border-width: 0;
 }
-
-.z1 { position: relative; z-index: 1; }
 
 /* ── HONDURAN MOTIFS ───────────────────────────────────────── */
 
