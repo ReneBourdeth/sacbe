@@ -76,6 +76,8 @@ export default function HomePage() {
           ))}
           <div className="sb-velo" />
 
+          {/* Top-right corner, kept in the normal layout so it can never cover the headline */}
+          <div className="sb-portada-arriba">
           <div className="sb-indicadores">
             {FOTOS.map((p, i) => (
               <button key={p.lugar} onClick={() => setActual(i)} aria-label={t.verFoto(p.lugar)} aria-current={i === actual}><span /></button>
@@ -87,6 +89,7 @@ export default function HomePage() {
             <strong style={S.cardRuta}>{nombreTerminal(f.origen)} → {nombreTerminal(f.destino)}</strong>
             <span style={S.cardLink}>{t.verHorarios}</span>
           </Link>
+          </div>
 
           <div>
             <p style={S.tagline}>{t.tagline}</p>
