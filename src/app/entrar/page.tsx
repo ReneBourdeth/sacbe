@@ -37,7 +37,8 @@ function EntrarInner() {
       },
     })
     setCargando(false)
-    if (error) return setError(t.errorEnvio)
+    // shortcut: Supabase's built-in email sends about 2 an hour for the whole site; connect an SMTP service to lift it
+    if (error) return setError(error.code === 'over_email_send_rate_limit' || error.status === 429 ? t.correoLimiteEntrar : t.errorEnvio)
     setEnviado(true)
   }
 

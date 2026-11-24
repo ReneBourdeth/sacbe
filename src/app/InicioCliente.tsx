@@ -15,6 +15,7 @@ import { hoyHonduras } from '@/lib/fecha'
 import { TERMINALES, nombreTerminal } from '@/lib/terminales'
 import AuthLink from '@/components/AuthLink'
 import LangToggle from '@/components/LangToggle'
+import TemaToggle from '@/components/TemaToggle'
 import { MarcaGuacamaya } from '@/components/Simbolos'
 import { TEXTOS, SALIDAS, RUTAS } from './inicio-textos'
 import { FOTOS, foto } from '@/lib/fotos'
@@ -97,6 +98,12 @@ export default function InicioCliente() {
   --display-weight: 500;
   --display-tracking: -0.025em;
   --display-tracking-xl: -0.035em;
+}
+/* light mode (the client's colours on a white page): the inverse of the brand palette above */
+html[data-tema="claro"] {
+  color-scheme: light;
+  --p-bg: #ffffff; --p-surface: #f2f2f2; --p-ink: #000000; --p-muted: #424242;
+  --p-inv-bg: #000000; --p-inv-surface: #141414; --p-inv-ink: #ffffff; --p-inv-muted: #c9cfc2;
 }` }} />
 
       <header className="nav nav--centre">
@@ -111,6 +118,7 @@ export default function InicioCliente() {
           </nav>
           <div className="nav__actions">
             <span className="idioma"><LangToggle /></span>
+            <span className="idioma"><TemaToggle /></span>
             <AuthLink className="nav__link" />
             <a className="btn btn--primary" href="#buscar">{T.accion}</a>
           </div>

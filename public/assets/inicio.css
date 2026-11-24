@@ -155,3 +155,13 @@ header.nav::after { content: ""; position: absolute; left: 0; right: 0; bottom: 
    (with its search form) and the close ran past their fixed height, and the next section covered the
    bottom of the search button and the footer's links. */
 :is(main > section, footer.closing) { height: auto !important; min-height: calc(var(--h, 1) * 100svh); }
+
+/* light mode (☀): the bar's glass and the search fields on white */
+html[data-tema="claro"] header.nav { background: rgb(255 255 255 / .78); }
+html[data-tema="claro"] .buscador select, html[data-tema="claro"] .buscador input { background: rgb(0 0 0 / .04); }
+/* the bar's right side (language, ☀, sign in, button) outgrew its third of the bar at 1280 and covered
+   "Preguntas": the sides take what they hold, the words centre in the space between */
+@media (min-width: 1024px) {
+  .nav--centre .nav__bar { grid-template-columns: auto minmax(0, 1fr) auto; column-gap: var(--s-6); }
+  .nav--centre .nav__links { justify-self: center; }
+}

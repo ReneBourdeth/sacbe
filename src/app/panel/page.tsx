@@ -57,7 +57,8 @@ export default function PanelPage() {
   // Already signed in from an earlier visit?
   useEffect(() => {
     createClient().auth.getSession().then(async ({ data }) => {
-      if (data.session) { setLogueado(true); await cargarEmpresa() }
+      // A guest buyer's invisible session is not a staff login: show them the password form
+      if (data.session && !data.session.user.is_anonymous) { setLogueado(true); await cargarEmpresa() }
       setVerificando(false)
     })
   }, [])

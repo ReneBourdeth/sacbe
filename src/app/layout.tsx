@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   },
 }
 
-const KIT_HEAD = `if(location.pathname==='/'){var h=document.documentElement;h.dataset.type='software';h.dataset.radius='round';h.dataset.buttons='tonal';h.dataset.ground='sky';h.setAttribute('data-motion','');document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700);document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)}`
+const KIT_HEAD = `try{if(localStorage.getItem('sacbe-tema')==='claro')document.documentElement.dataset.tema='claro'}catch(e){}if(location.pathname==='/'){var h=document.documentElement;h.dataset.type='software';h.dataset.radius='round';h.dataset.buttons='tonal';h.dataset.ground='sky';h.setAttribute('data-motion','');document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700);document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)}`
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
