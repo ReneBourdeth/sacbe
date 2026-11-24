@@ -7,7 +7,7 @@ import { cancelarBoleto, getMisBoletos } from '@/lib/api'
 import { useLang } from '@/lib/i18n'
 import { formatoFechaHora } from '@/lib/fecha'
 import { qrComoImagen } from '@/lib/qr'
-import SiteHeader from '@/components/SiteHeader'
+import SiteHeader, { SiteFooter } from '@/components/SiteHeader'
 
 // Shape returned by getMisBoletos: a ticket joined with its trip, route and seat.
 // Joined parts can be null when RLS hides them (e.g. a trip that already left).
@@ -125,6 +125,7 @@ export default function MisViajesPage() {
           )
         })}
       </div>
+      <SiteFooter />
     </main>
   )
 }

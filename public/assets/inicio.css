@@ -25,7 +25,7 @@
 .hero__art { background: var(--p-surface); }
 .hero__art > .ly-piece--note { left: var(--s-6); bottom: var(--s-6); width: 300px; z-index: 2; }
 .ly-piece--main .d-row { grid-template-columns: 52px minmax(0, 1fr) 64px 96px; }
-.d-hora { display: grid; place-items: center; font: 500 13px/1 var(--font-text); color: #eceef0; background: rgb(255 255 255 / .07) !important; }
+.d-hora { display: grid; place-items: center; font: 500 13px/1 var(--font-text); color: #eceef0; background: #262626 !important; }
 .d-note__line { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 13px; color: #3d4247; border-top: 1px solid rgb(0 0 0 / .06); }
 .d-note__line:first-of-type { border-top: 0; }
 .d-note__line i { width: 18px; height: 18px; border-radius: 50%; flex: none; display: grid; place-items: center; background: #fbe3e6; color: #a51c2e; font-style: normal; font-size: 13px; font-weight: 600; }
@@ -138,7 +138,7 @@
 .hero__art > .ly-piece--note { z-index: 2; }
 /* glass: the drawn windows and cards let the photograph show through, blurred */
 .d-win--dark, .frame .recibo, .panel:has(> .foto-panel) .mini {
-  background: rgb(10 10 10 / .8) !important; backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  background: rgb(10 10 10 / .86) !important; backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
   border: 1px solid rgb(255 255 255 / .14); }
 .d-card { background: rgb(255 255 255 / .86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 /* the search fields and the bar: see-through on the page's black */
@@ -148,7 +148,7 @@ header.nav { background: rgb(0 0 0 / .62); backdrop-filter: blur(14px); -webkit-
 header.nav::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px;
   background: linear-gradient(90deg, #d7263d 0 50%, #ffc21a 50% 67%, #4db8ff 67% 100%); pointer-events: none; }
 /* the hero's window sits over the brightest photograph: a denser glass and lighter grey text */
-.d-win--dark { background: rgb(10 10 10 / .88) !important; }
+.d-win--dark { background: rgb(10 10 10 / .92) !important; }
 .d-win--dark .d-win__bar, .d-win--dark .d-side, .d-win--dark .d-row small { color: #d6d9dd; }
 
 /* Sections are one or two screens tall, but never shorter than what they hold: on a short window the hero
@@ -207,9 +207,9 @@ html[data-tema="claro"] .d-win--dark .d-row b { color: #16181a; }
 html[data-tema="claro"] .d-win--dark :is(.d-rows, .d-row) { border-color: rgb(0 0 0 / .08); }
 html[data-tema="claro"] .d-win--dark .d-side > span.is-on { background: rgb(0 0 0 / .05); color: #16181a; }
 html[data-tema="claro"] .d-win--dark .d-win__dots i { background: #d6d9dd; }
-html[data-tema="claro"] .d-hora { color: #16181a; background: rgb(0 0 0 / .05) !important; }
+html[data-tema="claro"] .d-hora { color: #16181a; background: #eef0f2 !important; }
 html[data-tema="claro"] :is(.frame .recibo, .panel:has(> .foto-panel) .mini) {
-  background: rgb(255 255 255 / .88) !important; border-color: rgb(0 0 0 / .08);
+  background: rgb(255 255 255 / .92) !important; border-color: rgb(0 0 0 / .08);
   --u-ink: #111111; --u-muted: #4d5257; --u-line: rgb(0 0 0 / .1); color: #111111; }
 
 /* titles and the Sacbé wordmark: bold and tight, as the client asked (over the kit's 500 weight) */
@@ -236,9 +236,10 @@ html[data-tema="claro"] :is(.frame .recibo, .panel:has(> .foto-panel) .mini) {
 
 /* routes are links: a row or a city card opens the results for that pair */
 .rows > li:has(> .ruta-link) { display: block; padding: 0; }
-.ruta-link { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s-1) var(--s-5); padding: var(--s-4) var(--s-2);
-  margin-inline: calc(-1 * var(--s-2)); color: inherit; text-decoration: none; border-radius: var(--r-sm, 8px); transition: background-color .2s, color .2s; }
-.ruta-link:hover, .ruta-link:focus-visible { background: color-mix(in srgb, #d7263d 14%, transparent); }
+/* the hover tint is a shadow ring, so the row's box stays on the column's edges */
+.ruta-link { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s-1) var(--s-5); padding-block: var(--s-4);
+  color: inherit; text-decoration: none; border-radius: 6px; transition: background-color .2s, box-shadow .2s, color .2s; }
+.ruta-link:hover, .ruta-link:focus-visible { --tinte: color-mix(in srgb, #d7263d 14%, transparent); background: var(--tinte); box-shadow: 0 0 0 8px var(--tinte); }
 .ruta-link:hover .rows__value, .ruta-link:focus-visible .rows__value { color: #d7263d; }
 html[data-tema="claro"] .ruta-link:hover .rows__value { color: #b51f33; }
 .ciudad:hover, .ciudad:focus-visible { border-color: #d7263d; transform: translateY(-2px); }
@@ -248,3 +249,7 @@ main > section.g2 > .wrap { grid-template-rows: auto auto !important; row-gap: v
 /* the seat-map window filled the rest of a screen-tall section; with sections at content height it keeps its own */
 #asientos .app.fill { flex: none; height: clamp(520px, 72svh, 680px); }
 @media (max-width: 639px) { #asientos .app.fill { height: 620px; } }
+/* the ring's city discs open their route (InicioCliente adds the click once the kit has drawn them) */
+.red-rutas .dg-node[data-ruta] { cursor: pointer; transition: transform .2s; }
+.red-rutas .dg-node[data-ruta]:hover { transform: translateY(-2px); }
+.red-rutas .dg-node[data-ruta]:hover .dg-cap__l { color: #d7263d; }

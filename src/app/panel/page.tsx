@@ -6,7 +6,7 @@ import { getMiEmpresa, getViajesEmpresa, marcarPagado, marcarReembolsado } from 
 import { useLang } from '@/lib/i18n'
 import { formatoHora, hoyHonduras } from '@/lib/fecha'
 import { nombreTerminal } from '@/lib/terminales'
-import SiteHeader from '@/components/SiteHeader'
+import SiteHeader, { SiteFooter } from '@/components/SiteHeader'
 import Escaner from './Escaner'
 import Horarios, { EditarViaje } from './Horarios'
 import Ingresos from './Ingresos'
@@ -191,6 +191,7 @@ export default function PanelPage() {
           ))}
         </div>
       )}
+      <SiteFooter />
     </main>
   )
 }
