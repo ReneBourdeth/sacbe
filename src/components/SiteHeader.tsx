@@ -32,6 +32,7 @@ export default function SiteHeader({ children }: { children?: React.ReactNode })
           <AuthLink />
           <a className="sb-btn sb-header-cta" href="/#buscar" style={S.cta}>{T.accion}</a>
         </div>
+        <Franja />
       </header>
     </div>
   )
@@ -45,6 +46,11 @@ export function Logo() {
       Sacbé
     </a>
   )
+}
+
+/** The macaw's three colours under the bar, as round-ended pills (styled in globals.css). */
+export function Franja() {
+  return <span className="franja" aria-hidden="true"><i /><i /><i /></span>
 }
 
 /** Footer of every inner page: the home footer's black band, shortened to the brand, © and credits. */
