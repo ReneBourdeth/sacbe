@@ -9,7 +9,7 @@ export default function LangToggle({ style }: { style?: React.CSSProperties }) {
   const estiloBoton = (l: Lang): React.CSSProperties => ({
     background: lang === l ? 'var(--tinta)' : 'transparent',
     color: lang === l ? 'var(--fondo)' : 'var(--tenue)',
-    border: 'none', borderRadius: 'var(--radio)', padding: '3px 9px', fontSize: '.85rem', fontWeight: 500, cursor: 'pointer',
+    border: 'none', borderRadius: 'var(--radio)', padding: '2px 7px', fontSize: '.8rem', fontWeight: 500, cursor: 'pointer',
   })
 
   return (
