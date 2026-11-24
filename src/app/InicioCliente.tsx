@@ -26,7 +26,7 @@ import { FOTOS, foto } from '@/lib/fotos'
 
 const CSS = [
   'system.css', 'ui/cards.css', 'motion/motion.css', 'backgrounds/backgrounds.css', 'layout/layout.css',
-  'icons/icon.css', 'ui/base.css', 'ui/window/fragment.css', 'layout/demo.css', 'inicio.css?v=15', // bump v when the file changes, so browsers drop the old copy
+  'icons/icon.css', 'ui/base.css', 'ui/window/fragment.css', 'layout/demo.css', 'inicio.css?v=16', // bump v when the file changes, so browsers drop the old copy
 ]
 const SCRIPTS = ['system.js', 'motion/motion.js', 'layout/layout.js']
 // Copán's ball court, public domain (Talk2winik, Wikimedia Commons), credited in the footer
