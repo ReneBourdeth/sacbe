@@ -105,8 +105,7 @@
 .mini__fila b { font-weight: 500; }
 .mini__campo { display: flex; justify-content: space-between; gap: 12px; padding: 8px 12px; margin: 4px 0; border: 1px solid var(--u-line); border-radius: 10px; color: var(--u-muted); font-size: 13px; }
 .mini__campo span { color: var(--u-ink); font-size: 14px; }
-.mini__qr { justify-self: center; width: 96px; height: 96px; margin: 4px 0 8px; border-radius: 10px;
-  background: conic-gradient(from 90deg at 2px 2px, #000 90deg, #fff 0) 0 0 / 12px 12px, #fff; box-shadow: inset 0 0 0 8px #fff; }
+.mini__qr { justify-self: center; width: 104px; height: 104px; margin: 4px 0 8px; padding: 6px; border-radius: 10px; background: #fff; object-fit: contain; }
 
 
 /* the drawn panels take the UI kit's ink, not the lit ground's dark ink around them */
@@ -214,3 +213,20 @@ html[data-tema="claro"] :is(.frame .recibo, .panel:has(> .foto-panel) .mini) {
 /* the wordmark in capitals and black weight, as the client asked; the close repeats it */
 .nav__logo { font-weight: 900; letter-spacing: -0.01em; text-transform: uppercase; }
 .close__word { font-weight: 900; text-transform: uppercase; letter-spacing: -0.03em; }
+
+/* routes: the ring diagram from 1024px; below that, the six cities with their lowest fare as cards */
+.ciudades { display: none; }
+@media (max-width: 1023px) {
+  #prices .red-rutas { display: none; }
+  .ciudades { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-3); margin: var(--s-7) 0 0 !important; padding: 0; list-style: none; }
+  .ciudad { display: flex; align-items: center; gap: var(--s-3); padding: var(--s-4); border: 1px solid var(--line); border-radius: var(--r-md); background: var(--p-surface); }
+  .ciudad svg { flex: none; color: #d7263d; }
+  .ciudad b { display: block; font-weight: 600; line-height: 1.2; }
+  .ciudad small { color: var(--muted); font-size: var(--t-small); }
+}
+@media (max-width: 639px) { .ciudades { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* below 1024 the route section is one flow (list, then the city cards), not two screens with a gap */
+@media (max-width: 1023px) {
+  main > section#prices.g2 { --h: 1; }
+  main > section#prices.g2 > .wrap { display: block; }
+}

@@ -300,9 +300,18 @@ html[data-tema="claro"] {
             </div>
             {/* the route network as the kit's ring diagram, each city with its lowest real fare */}
               <div className="panel red-rutas"><div className="dg" data-dg-still data-diagram={JSON.stringify({
-                layout: 'ring', size: 'band', ground: 'none', motion: { pulse: 'none' }, alt: T.rutas.alt, center: { label: 'Sacbé', icon: 'ui:globe' },
+                layout: 'ring', ground: 'none', motion: { pulse: 'none' }, alt: T.rutas.alt, center: { label: 'Sacbé', icon: 'ui:globe' },
                 ring: CIUDADES_DESDE.map(([c, l]) => ({ label: nombreTerminal(c), icon: 'ui:map-pin', meta: `${T.rutas.desde} L ${l}` })),
               })} /></div>
+            {/* phones and tablets: the same cities and fares as plain cards (the ring is too small to read there) */}
+            <ul className="ciudades" aria-label={T.rutas.alt}>
+              {CIUDADES_DESDE.map(([c, l]) => (
+                <li key={c} className="ciudad">
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z" fill="none" stroke="currentColor" strokeWidth="1.8" /><circle cx="12" cy="10" r="2.3" fill="currentColor" /></svg>
+                  <span><b>{nombreTerminal(c)}</b><small>{T.rutas.desde} L {l}</small></span>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
 
@@ -337,7 +346,8 @@ html[data-tema="claro"] {
                       )}
                       {i === 2 && (
                         <div className="ui ui-panel mini mini--qr">
-                          <span className="mini__qr" aria-hidden="true" />
+                          {/* eslint-disable-next-line @next/next/no-img-element -- a real QR drawn by Sacbé's own /qr route */}
+                          <img className="mini__qr" src="/qr/SCB-7Q2K-M9XD-4TFA" alt="" loading="lazy" />
                           <div className="mini__fila"><b>{T.pasos.escaneado}</b><span className="d-chip">{T.pasos.abordo}</span></div>
                         </div>
                       )}
@@ -438,7 +448,8 @@ function TarjetaEmpresa({ i, c, T }: { i: number; c: { h3: string; p: string }; 
               ))}
             </>}
             {i === 1 && <>
-              <span className="mini__qr" aria-hidden="true" />
+              {/* eslint-disable-next-line @next/next/no-img-element -- a real QR drawn by Sacbé's own /qr route */}
+              <img className="mini__qr" src="/qr/SCB-ABOR-DAR1-TEST" alt="" loading="lazy" />
               <div className="mini__fila"><span>SCB-ABOR-DAR1-TEST</span><span className="d-chip">{T.empresas.valido}</span></div>
               <div className="mini__fila"><span>SCB-YAAB-ORDO-TEST</span><span className="d-chip d-chip--out">{T.empresas.usado}</span></div>
             </>}
