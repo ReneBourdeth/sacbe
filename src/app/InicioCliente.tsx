@@ -95,9 +95,9 @@ export default function InicioCliente() {
   --font-display: "Red Hat Display", system-ui, sans-serif;
   --font-text: "Red Hat Text", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-  --display-weight: 500;
-  --display-tracking: -0.025em;
-  --display-tracking-xl: -0.035em;
+  --display-weight: 700;
+  --display-tracking: -0.04em;
+  --display-tracking-xl: -0.05em;
 }
 /* light mode (the client's colours on a white page): the inverse of the brand palette above */
 html[data-tema="claro"] {
