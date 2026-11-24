@@ -316,7 +316,7 @@ html[data-tema="claro"] a.d-row:hover { background: rgb(0 0 0 / .04); }
 @media (prefers-reduced-motion: reduce) { .panel-link, .panel-link .mini { transition: none; } .panel-link:hover { transform: none; } }
 .d-side > button > i { flex: none; width: 12px; height: 12px; border-radius: 50%; }
 /* payment: the receipt centred on the photo at its own height */
-.recibo-centro { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; z-index: 1; }
+.recibo-centro { position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; max-height: none !important; margin: 0 !important; display: grid; place-items: center; padding: 24px; z-index: 1; }
 .recibo-centro > div { width: min(420px, 100%); }
 .recibo-centro .recibo { height: auto !important; }
 #pago .frame { display: block !important; position: relative; min-height: 520px; overflow: hidden; }
