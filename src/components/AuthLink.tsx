@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase'
 import { useLang } from '@/lib/i18n'
 
 /** Shows "Entrar" when logged out and "Mis boletos" when logged in. Updates live on sign-in/out. */
-export default function AuthLink({ style }: { style?: React.CSSProperties }) {
+export default function AuthLink({ style, className }: { style?: React.CSSProperties; className?: string }) {
   const { t } = useLang()
   const [logueado, setLogueado] = useState(false)
 
@@ -18,8 +18,8 @@ export default function AuthLink({ style }: { style?: React.CSSProperties }) {
   }, [])
 
   return (
-    <Link href={logueado ? '/mis-viajes' : '/entrar?next=/mis-viajes'}
-      style={{ fontSize: '.95rem', fontWeight: 500, color: 'var(--tinta)', ...style }}>
+    <Link href={logueado ? '/mis-viajes' : '/entrar?next=/mis-viajes'} className={className}
+      style={className ? style : { fontSize: '.95rem', fontWeight: 500, color: 'var(--tinta)', ...style }}>
       {logueado ? t.misBoletos : t.entrar}
     </Link>
   )

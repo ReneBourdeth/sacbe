@@ -1,27 +1,35 @@
 import type { Metadata } from 'next'
-import { Archivo } from 'next/font/google'
 import '../styles/globals.css'
 import { LangProvider } from '@/lib/i18n'
 
-// Archivo: a heavy, wide grotesk for the big poster-style headlines and a
-// readable UI. Variable font, so every weight comes in one file.
-const archivo = Archivo({ subsets: ['latin'], variable: '--font-archivo' })
-
 export const metadata: Metadata = {
-  title: 'Sacbé — Plataforma Nacional de Transporte',
-  description: 'Conectando destinos, uniendo personas. Compra boletos de bus en Honduras.',
+  title: 'Sacbé: boletos de bus en Honduras',
+  description: 'Busca salidas entre seis ciudades de Honduras, elige tu asiento y lleva el boleto con QR en el teléfono.',
   keywords: ['bus', 'honduras', 'boletos', 'transporte', 'san pedro sula'],
   openGraph: {
     title: 'Sacbé',
-    description: 'Conectando destinos, uniendo personas.',
+    description: 'Boletos de bus entre seis ciudades de Honduras.',
     locale: 'es_HN',
     type: 'website',
   },
 }
 
+const KIT_HEAD = `if(location.pathname==='/'){var h=document.documentElement;h.dataset.type='software';h.dataset.radius='round';h.dataset.buttons='tonal';h.dataset.ground='sky';h.setAttribute('data-motion','');document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700);document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)}`
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={archivo.variable}>
+    // suppressHydrationWarning: the home page sets the kit's flags on <html> before React starts
+    <html lang="es" suppressHydrationWarning>
+      <head>
+        {/* the pairing the taste skill dealt (red-hat), from Google Fonts */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font -- one font link for every page, in the root layout */}
+        <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400..700&family=Red+Hat+Text:wght@400..600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+        {/* the taste skill's head line, home page only: the kit's page flags, and the hero's entrance guard
+            (its words wait for motion.js, or show after 700 ms if it is late); the moments' guard the same way */}
+        <script dangerouslySetInnerHTML={{ __html: KIT_HEAD }} />
+      </head>
       <body><LangProvider>{children}</LangProvider></body>
     </html>
   )

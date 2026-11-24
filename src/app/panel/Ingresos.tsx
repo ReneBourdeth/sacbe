@@ -58,7 +58,7 @@ export default function Ingresos({ recarga }: { recarga: number }) {
                   <tr key={f.origen + f.destino}>
                     <td style={S.td}>{nombreTerminal(f.origen)} → {nombreTerminal(f.destino)}</td>
                     <td style={S.tdNum}>{f.boletos_pagados}</td>
-                    <td style={{ ...S.tdNum, color: 'var(--verde)', fontWeight: 700 }}>{lempiras(f.ingresos)}</td>
+                    <td style={{ ...S.tdNum, color: 'var(--verde)', fontWeight: 500 }}>{lempiras(f.ingresos)}</td>
                     <td style={S.tdNum}>{f.boletos_pendientes}</td>
                     <td style={{ ...S.tdNum, color: 'var(--tenue)' }}>{lempiras(f.monto_pendiente)}</td>
                   </tr>
@@ -91,5 +91,5 @@ const S: Record<string, React.CSSProperties> = {
   thNum: { textAlign: 'right', color: 'var(--tenue)', fontWeight: 500, padding: '6px 8px', borderBottom: '1px solid var(--borde)' },
   td: { padding: '6px 8px', borderBottom: '1px solid var(--borde2)' },
   tdNum: { padding: '6px 8px', borderBottom: '1px solid var(--borde2)', textAlign: 'right', fontVariantNumeric: 'tabular-nums' },
-  tdTotal: { padding: '8px', fontWeight: 800, borderTop: '2px solid var(--borde)', fontVariantNumeric: 'tabular-nums' },
+  tdTotal: { padding: '8px', fontWeight: 500, borderTop: '2px solid var(--borde)', fontVariantNumeric: 'tabular-nums' },
 }

@@ -113,7 +113,7 @@ const S: Record<string, React.CSSProperties> = {
   sub: { color: 'var(--tenue)', marginBottom: '1.25rem' },
   label: { display: 'block', fontSize: '.9rem', fontWeight: 500, color: 'var(--tenue)', marginBottom: 6 },
   input: { width: '100%', height: 46, padding: '0 13px', background: 'var(--superficie)', border: '1px solid var(--borde)', marginBottom: '1rem' },
-  btn: { width: '100%', background: 'var(--guacamaya)', color: '#FFFFFF', border: 'none', padding: 13, fontWeight: 700, cursor: 'pointer' },
+  btn: { width: '100%', background: 'var(--guacamaya)', color: 'var(--sobre-accion)', border: 'none', padding: 13, fontWeight: 500, cursor: 'pointer' },
   link: { display: 'block', margin: '1rem auto 0', background: 'none', border: 'none', color: 'var(--turquesa)', fontSize: '.95rem', textDecoration: 'underline', cursor: 'pointer' },
-  error: { marginTop: '1rem', color: 'var(--rojo)', fontSize: '.95rem', fontWeight: 700, textAlign: 'center' },
+  error: { marginTop: '1rem', color: 'var(--rojo)', fontSize: '.95rem', fontWeight: 500, textAlign: 'center' },
 }

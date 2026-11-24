@@ -114,7 +114,7 @@ export default function Horarios({ empresaId, fecha, onCambio }: Props) {
         </form>
       </details>
 
-      {aviso && <p role="status" style={{ marginTop: '.5rem', fontWeight: 700, color: aviso === t.guardado ? 'var(--verde)' : 'var(--rojo)' }}>{aviso}</p>}
+      {aviso && <p role="status" style={{ marginTop: '.5rem', fontWeight: 500, color: aviso === t.guardado ? 'var(--verde)' : 'var(--rojo)' }}>{aviso}</p>}
     </section>
   )
 }
@@ -146,7 +146,7 @@ export function EditarViaje({ viaje, onCambio }: {
         <Campo label={t.precio}><input type="number" min={1} required value={precio} onChange={e => setPrecio(e.target.value)} style={S.input} /></Campo>
         <button className="sb-btn" style={S.btn}>{t.guardar}</button>
       </form>
-      {error && <p role="alert" style={{ color: 'var(--rojo)', fontWeight: 700 }}>{t.errorGuardar}</p>}
+      {error && <p role="alert" style={{ color: 'var(--rojo)', fontWeight: 500 }}>{t.errorGuardar}</p>}
     </details>
   )
 }
@@ -165,5 +165,5 @@ const S: Record<string, React.CSSProperties> = {
   campo: { display: 'flex', flexDirection: 'column', gap: 4, minWidth: 130, flex: '1 1 130px' },
   label: { fontSize: '.85rem', color: 'var(--tenue)' },
   input: { height: 42, padding: '0 10px', background: 'var(--hundido)', border: '1px solid var(--borde)' },
-  btn: { height: 42, background: 'var(--guacamaya)', color: '#FFFFFF', border: 'none', padding: '0 18px', fontWeight: 700, cursor: 'pointer' },
+  btn: { height: 42, background: 'var(--guacamaya)', color: 'var(--sobre-accion)', border: 'none', padding: '0 18px', fontWeight: 500, cursor: 'pointer' },
 }

@@ -1,0 +1,5 @@
+[
+  { "check": "copy-headings", "target": "h2#rutas-h", "reason": "Spanish page: 'precios' (prices) is the section noun and the card titles are verb + object in Spanish; the checker's noun list reads English only" },
+  { "check": "cut-text", "target": "div.dg-node.dg-node--disc:nth-of-type(2) > span.dg-cap", "reason": "the kit's ring diagram sets each city's caption under its disc, wider than the disc by design; the caption is whole on screen (scrollWidth equals clientWidth)" },
+  { "check": "button-styles", "target": "(one screen)", "reason": "the odd 'buttons' are the kit diagram's city nodes in a drawn mock, not controls; the page has one primary button style" }
+]

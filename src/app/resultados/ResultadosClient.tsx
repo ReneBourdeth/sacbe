@@ -35,14 +35,14 @@ export default function ResultadosClient({ viajes, origen, destino, fecha, proxi
   return (
     <main style={{ minHeight: '100vh', position: 'relative', zIndex: 1 }}>
       <SiteHeader>
-        <Link href="/" className="sb-hide-sm" style={S.back}>{t.cambiarBusqueda}</Link>
+        <a href="/" className="sb-hide-sm" style={S.back}>{t.cambiarBusqueda}</a>
       </SiteHeader>
 
       {/* Route and date being shown */}
       <div style={S.subhead}>
         <h1 className="sb-titulo-pagina" style={S.shRuta}>{nombreTerminal(origen)} → {nombreTerminal(destino)}</h1>
         <span style={S.shFecha}>{formatoDia(fecha, locale)}</span>
-        <Link href="/" style={S.shEdit}>{t.editar}</Link>
+        <a href="/" style={S.shEdit}>{t.editar}</a>
       </div>
 
       <div className="sb-layout">

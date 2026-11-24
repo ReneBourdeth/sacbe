@@ -1,0 +1,152 @@
+/* Sacbé home: page CSS only where the taste skill allows it (inside visuals, the app-frame recipe,
+   the hero's search form in place of its buttons). Everything else is the kit's system. */
+
+/* ── Hero: the search form takes the place of the hero's buttons ── */
+.buscador { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4) var(--s-3); margin-top: var(--s-6); }
+.buscador .field { display: grid; gap: var(--s-2); min-width: 0; }
+.buscador .field:nth-child(3) { grid-column: 1 / -1; }
+.buscador label { font-size: var(--t-small); font-weight: 500; color: var(--muted); }
+.buscador select, .buscador input { height: 48px; width: 100%; min-width: 0; padding: 0 var(--s-4); font: 400 16px/1 var(--font-text);
+  color: var(--ink); background: var(--p-surface); border: 1px solid var(--line); border-radius: var(--r-sm); }
+.buscador .btn-row { grid-column: 1 / -1; margin-top: var(--s-2); }
+.buscador .btn { width: 100%; justify-content: center; }
+.hero--collage .hero__proof { margin-top: var(--s-5); }
+/* a phone: from and to side by side, the date and the button on one row, the company line in the footer's place */
+@media (max-width: 639px) {
+  .buscador { grid-template-columns: 1fr 1fr; gap: var(--s-3); margin-top: var(--s-4); }
+  .buscador .field:nth-child(3) { grid-column: auto; }
+  .buscador .btn-row { grid-column: auto; margin-top: 0; align-self: end; }
+  .buscador .btn { height: 48px; }
+  .buscador .btn .m-arrow { display: none; }
+  .hero--collage .hero__proof { display: none; }
+}
+
+/* the hero art: Copán's pyramid (the client's photographs, as asked) with the app's glass window over it */
+.hero__art { background: var(--p-surface); }
+.hero__art > .ly-piece--note { left: var(--s-6); bottom: var(--s-6); width: 300px; z-index: 2; }
+.ly-piece--main .d-row { grid-template-columns: 52px minmax(0, 1fr) 64px 96px; }
+.d-hora { display: grid; place-items: center; font: 500 13px/1 var(--font-text); color: #eceef0; background: rgb(255 255 255 / .07) !important; }
+.d-note__line { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 13px; color: #3d4247; border-top: 1px solid rgb(0 0 0 / .06); }
+.d-note__line:first-of-type { border-top: 0; }
+.d-note__line i { width: 18px; height: 18px; border-radius: 50%; flex: none; display: grid; place-items: center; background: #fbe3e6; color: #a51c2e; font-style: normal; font-size: 13px; font-weight: 600; }
+.d-note__line b { font-weight: 500; color: #16181a; }
+
+/* ── App-frame (sections-library.md, app-frame: the recipe's page CSS) ── */
+.app.ui { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); margin-top: var(--s-7); background: var(--u-bg); border: 1px solid var(--u-border); border-radius: var(--u-r); box-shadow: var(--u-shadow); }
+.app > .app__pane { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
+.app > .app__pane + .app__pane { border-left: 1px solid var(--u-line); }
+.app > .app__pane > .ui-panel { width: 100%; border: 0; border-radius: 0; box-shadow: none; }
+.app > .app__pane::after { content: ""; position: absolute; inset: auto 0 0 0; height: 64px; background: linear-gradient(transparent, var(--u-bg)); pointer-events: none; }
+@media (min-width: 1024px) and (max-width: 1279px) { .app.ui { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); } }
+@media (max-width: 1023px) {
+  .app.ui { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .app > .app__pane--list { max-height: 252px; }
+  .app > .app__pane--list::after { display: none; }
+  .app .ui-win__side { display: none; }
+  .app .ui-win__body { grid-template-columns: minmax(0, 1fr); }
+  .app > .app__pane + .app__pane { border-left: 0; border-top: 1px solid var(--u-line); }
+}
+@media (max-width: 639px) {
+  .app.ui { grid-template-rows: minmax(0, 1fr); }
+  .app > .app__pane--list { display: none; }
+  .app > .app__pane + .app__pane { border-top: 0; }
+}
+.ui-win__row.is-open { background: color-mix(in oklab, #d7263d 14%, transparent); }
+
+/* the open pane: the bus's seat map, front to back */
+.mapa { padding: 20px 24px; display: grid; gap: 16px; align-content: start; font: 400 14px/1.4 var(--font-text); }
+.mapa__head { display: flex; justify-content: space-between; align-items: start; gap: 16px; flex-wrap: wrap; }
+.mapa__head b { display: block; font-weight: 500; font-size: 16px; }
+.mapa__head small { color: var(--u-muted); font-size: 13px; }
+.mapa__leyenda { display: flex; gap: 14px; font-size: 13px; color: var(--u-muted); }
+.mapa__leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+.mapa__leyenda i { width: 12px; height: 12px; border-radius: 4px; border: 1px solid var(--u-line); }
+.mapa__leyenda .m-ocupado { background: var(--u-line); }
+.mapa__leyenda .m-tuyo { background: #d7263d; border-color: #d7263d; }
+.mapa__bus { justify-self: center; display: grid; gap: 8px; padding: 16px 20px; border: 1px solid var(--u-line); border-radius: 28px 28px 14px 14px; }
+.mapa__frente { justify-self: center; font-size: 13px; color: var(--u-muted); padding-bottom: 4px; }
+.mapa__fila { display: grid; grid-template-columns: repeat(2, 40px) 28px repeat(2, 40px); gap: 8px; }
+.mapa__asiento { height: 36px; display: grid; place-items: center; border: 1px solid var(--u-line); border-radius: 8px; font-size: 13px; }
+.mapa__asiento.is-ocupado { background: var(--u-line); color: var(--u-muted); }
+.mapa__asiento.is-tuyo { background: #d7263d; border-color: #d7263d; color: #fff; font-weight: 500; }
+.mapa__pie { display: flex; justify-content: space-between; align-items: center; font-weight: 500; }
+.mapa__btn { background: #d7263d; color: #fff; }
+
+/* ── Payment split: the booking slip ── */
+.recibo-pos { --w: 420px; --ay: 56px; }
+.recibo { padding: 20px 24px; display: grid; gap: 12px; font: 400 14px/1.4 var(--font-text); }
+.recibo__head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.recibo__head b { font-weight: 500; font-size: 15px; }
+.recibo__viaje { color: var(--u-muted); font-size: 13px; }
+.recibo__filas { display: grid; gap: 0; margin: 0; }
+.recibo__filas > div { display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid var(--u-line); }
+.recibo__filas dt { color: var(--u-muted); } .recibo__filas dd { margin: 0; font-variant-numeric: tabular-nums; }
+.recibo__total dt, .recibo__total dd { font-weight: 500; color: var(--u-ink); }
+.recibo__agencia { justify-self: start; font-size: 13px; padding: 4px 10px; border-radius: 99px; background: var(--u-line); }
+.datos { display: grid; gap: var(--s-3); padding: 0; list-style: none; }
+.datos li { padding-top: var(--s-3); border-top: 1px solid var(--line); }
+
+/* ── Routes price list in two columns ── */
+.rutas-lista { row-gap: 0; }
+#prices .red-rutas { --p-h: 600px; height: var(--p-h); position: relative; background: var(--p-surface); }
+@media (max-width: 639px) { #prices .red-rutas { --p-h: 420px; } }
+/* the language switch in the nav: 44px tap targets */
+.idioma [role="group"] button { min-height: 36px; min-width: 40px; }
+@media (max-width: 1023px) { .idioma [role="group"] button { min-height: 44px; min-width: 52px; } }
+
+/* ── Steps and the company panel: small drawn pieces of the app ── */
+.paso-pos { --fit-max: 340px; --ax: max(24px, 50% - 170px); --ay: 40px; --ay-sm: 24px; }
+.panel-pos { --fit-max: 400px; --ax: max(24px, 50% - 200px); --ay: 40px; --ay-sm: 24px; }
+#pasos .panel { --p-h: 300px; }
+#empresas .panel { --p-h: 336px; }
+.mini { padding: 16px 18px; display: grid; gap: 4px; font: 400 14px/1.4 var(--font-text); }
+.mini__fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--u-line); }
+.mini__fila b { font-weight: 500; }
+.mini__campo { display: flex; justify-content: space-between; gap: 12px; padding: 8px 12px; margin: 4px 0; border: 1px solid var(--u-line); border-radius: 10px; color: var(--u-muted); font-size: 13px; }
+.mini__campo span { color: var(--u-ink); font-size: 14px; }
+.mini__qr { justify-self: center; width: 96px; height: 96px; margin: 4px 0 8px; border-radius: 10px;
+  background: conic-gradient(from 90deg at 2px 2px, #000 90deg, #fff 0) 0 0 / 12px 12px, #fff; box-shadow: inset 0 0 0 8px #fff; }
+
+
+/* the drawn panels take the UI kit's ink, not the lit ground's dark ink around them */
+.recibo, .mini, .mapa { color: var(--u-ink); }
+.d-win--dark .d-row b { color: #eceef0; }
+.d-win--dark .d-row small { color: #9aa0a6; }
+
+/* the split frame of the payment section a little taller than 5:4, so the section is not half empty */
+#pago .frame--split { --ratio: 96%; }
+/* the close's name: room for the accent on the é above the cap height */
+.close__word { line-height: 1.04; }
+
+/* the judges' tablet (640 to 1023, layout-v4.md section 2): stacked sections that outgrow one screen take two */
+@media (min-width: 640px) and (max-width: 1023px) {
+  #pago, #pasos, #faq, #ciudades { --h: 2; }
+  #prices .red-rutas { --p-h: 440px; }
+  #empresas .panel { --p-h: 260px; }
+  .ly-piece--main .d-row:nth-child(n+5) { display: none; }
+}
+
+/* a phone: the company panel's four cards fit its two screens (after the base --p-h above) */
+@media (max-width: 639px) { #empresas .panel { --p-h: 120px; } }
+
+/* ── The client's photographs and glass (asked for by the client, over the kit's flat frames) ── */
+/* a photograph fills its frame or panel behind the drawn UI */
+.foto-panel { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; border-radius: inherit; }
+:is(.hero__art, .frame, .panel):has(> .foto-panel) { position: relative; overflow: hidden; }
+:is(.hero__art, .frame, .panel) > .foto-panel ~ * { z-index: 1; }
+.hero__art > .ly-piece { z-index: 1; }
+.hero__art > .ly-piece--note { z-index: 2; }
+/* glass: the drawn windows and cards let the photograph show through, blurred */
+.d-win--dark, .frame .recibo, .panel:has(> .foto-panel) .mini {
+  background: rgb(10 10 10 / .8) !important; backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgb(255 255 255 / .14); }
+.d-card { background: rgb(255 255 255 / .86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+/* the search fields and the bar: see-through on the page's black */
+.buscador select, .buscador input { background: rgb(255 255 255 / .06); }
+header.nav { background: rgb(0 0 0 / .62); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+/* the macaw's feathers (the earlier design's stripe) as the bar's bottom line */
+header.nav::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px;
+  background: linear-gradient(90deg, #d7263d 0 50%, #ffc21a 50% 67%, #4db8ff 67% 100%); pointer-events: none; }
+/* the hero's window sits over the brightest photograph: a denser glass and lighter grey text */
+.d-win--dark { background: rgb(10 10 10 / .88) !important; }
+.d-win--dark .d-win__bar, .d-win--dark .d-side, .d-win--dark .d-row small { color: #d6d9dd; }

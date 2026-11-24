@@ -3,3 +3,12 @@
 node_modules/
 .next/
 *.tsbuildinfo
+
+# taste skill: keep its deal history and waivers, not its Chrome profiles and screenshots
+.taste-skill/chrome-*
+.taste-skill/shots/
+.taste-skill/*.html
+.taste-skill/*.txt
+.taste-skill/gate/
+.taste-skill/gate.json
+.taste-skill/build.done.json
