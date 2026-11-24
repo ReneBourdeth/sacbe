@@ -11,7 +11,6 @@ import { qrComoImagen } from '@/lib/qr'
 import { numeroWhatsApp } from '@/lib/telefono'
 import { useAsientos } from './useAsientos'
 import MapaAsientos from './MapaAsientos'
-import { MarcaGuacamaya } from '@/components/Simbolos'
 import { S } from './estilos'
 
 // 1 seats → 2 passengers → 3 payment → 4 confirmation
@@ -179,17 +178,18 @@ export default function ModalCompra({ viaje, inicial = [], onCerrar }: Props) {
     // Clicking the dark background closes the window; clicks inside don't
     <div className="sb-overlay" style={S.overlay} onClick={onCerrar}>
       <div className="sb-modal" role="dialog" aria-modal style={S.modal} onClick={e => e.stopPropagation()}>
-        <button style={S.modalX} onClick={onCerrar} aria-label={t.cerrar}>✕</button>
-
-        {/* Progress bar */}
-        <div style={S.stepBar}>
-          {[1, 2, 3, 4].map(n => <div key={n} style={{ ...S.stepDot, ...(n <= paso ? S.stepDotOn : {}) }} />)}
+        <div className="vm-barra">
+          <span className="vv-puntos" aria-hidden="true"><i /><i /><i /></span>
+          <span className="vm-ruta">Sacbé <span aria-hidden="true">/</span> <b>{ruta}</b>{paso < 4 && <> · {t.paso(paso)}</>}</span>
+          <button className="vm-x" onClick={onCerrar} aria-label={t.cerrar}>✕</button>
         </div>
+        {/* progress: the bar's macaw stripe, one pill per step */}
+        <div className="vm-pasos" aria-hidden="true">{[1, 2, 3, 4].map(n => <i key={n} className={n <= paso ? 'is-on' : undefined} />)}</div>
+        <div className="vm-cuerpo">
 
         {/* ── STEP 1: SEATS ── */}
         {paso === 1 && (
           <div>
-            <div style={S.mEyebrow}>{t.paso(1)}</div>
             <div style={S.mTitle}>{t.seleccionaAsiento}</div>
             <div style={S.mSub}>
               {viaje.empresa} · {formatoHora(viaje.salida, locale)} · {t.hastaAsientos(MAX_ASIENTOS)}
@@ -205,7 +205,6 @@ export default function ModalCompra({ viaje, inicial = [], onCerrar }: Props) {
         {/* ── STEP 2: ONE PASSENGER PER SEAT ── */}
         {paso === 2 && (
           <div>
-            <div style={S.mEyebrow}>{t.paso(2)}</div>
             <div style={S.mTitle}>{t.datosPasajero}</div>
             {!logueado && (
               <div style={S.pasajeroCaja}>
@@ -265,7 +264,6 @@ export default function ModalCompra({ viaje, inicial = [], onCerrar }: Props) {
         {/* ── STEP 3: PAYMENT ── */}
         {paso === 3 && (
           <div>
-            <div style={S.mEyebrow}>{t.paso(3)}</div>
             <div style={S.mTitle}>{t.metodoPago}</div>
             <div style={S.metodos}>
               {(['tarjeta', 'efectivo'] as const).map(m => (
@@ -296,11 +294,12 @@ export default function ModalCompra({ viaje, inicial = [], onCerrar }: Props) {
               </div>
             )}
 
-            <div style={S.resumenBox}>
-              <div style={S.resLine}><span>{t.boletosPor(elegidos.length, viaje.precio)}</span><strong>L. {elegidos.length * viaje.precio}</strong></div>
-              <div style={S.resLine}><span>{t.cargoPorServicio} × {elegidos.length}</span><strong>L. {elegidos.length * CARGO_SERVICIO}</strong></div>
-              <div style={S.resTotal}><span>{t.total}</span><span>L. {total}</span></div>
-            </div>
+            <dl className="tk-filas vm-recibo">
+              <div><dt>{t.asiento}</dt><dd>{elegidos.map(a => a.numero).join(', ')}</dd></div>
+              <div><dt>{t.boletosPor(elegidos.length, viaje.precio)}</dt><dd>L {elegidos.length * viaje.precio}</dd></div>
+              <div><dt>{t.cargoPorServicio} × {elegidos.length}</dt><dd>L {elegidos.length * CARGO_SERVICIO}</dd></div>
+              <div className="tk-total"><dt>{t.total}</dt><dd>L {total}</dd></div>
+            </dl>
             <div style={{ display: 'flex', gap: '.5rem' }}>
               <button style={S.btnBack} onClick={() => setPaso(2)}>{t.atras}</button>
               <button className="sb-btn" style={{ ...S.btnPagar, flex: 1, opacity: enviando ? .7 : 1 }} onClick={confirmarCompra} disabled={enviando}>
@@ -310,37 +309,43 @@ export default function ModalCompra({ viaje, inicial = [], onCerrar }: Props) {
           </div>
         )}
 
-        {/* ── STEP 4: CONFIRMATION, one QR per ticket ── */}
+        {/* ── STEP 4: CONFIRMATION: the receipt, then one QR card per ticket ── */}
         {paso === 4 && boletos.length > 0 && (
-          <div style={{ textAlign: 'center' }}>
-            <div style={S.confIcono}><MarcaGuacamaya size={56} /></div>
+          <div>
             {/* Cash: tickets stay "reservado" until the bus company confirms payment in /panel */}
-            <div style={S.confTitulo}>{metodo === 'efectivo' ? t.reservaPendiente : t.boletoConfirmado}</div>
-            <p style={S.confSub}>{metodo === 'efectivo' ? t.pagaEnPagoExpress(total) : t.caminoBlanco}</p>
-            <p style={{ ...S.confSub, marginTop: '-.75rem' }}>{viaje.empresa} · {ruta} · {formatoFechaHora(viaje.salida, locale)}</p>
-            {correoEnviado && <p style={{ ...S.confSub, color: 'var(--tinta)', fontWeight: 600 }}>✉ {t.correoEnviado(correoEnviado)}</p>}
+            <div style={S.mTitle}>{metodo === 'efectivo' ? t.reservaPendiente : t.boletoConfirmado}</div>
+            <p style={S.mSub}>{metodo === 'efectivo' ? t.pagaEnPagoExpress(total) : t.caminoBlanco}</p>
+            {correoEnviado && <p style={{ ...S.mSub, color: 'var(--tinta)', fontWeight: 600 }}>✉ {t.correoEnviado(correoEnviado)}</p>}
+            <div className="vm-recibo-caja">
+              <div className="tk-head"><b>{viaje.empresa}</b><span className={`vv-chip${metodo === 'efectivo' ? ' is-pocos' : ''}`}>{metodo === 'efectivo' ? t.estados.reservado : t.estados.pagado}</span></div>
+              <small>{ruta} · {formatoFechaHora(viaje.salida, locale)}</small>
+              <dl className="tk-filas">
+                <div><dt>{t.asiento}</dt><dd>{boletos.map(b => b.numero).join(', ')}</dd></div>
+                <div><dt>{t.boletosPor(boletos.length, viaje.precio)}</dt><dd>L {boletos.length * viaje.precio}</dd></div>
+                <div><dt>{t.cargoPorServicio} × {boletos.length}</dt><dd>L {boletos.length * CARGO_SERVICIO}</dd></div>
+                <div className="tk-total"><dt>{t.total}</dt><dd>L {total}</dd></div>
+              </dl>
+              {metodo === 'efectivo' && <span className="vm-agencia">PagoExpress</span>}
+            </div>
 
             {boletos.map(b => (
-              <div key={b.codigo} style={S.boletoListo}>
-                <div style={{ background: 'white', padding: 8, borderRadius: 'var(--radio)' }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element -- local data: URL, nothing to optimize */}
-                  <img src={b.qr} alt={`QR ${t.asiento} ${b.numero}`} style={{ display: 'block', width: 120, height: 120 }} />
-                </div>
-                <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontWeight: 500, fontSize: '1.1rem' }}>{t.asiento} {b.numero}</div>
+              <div key={b.codigo} className="vm-qr">
+                {/* eslint-disable-next-line @next/next/no-img-element -- local data: URL, nothing to optimize */}
+                <img src={b.qr} alt={`QR ${t.asiento} ${b.numero}`} width={112} height={112} />
+                <div>
+                  <div className="tk-head"><b>{t.asiento} {b.numero}</b></div>
                   <div>{b.nombre}</div>
-                  <div style={{ fontFamily: 'monospace', color: 'var(--tenue)' }}>{b.codigo}</div>
-                  <a href={b.qr} download={`sacbe-${b.codigo}.png`} style={{ display: 'inline-block', marginTop: '.35rem', color: 'var(--turquesa)', textDecoration: 'underline' }}>{t.descargarQr}</a>
+                  <div className="tk-codigo" style={{ color: 'var(--tenue)' }}>{b.codigo}</div>
+                  <a href={b.qr} download={`sacbe-${b.codigo}.png`} className="vm-descarga">{t.descargarQr}</a>
                 </div>
               </div>
             ))}
 
-            <button style={{ ...S.btnPagar, marginBottom: '.5rem', background: '#25D366', color: '#000000' }} onClick={compartirWhatsApp}>
-              {whatsappDe ? t.enviarMiWhatsapp : t.whatsapp}
-            </button>
+            <button className="vm-whatsapp" onClick={compartirWhatsApp}>{whatsappDe ? t.enviarMiWhatsapp : t.whatsapp}</button>
             <a href="/mis-viajes" style={{ ...S.btnPagar, ...S.btnSecundario }}>{t.verBoletos}</a>
           </div>
         )}
+        </div>
       </div>
     </div>
   )

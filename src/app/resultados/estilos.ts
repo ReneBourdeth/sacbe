@@ -39,7 +39,7 @@ export const S: Record<string, React.CSSProperties> = {
   sbTotal: totalLinea,
   btnComprar: { ...boton, width: '100%', padding: 13, marginTop: '1rem' },
   overlay: { position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, .75)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', backdropFilter: 'blur(4px)' },
-  modal: { background: 'var(--fondo)', border: '1px solid var(--borde2)', borderRadius: 'var(--radio)', width: '100%', maxWidth: 580, maxHeight: '95vh', overflowY: 'auto', padding: '2rem', position: 'relative' },
+  modal: { background: 'var(--fondo)', border: '1px solid var(--borde2)', borderRadius: 'var(--radio)', width: '100%', maxWidth: 600, maxHeight: '95vh', overflowY: 'auto', padding: 0, position: 'relative' },
   modalX: { borderRadius: 'var(--radio-btn)', position: 'absolute', top: '.875rem', right: '.875rem', width: 32, height: 32, border: '1px solid var(--borde)', background: 'var(--superficie)', cursor: 'pointer', color: 'var(--tinta)', display: 'flex', alignItems: 'center', justifyContent: 'center' },
   // Progress: one macaw-feather segment per step
   stepBar: { display: 'flex', gap: 4, marginBottom: '1.5rem', marginRight: '2.5rem' },

@@ -30,7 +30,7 @@ const CSS = [
 ]
 const SCRIPTS = ['system.js', 'motion/motion.js', 'layout/layout.js']
 // Copán's ball court, public domain (Talk2winik, Wikimedia Commons), credited in the footer
-const FOTO_COPAN = 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/CPN_BallCourt_01.jpg/1920px-CPN_BallCourt_01.jpg'
+const FOTO_COPAN = 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/CPN_BallCourt_01.jpg/1280px-CPN_BallCourt_01.jpg'
 const PASOS_FOTOS = [FOTOS.carretera, FOTOS.roatan, FOTOS.bus]
 // where each step's picture leads: pick seats, how to pay, your tickets with their QR
 const PASOS_ENLACES = ['/resultados?origen=SPS&destino=TGU', '#faq', '/mis-viajes']
@@ -228,7 +228,7 @@ html[data-tema="claro"] {
               <p className="span-6 start-7">{T.app.p} <a className="link" href="/resultados?origen=SPS&destino=TGU">{T.app.link}</a></p>
             </div>
             {/* the same departures window as the results page, with sample trips: pick a departure and seats, then Continue */}
-            <div className="ventana-demo">
+            <div className="ventana-demo marco-foto" style={{ ['--marco' as string]: `url("${foto(FOTOS.bus.f)}")` }}>
               <VentanaViajes titulo="San Pedro Sula → Tegucigalpa" filas={FILAS_DEMO} elegido={demoId} onElegir={id => { setDemoId(id); setDemoSel([]) }}
                 asientos={asientosDemo(demoId)} marcados={demoSel}
                 onAsiento={a => setDemoSel(m => m.includes(a.id) ? m.filter(x => x !== a.id) : m.length >= 6 ? m : [...m, a.id])}
@@ -306,7 +306,7 @@ html[data-tema="claro"] {
                   <p>{c.p}</p>
                   <a className="panel panel-link" href={PASOS_ENLACES[i]} aria-label={c.h3}>
                     {/* eslint-disable-next-line @next/next/no-img-element -- remote Wikimedia photos, served already sized */}
-                    <img className="foto-panel" src={foto(PASOS_FOTOS[i].f, 960)} alt="" loading="lazy" />
+                    <img className="foto-panel" src={foto(PASOS_FOTOS[i].f)} alt="" loading="lazy" />
                     <div className="stage stage--fade-b"><div className="at-rise fit paso-pos">
                       {i === 0 && (
                         <div className="ui ui-panel mini">
