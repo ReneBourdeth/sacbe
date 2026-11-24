@@ -16,8 +16,8 @@ export function useAsientos(viajeId: string | null) {
   useEffect(() => {
     let activo = true // ignore late answers after the window closes
     setCargado(false)
-    setAsientos([])
-    if (!viajeId) return
+    // the previous bus stays drawn until this one arrives, so the window doesn't collapse and jump
+    if (!viajeId) { setAsientos([]); return }
 
     getAsientos(viajeId)
       .then(lista => { if (activo) setAsientos(lista) })
