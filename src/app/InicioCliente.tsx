@@ -5,7 +5,7 @@
          buttons tonal, mark: the client's own macaw logo, ground sky, type red-hat, radius round;
          colours: the client's own (start.mjs brand: black, white, macaw red), not the dealt palette;
          photographs from the earlier design under glass panels, as the client asked
-   moments: giant-type-pass (#ciudades; counter-rolls was dealt first, dealt again: its 1em digit window clips Red Hat's figures)
+   moments: giant-type-pass (#ciudades; counter-rolls was dealt first, dealt again: its 1em digit window clips the display font's figures)
    Built with the taste skill's kit (public/assets), loaded after React has hydrated. */
 
 import { useEffect, useState } from 'react'
@@ -22,7 +22,7 @@ import { FOTOS, foto } from '@/lib/fotos'
 
 const CSS = [
   'system.css', 'ui/cards.css', 'motion/motion.css', 'backgrounds/backgrounds.css', 'layout/layout.css',
-  'icons/icon.css', 'ui/base.css', 'ui/window/fragment.css', 'diagrams/diagram.css', 'layout/demo.css', 'inicio.css',
+  'icons/icon.css', 'ui/base.css', 'ui/window/fragment.css', 'diagrams/diagram.css', 'layout/demo.css', 'inicio.css?v=3', // bump v when the file changes, so browsers drop the old copy
 ]
 const SCRIPTS = ['system.js', 'motion/motion.js', 'layout/layout.js', 'diagrams/mount.js']
 // Copán's ball court, public domain (Talk2winik, Wikimedia Commons), credited in the footer
@@ -47,8 +47,13 @@ function useKit() {
 const OCUPADOS = new Set(['1A', '1B', '2C', '3A', '3D', '5B', '5C', '6A', '7D', '8B', '8C', '9A', '10C', '10D'])
 const ELEGIDOS = new Set(['4C', '4D'])
 // Each city's lowest fare to anywhere, from RUTAS (the database's prices)
-const CIUDADES_DESDE = ['SPS', 'TGU', 'CEI', 'CMG', 'CHO', 'CPN'].map(c =>
-  [c, Math.min(...RUTAS.filter(([a, b]) => a === c || b === c).map(r => r[2]))] as const)
+// plus the other city of that cheapest route, so a card can open its search
+const CIUDADES_DESDE = ['SPS', 'TGU', 'CEI', 'CMG', 'CHO', 'CPN'].map(c => {
+  const [a, b, l] = RUTAS.filter(([a, b]) => a === c || b === c).reduce((m, r) => (r[2] < m[2] ? r : m))
+  return [c, l, a === c ? b : a] as const
+})
+// A results link without a date: the results page starts today and offers the next day with buses
+const enlaceRuta = (o: string, d: string) => `/resultados?${new URLSearchParams({ origen: o, destino: d })}`
 
 export default function InicioCliente() {
   const { lang } = useLang()
@@ -94,8 +99,8 @@ export default function InicioCliente() {
   --p-accent: #d7263d; --p-accent-ink: #ffffff; --p-action: #d7263d; --p-action-ink: #ffffff;
   --p-inv-bg: #ffffff; --p-inv-surface: #e8e8e8; --p-inv-ink: #000000; --p-inv-muted: #424242;
   --p-inv-accent: #d7263d; --p-inv-accent-ink: #ffffff; --p-inv-action: #d7263d; --p-inv-action-ink: #ffffff;
-  --font-display: "Red Hat Display", system-ui, sans-serif;
-  --font-text: "Red Hat Text", system-ui, sans-serif;
+  --font-display: "Figtree", system-ui, sans-serif;
+  --font-text: "Figtree", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   --display-weight: 700;
   --display-tracking: -0.04em;
@@ -294,7 +299,7 @@ html[data-tema="claro"] {
                 {[RUTAS.slice(0, 8), RUTAS.slice(8)].map((col, c) => (
                   <ul className="rows span-6" key={c}>
                     {col.map(([a, b, p]) => (
-                      <li key={a + b}><span className="rows__name">{nombreTerminal(a)} ↔ {nombreTerminal(b)}</span><span className="rows__value">{T.rutas.desde} L {p}</span></li>
+                      <li key={a + b}><a className="ruta-link" href={enlaceRuta(a, b)}><span className="rows__name">{nombreTerminal(a)} ↔ {nombreTerminal(b)}</span><span className="rows__value">{T.rutas.desde} L {p} <span aria-hidden="true">→</span></span></a></li>
                     ))}
                   </ul>
                 ))}
@@ -307,11 +312,11 @@ html[data-tema="claro"] {
               })} /></div>
             {/* phones and tablets: the same cities and fares as plain cards (the ring is too small to read there) */}
             <ul className="ciudades" aria-label={T.rutas.alt}>
-              {CIUDADES_DESDE.map(([c, l]) => (
-                <li key={c} className="ciudad">
+              {CIUDADES_DESDE.map(([c, l, d]) => (
+                <li key={c}><a className="ciudad" href={enlaceRuta(c, d)}>
                   <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z" fill="none" stroke="currentColor" strokeWidth="1.8" /><circle cx="12" cy="10" r="2.3" fill="currentColor" /></svg>
-                  <span><b>{nombreTerminal(c)}</b><small>{T.rutas.desde} L {l}</small></span>
-                </li>
+                  <span><b>{nombreTerminal(c)}</b><small>{nombreTerminal(d)} · {T.rutas.desde} L {l}</small></span>
+                </a></li>
               ))}
             </ul>
           </div>

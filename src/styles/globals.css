@@ -1,6 +1,6 @@
 /* ── SACBÉ DESIGN TOKENS ───────────────────────────────────── */
 /* One system with the home page (built with the taste skill's kit in public/assets): the client's
-   own colours (black, white, macaw red), Red Hat type and round corners. The inner pages keep their
+   own colours (black, white, macaw red), Figtree type and round corners. The inner pages keep their
    own layouts and read the same values through these names. */
 :root {
   color-scheme: dark;     /* native date pickers, selects and scrollbars go dark too */
@@ -19,12 +19,15 @@
   --rojo:       #FF6B6B;
   --verde:      #4ADE80;
 
-  --font-display: "Red Hat Display", system-ui, sans-serif;
-  --font-sans:    "Red Hat Text", system-ui, sans-serif;
+  --font-display: "Figtree", system-ui, sans-serif;
+  --font-sans:    "Figtree", system-ui, sans-serif;
 
   --borde:  rgba(255, 255, 255, .3);
   --borde2: rgba(255, 255, 255, .16);
-  --radio:  16px; /* round: one corner size for every box, button and field */
+  /* round, as on the home page (the kit's round radius): cards and panels, fields, and pill buttons */
+  --radio:       24px;
+  --radio-campo: 12px;
+  --radio-btn:   999px;
   --barra:  rgba(0, 0, 0, .6); /* the top bar's glass */
 }
 
@@ -89,7 +92,8 @@ a { color: inherit; text-decoration: none; }
 
 input, select, button { font-family: var(--font-sans); font-size: 1rem; }
 input, select { color: var(--tinta); }
-button, input, select { border-radius: var(--radio); }
+button, input, select { border-radius: var(--radio-campo); }
+button { font-weight: 600; }
 
 /* iPhone/iPad Safari gives date and time fields a fixed minimum width, so they
    stick out of narrow boxes. Only iOS matches this @supports test. */
@@ -155,3 +159,8 @@ button, input, select { border-radius: var(--radio); }
 
   .sb-card-auth { margin: 2rem 1rem !important; padding: 1.5rem !important; }
 }
+
+/* the inner pages' bar matches the home bar: the macaw's red, yellow and blue as a thin stripe under it */
+.sb-header { position: relative; }
+.sb-header::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px;
+  background: linear-gradient(90deg, #d7263d 0 50%, #ffc21a 50% 67%, #4db8ff 67% 100%); pointer-events: none; }

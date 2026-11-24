@@ -105,8 +105,8 @@ export default function Escaner({ onValidado }: { onValidado: () => void }) {
 }
 
 const S: Record<string, React.CSSProperties> = {
-  caja: { background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 'var(--radio)', padding: '1rem 1.25rem', marginBottom: '1.5rem' },
-  btn: { background: 'var(--guacamaya)', color: 'var(--sobre-accion)', border: 'none', padding: '10px 16px', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap' },
+  caja: { background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 'var(--radio)', padding: '1.25rem 1.5rem', marginBottom: '1.5rem' },
+  btn: { background: 'var(--guacamaya)', borderRadius: 'var(--radio-btn)', color: 'var(--sobre-accion)', border: 'none', padding: '10px 16px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' },
   video: { display: 'block', width: '100%', maxWidth: 360, aspectRatio: '1', objectFit: 'cover', borderRadius: 'var(--radio)', margin: '.75rem 0', background: '#000' },
   fila: { display: 'flex', gap: '.5rem', marginTop: '.75rem' },
   input: { flex: 1, minWidth: 0, height: 44, padding: '0 12px', background: 'var(--hundido)', border: '1px solid var(--borde)', fontFamily: 'monospace' },

@@ -116,7 +116,7 @@ export default function MisViajesPage() {
                 )}
               </div>
               {qrs[b.id] && b.estado !== 'cancelado' && ( // a cancelled ticket can't board, so don't offer its QR
-                <div style={{ background: 'white', padding: 8, alignSelf: 'center' }}>
+                <div style={{ background: 'white', padding: 8, alignSelf: 'center', borderRadius: 'var(--radio-campo)' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element -- local data: URL */}
                   <img src={qrs[b.id]} alt="QR" width={110} height={110} style={{ display: 'block' }} />
                 </div>
@@ -132,17 +132,17 @@ export default function MisViajesPage() {
 const S: Record<string, React.CSSProperties> = {
   main: { minHeight: '100vh', position: 'relative', zIndex: 1 },
   email: { fontSize: '.9rem', color: 'var(--tenue)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 },
-  cancelar: { display: 'block', marginTop: '.75rem', background: 'none', border: '1px solid var(--rojo)', color: 'var(--rojo)', padding: '6px 12px', fontWeight: 500, cursor: 'pointer' },
+  cancelar: { display: 'block', marginTop: '.75rem', background: 'none', border: '1px solid var(--rojo)', color: 'var(--rojo)', borderRadius: 'var(--radio-btn)', padding: '6px 16px', fontWeight: 600, cursor: 'pointer' },
   salir: { background: 'none', border: 'none', color: 'var(--tinta)', fontWeight: 500, cursor: 'pointer', textDecoration: 'underline' },
   wrap: { maxWidth: 720, margin: '2rem auto', padding: '0 1.5rem 4rem' },
   title: { marginBottom: '1.5rem' },
   muted: { color: 'var(--tenue)', marginBottom: '.75rem' },
   aviso: { background: 'var(--superficie)', border: '1px solid var(--amarillo)', borderRadius: 'var(--radio)', padding: '.875rem 1rem', marginBottom: '1.25rem' },
   empty: { background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 'var(--radio)', padding: '3rem', textAlign: 'center', color: 'var(--tenue)' },
-  btn: { display: 'inline-block', background: 'var(--guacamaya)', color: 'var(--sobre-accion)', borderRadius: 'var(--radio)', padding: '11px 22px', fontWeight: 500 },
-  card: { display: 'flex', gap: '1.25rem', flexWrap: 'wrap', background: 'var(--superficie)', border: '1px solid var(--borde2)', borderTop: '5px solid var(--guacamaya)', borderRadius: 'var(--radio)', padding: '1.25rem', marginBottom: '1rem' },
-  ruta: { fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 500 },
+  btn: { display: 'inline-block', background: 'var(--guacamaya)', borderRadius: 'var(--radio-btn)', color: 'var(--sobre-accion)', padding: '11px 22px', fontWeight: 600 },
+  card: { display: 'flex', gap: '1.25rem', flexWrap: 'wrap', background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 'var(--radio)', padding: '1.25rem', marginBottom: '1rem' },
+  ruta: { fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 700, letterSpacing: '-.03em' },
   fila: { display: 'flex', justifyContent: 'space-between', gap: '1rem', fontSize: '.95rem', marginBottom: 3, color: 'var(--tenue)' },
-  estado: { display: 'inline-block', marginTop: '.5rem', fontSize: '.9rem', fontWeight: 500, padding: '2px 12px', borderRadius: 'var(--radio)', background: 'var(--hundido)', color: 'var(--tinta)' },
+  estado: { display: 'inline-block', marginTop: '.5rem', fontSize: '.9rem', fontWeight: 500, padding: '2px 12px', borderRadius: 'var(--radio-btn)', background: 'var(--hundido)', color: 'var(--tinta)' },
   estadoOk: { background: 'rgba(74, 222, 128, .15)', color: 'var(--verde)' },
 }
