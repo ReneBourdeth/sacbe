@@ -317,8 +317,9 @@ export default function ModalCompra({ viaje, inicial = [], onCerrar }: Props) {
             <p style={S.mSub}>{metodo === 'efectivo' ? t.pagaEnPagoExpress(total) : t.caminoBlanco}</p>
             {correoEnviado && <p style={{ ...S.mSub, color: 'var(--tinta)', fontWeight: 600 }}>✉ {t.correoEnviado(correoEnviado)}</p>}
             <div className="vm-recibo-caja">
-              <div className="tk-head"><b>{viaje.empresa}</b><span className={`vv-chip${metodo === 'efectivo' ? ' is-pocos' : ''}`}>{metodo === 'efectivo' ? t.estados.reservado : t.estados.pagado}</span></div>
-              <small>{ruta} · {formatoFechaHora(viaje.salida, locale)}</small>
+              <div className="tk-head"><b>{t.reserva} {boletos[0].codigo}{boletos.length > 1 ? ` +${boletos.length - 1}` : ''}</b><span className={`vv-chip${metodo === 'efectivo' ? ' is-pocos' : ''}`}>{metodo === 'efectivo' ? t.estados.reservado : t.estados.pagado}</span></div>
+              <small>{viaje.empresa} · {formatoFechaHora(viaje.salida, locale)}</small>
+              <small>{ruta}</small>
               <dl className="tk-filas">
                 <div><dt>{t.asiento}</dt><dd>{boletos.map(b => b.numero).join(', ')}</dd></div>
                 <div><dt>{t.boletosPor(boletos.length, viaje.precio)}</dt><dd>L {boletos.length * viaje.precio}</dd></div>

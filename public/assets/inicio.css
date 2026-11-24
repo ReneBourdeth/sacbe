@@ -315,3 +315,10 @@ html[data-tema="claro"] a.d-row:hover { background: rgb(0 0 0 / .04); }
 .panel-link .mini { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
 @media (prefers-reduced-motion: reduce) { .panel-link, .panel-link .mini { transition: none; } .panel-link:hover { transform: none; } }
 .d-side > button > i { flex: none; width: 12px; height: 12px; border-radius: 50%; }
+/* payment: the receipt centred on the photo at its own height */
+.recibo-centro { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; z-index: 1; }
+.recibo-centro > div { width: min(420px, 100%); }
+.recibo-centro .recibo { height: auto !important; }
+#pago .frame { display: block !important; position: relative; min-height: 520px; overflow: hidden; }
+#pago .frame > .foto-panel { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+@media (max-width: 639px) { #pago .frame { min-height: 460px; } }
