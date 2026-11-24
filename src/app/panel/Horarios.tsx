@@ -156,7 +156,7 @@ function Campo({ label, children }: { label: string; children: React.ReactNode }
 }
 
 const S: Record<string, React.CSSProperties> = {
-  caja: { background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 'var(--radio)', padding: '1rem 1.25rem', marginBottom: '1.5rem' },
+  caja: { background: 'var(--superficie)', border: '1px solid var(--borde2)', borderRadius: 'var(--radio)', padding: '1.25rem 1.5rem', marginBottom: '1.5rem' },
   muted: { color: 'var(--tenue)' },
   lista: { margin: '0 0 .75rem 1.1rem', color: 'var(--tenue)', display: 'grid', gap: 2 },
   detalle: { marginTop: '.5rem' },
@@ -165,5 +165,5 @@ const S: Record<string, React.CSSProperties> = {
   campo: { display: 'flex', flexDirection: 'column', gap: 4, minWidth: 130, flex: '1 1 130px' },
   label: { fontSize: '.85rem', color: 'var(--tenue)' },
   input: { height: 42, padding: '0 10px', background: 'var(--hundido)', border: '1px solid var(--borde)' },
-  btn: { height: 42, background: 'var(--guacamaya)', color: 'var(--sobre-accion)', border: 'none', padding: '0 18px', fontWeight: 500, cursor: 'pointer' },
+  btn: { height: 42, background: 'var(--guacamaya)', borderRadius: 'var(--radio-btn)', color: 'var(--sobre-accion)', border: 'none', padding: '0 18px', fontWeight: 600, cursor: 'pointer' },
 }

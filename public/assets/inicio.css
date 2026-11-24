@@ -154,7 +154,10 @@ header.nav::after { content: ""; position: absolute; left: 0; right: 0; bottom: 
 /* Sections are one or two screens tall, but never shorter than what they hold: on a short window the hero
    (with its search form) and the close ran past their fixed height, and the next section covered the
    bottom of the search button and the footer's links. */
-:is(main > section, footer.closing) { height: auto !important; min-height: calc(var(--h, 1) * 100svh); }
+/* Only the hero fills the screen; the other sections are as tall as what they hold (the client found
+   one to two empty screens per section too much). */
+:is(main > section, footer.closing) { height: auto !important; min-height: 0 !important; }
+main > section:first-child { min-height: 100svh !important; }
 
 /* light mode (☀): the bar's glass and the search fields on white */
 html[data-tema="claro"] header.nav { background: rgb(255 255 255 / .78); }
@@ -219,14 +222,29 @@ html[data-tema="claro"] :is(.frame .recibo, .panel:has(> .foto-panel) .mini) {
 @media (max-width: 1023px) {
   #prices .red-rutas { display: none; }
   .ciudades { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-3); margin: var(--s-7) 0 0 !important; padding: 0; list-style: none; }
-  .ciudad { display: flex; align-items: center; gap: var(--s-3); padding: var(--s-4); border: 1px solid var(--line); border-radius: var(--r-md); background: var(--p-surface); }
+  .ciudad { color: inherit; text-decoration: none; transition: border-color .2s, transform .2s; display: flex; align-items: center; gap: var(--s-3); padding: var(--s-4); border: 1px solid var(--line); border-radius: var(--r-md); background: var(--p-surface); }
   .ciudad svg { flex: none; color: #d7263d; }
   .ciudad b { display: block; font-weight: 600; line-height: 1.2; }
   .ciudad small { color: var(--muted); font-size: var(--t-small); }
 }
-@media (max-width: 639px) { .ciudades { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 639px) { .ciudades { grid-template-columns: 1fr; gap: var(--s-2); } }
 /* below 1024 the route section is one flow (list, then the city cards), not two screens with a gap */
 @media (max-width: 1023px) {
   main > section#prices.g2 { --h: 1; }
   main > section#prices.g2 > .wrap { display: block; }
 }
+
+/* routes are links: a row or a city card opens the results for that pair */
+.rows > li:has(> .ruta-link) { display: block; padding: 0; }
+.ruta-link { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s-1) var(--s-5); padding: var(--s-4) var(--s-2);
+  margin-inline: calc(-1 * var(--s-2)); color: inherit; text-decoration: none; border-radius: var(--r-sm, 8px); transition: background-color .2s, color .2s; }
+.ruta-link:hover, .ruta-link:focus-visible { background: color-mix(in srgb, #d7263d 14%, transparent); }
+.ruta-link:hover .rows__value, .ruta-link:focus-visible .rows__value { color: #d7263d; }
+html[data-tema="claro"] .ruta-link:hover .rows__value { color: #b51f33; }
+.ciudad:hover, .ciudad:focus-visible { border-color: #d7263d; transform: translateY(-2px); }
+
+/* two-screen sections (.g2) without the screen-sized gap between their two halves */
+main > section.g2 > .wrap { grid-template-rows: auto auto !important; row-gap: var(--s-8) !important; }
+/* the seat-map window filled the rest of a screen-tall section; with sections at content height it keeps its own */
+#asientos .app.fill { flex: none; height: clamp(520px, 72svh, 680px); }
+@media (max-width: 639px) { #asientos .app.fill { height: 620px; } }
