@@ -66,7 +66,8 @@ html[data-tema="claro"] option { background: #fff; }
    Commons) under glass panels. The home page (html[data-type], set by the kit's head line) has its own
    photographs in its frames. A fixed layer, since iOS ignores background-attachment: fixed. */
 html:not([data-type]) body::before {
-  content: ''; position: fixed; inset: 0; z-index: -1;
+  content: ''; position: fixed; inset: -12px; z-index: -1;
+  filter: blur(3px); /* a 1280px photo on a wide screen: soft depth instead of visible pixels */
   background: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.88)),
     url("https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/CPN_BallCourt_01.jpg/1280px-CPN_BallCourt_01.jpg") center / cover;
 }
@@ -154,7 +155,8 @@ button { font-weight: 600; }
   .sb-trip > :nth-child(1) { text-align: left; }
 
   .sb-overlay { align-items: flex-end !important; padding: 0 !important; }
-  .sb-modal { padding: 1.5rem 1rem 1.25rem !important; max-height: 92vh !important; border-radius: var(--radio) var(--radio) 0 0 !important; }
+  .sb-modal { max-height: 92vh !important; border-radius: var(--radio) var(--radio) 0 0 !important; }
+  .vm-cuerpo { padding: 1.25rem 1rem 1.25rem !important; }
   .sb-form2 { grid-template-columns: 1fr; }
 
   .sb-card-auth { margin: 2rem 1rem !important; padding: 1.5rem !important; }
@@ -293,3 +295,38 @@ main:has(> .sb-footer) > :not(:first-child):not(.sb-footer) { animation: sube .5
 .tk-qr { padding: 10px; background: #fff; border-radius: var(--radio-campo); line-height: 0; margin-inline: auto; }
 .vv-chip.is-off::before { background: var(--toba); }
 .vv-asientos { scroll-margin-top: 84px; }
+
+/* ── THE BOOKING WINDOW (ModalCompra): the home page's window: dots bar, stripe progress, receipt, QR cards ── */
+.vm-barra { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 14px; padding: 14px 16px 14px 20px;
+  background: var(--fondo); border-bottom: 1px solid var(--borde2); font-size: 14px; color: var(--tenue); }
+.vm-barra b { color: var(--tinta); font-weight: 600; }
+.vm-ruta { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vm-x { flex: none; width: 32px; height: 32px; display: grid; place-items: center; padding: 0; border: 1px solid var(--borde); border-radius: 50%;
+  background: transparent; color: var(--tinta); cursor: pointer; font-size: 13px; transition: background-color .2s; }
+.vm-x:hover { background: var(--hundido); }
+.vm-pasos { display: flex; gap: 6px; padding: 14px 20px 0; }
+.vm-pasos i { flex: 1; height: 4px; border-radius: 999px; background: var(--hundido); transition: background-color .3s; }
+.vm-pasos i.is-on { background: var(--guacamaya); }
+.vm-cuerpo { padding: 1.25rem 1.75rem 1.75rem; }
+.vm-recibo { margin: 1rem 0; }
+.tk-total dt, .tk-total dd { color: var(--tinta) !important; font-weight: 700; font-size: 1.05rem; }
+.vm-recibo-caja { display: grid; gap: 4px; padding: 1.1rem 1.25rem; margin-bottom: .875rem; border: 1px solid var(--borde2); border-radius: var(--radio); background: var(--hundido); }
+.vm-recibo-caja > small { color: var(--tenue); }
+.vm-agencia { justify-self: start; margin-top: .5rem; padding: 4px 12px; border-radius: 999px; background: var(--borde2); font-size: .85rem; }
+.vm-qr { display: flex; align-items: center; gap: 1rem; padding: .875rem; margin-bottom: .75rem; border: 1px solid var(--borde2); border-radius: var(--radio); background: var(--hundido); }
+.vm-qr img { flex: none; padding: 8px; background: #fff; border-radius: var(--radio-campo); }
+.vm-descarga { display: inline-block; margin-top: .35rem; color: var(--turquesa); text-decoration: underline; text-underline-offset: 3px; }
+.vm-whatsapp { display: block; width: 100%; height: 48px; margin: .25rem 0 .5rem; border: 0; border-radius: var(--radio-btn); background: #25D366; color: #000; font-weight: 600; cursor: pointer; }
+.vm-bus { margin: 1rem auto; width: max-content; }
+
+/* the departures window floats as glass on a rounded photograph, like the home page's hero window */
+.marco-foto { position: relative; padding: clamp(14px, 3.5vw, 44px); border-radius: 28px; background: var(--marco) center / cover; isolation: isolate; }
+.marco-foto::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: rgb(0 0 0 / .15); z-index: -1; }
+.marco-foto .vv { background: rgb(10 10 10 / .86); backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border-color: rgb(255 255 255 / .14); box-shadow: 0 30px 70px -20px rgb(0 0 0 / .6); }
+html[data-tema="claro"] .marco-foto .vv { background: rgb(255 255 255 / .9); border-color: rgb(0 0 0 / .08); }
+@media (max-width: 639px) { .marco-foto { padding: 10px; border-radius: 22px; } }
+/* passenger boxes: the home page's mini panels (title inside, soft fill), not a legend on the border */
+.vm-cuerpo fieldset { background: var(--hundido); border-color: var(--borde2) !important; }
+.vm-cuerpo fieldset > legend { float: left; width: 100%; padding: 0 !important; margin-bottom: .6rem; font-weight: 700 !important; }
+.vm-cuerpo fieldset > legend + * { clear: both; }

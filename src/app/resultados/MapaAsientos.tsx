@@ -2,7 +2,6 @@
 
 import { useLang } from '@/lib/i18n'
 import type { Asiento } from '@/lib/supabase'
-import { S } from './estilos'
 
 type Props = {
   asientos: Asiento[]
@@ -12,44 +11,31 @@ type Props = {
 }
 
 /**
- * Bus seat map, drawn as rows of 4 seats with an aisle in the middle:
- *   A B | C D
- * Taken seats are greyed out and can't be clicked. Clicking a seat toggles it.
+ * The bus seen from above, drawn like the departures window's (globals.css .vv-*): rows of A B | C D,
+ * front to back. Taken seats are hatched and can't be clicked; a click picks or drops a seat.
  */
 export default function MapaAsientos({ asientos, cargado, seleccionados, onSeleccionar }: Props) {
   const { t } = useLang()
+  const filas: Asiento[][] = []
+  for (const a of asientos) (filas[a.fila - 1] ??= []).push(a)
 
   return (
-    <div style={S.busShell}>
-      <div style={S.busFront}>
-        <span style={S.busFrontText}>{t.frente}</span>
-      </div>
-
-      {/* 5-column grid: 2 seats, aisle, 2 seats. getAsientos already sorts front to back, left to right */}
-      <div style={S.busGrid}>
-        {asientos.length === 0 ? (
-          <p style={S.busVacio}>{cargado ? t.sinAsientos : t.cargandoAsientos}</p>
-        ) : asientos.flatMap(asiento => {
-          const libre = asiento.estado === 'disponible'
-          const celda = (
-            <button key={asiento.id} type="button" disabled={!libre}
-              aria-pressed={seleccionados.some(x => x.id === asiento.id)}
-              aria-label={`${t.asiento} ${asiento.numero}`}
-              onClick={() => onSeleccionar(asiento)}
-              style={{
-                ...S.seat,
-                ...(!libre ? S.seatOcu : {}),
-                ...(seleccionados.some(x => x.id === asiento.id) ? S.seatSel : {}),
-              }}>
-              {asiento.numero}
-            </button>
-          )
-          // Empty cell after column B = the aisle
-          return asiento.columna === 'B'
-            ? [celda, <div key={`pasillo-${asiento.fila}`} aria-hidden />]
-            : [celda]
-        })}
-      </div>
+    <div className="vv-bus vm-bus">
+      <span className="vv-frente">{t.frente}</span>
+      {asientos.length === 0 ? <p className="vv-guia">{cargado ? t.sinAsientos : t.cargandoAsientos}</p>
+        : filas.filter(Boolean).map((fila, i) => (
+          <div className="vv-fila-bus" key={i}>
+            {fila.map(a => {
+              const libre = a.estado === 'disponible'
+              const tuyo = seleccionados.some(x => x.id === a.id)
+              return (
+                <button key={a.id} type="button" disabled={!libre} aria-pressed={tuyo} aria-label={`${t.asiento} ${a.numero}`}
+                  className={`vv-asiento${a.columna === 'C' ? ' tras-pasillo' : ''}${!libre ? ' is-ocupado' : ''}${tuyo ? ' is-tuyo' : ''}`}
+                  onClick={() => onSeleccionar(a)}>{a.numero}</button>
+              )
+            })}
+          </div>
+        ))}
     </div>
   )
 }

@@ -12,6 +12,7 @@ import VentanaViajes, { type AsientoBus } from '@/components/VentanaViajes'
 import { useAsientos } from './useAsientos'
 import ModalCompra from './ModalCompra'
 import { S } from './estilos'
+import { FOTOS, foto } from '@/lib/fotos'
 
 // Same limit the database enforces per person and trip
 const MAX_ASIENTOS = 6
@@ -73,7 +74,7 @@ export default function ResultadosClient({ viajes, origen, destino, fecha, proxi
         <a href="/" style={S.shEdit}>{t.editar}</a>
       </div>
 
-      <div className="sb-ventana">
+      <div className="sb-ventana marco-foto" style={{ ['--marco' as string]: `url("${foto(FOTOS.bus.f)}")` }}>
         <VentanaViajes
           titulo={ruta}
           filas={viajes.map(v => ({ id: v.id, empresa: v.empresa, hora: hora24Honduras(v.salida), clase: v.clase, precio: v.precio, disp: v.asientos_disp }))}
