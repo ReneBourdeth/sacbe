@@ -127,7 +127,7 @@
 }
 
 /* a phone: the company panel's four cards fit its two screens (after the base --p-h above) */
-@media (max-width: 639px) { #empresas .panel { --p-h: 120px; } }
+@media (max-width: 639px) { #empresas .panel { --p-h: 200px; } }
 
 /* ── The client's photographs and glass (asked for by the client, over the kit's flat frames) ── */
 /* a photograph fills its frame or panel behind the drawn UI */
@@ -164,4 +164,33 @@ html[data-tema="claro"] .buscador select, html[data-tema="claro"] .buscador inpu
 @media (min-width: 1024px) {
   .nav--centre .nav__bar { grid-template-columns: auto minmax(0, 1fr) auto; column-gap: var(--s-6); }
   .nav--centre .nav__links { justify-self: center; }
+}
+
+/* the phone and tablet menu sheet: opaque, as the kit has it (the bar's glass above made it see-through) */
+header.nav.is-open { background: var(--p-bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
+/* the ☀ switch: a 44px tap in the sheet */
+@media (max-width: 1023px) { .idioma > button { width: 44px !important; height: 44px !important; } }
+/* the hero window on a phone: the price column hides, so the free-seat chip takes the third column */
+@media (max-width: 639px) { .ly-piece--main .d-row { grid-template-columns: 52px minmax(0, 1fr) auto; } }
+
+/* ES/EN and ☀ stay in the bar on tablets and phones too (the kit keeps only the main button there);
+   a phone has no room for all four, so its bar drops the button: the hero's search is right under it */
+@media (max-width: 1023px) {
+  .nav:not(.is-open) .nav__actions > .idioma { display: inline-flex; }
+}
+@media (max-width: 639px) {
+  .nav:not(.is-open) .nav__actions > .btn--primary { display: none; }
+  .nav:not(.is-open) .nav__actions { gap: 6px; }
+}
+/* the closing footer is the brand's black with white text in both modes: the kit's inverse ground is
+   white under the client's palette (white titles on white in night mode, grey in light mode) */
+html footer.closing.footer--dark.ground-inverse {
+  background: #0b0b0b; color: #fff;
+  --ink: #fff; --muted: #c9cfc2; --line: rgb(255 255 255 / .16); --tinta: #fff; --tenue: #c9cfc2;
+}
+/* the tablet hero: the small ticket card covered the squeezed window, so it goes (as on a phone) and the
+   photograph with the window gets a real height */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .hero__art > .ly-piece--note { display: none; }
+  .hero__art { min-height: 380px; }
 }

@@ -20,7 +20,7 @@ const es = {
   },
   app: {
     h2: 'El mapa de asientos de cada bus',
-    p: 'La lista muestra las salidas del día con empresa, clase y precio. Abres una y ves sus 40 asientos: los ocupados en gris, los tuyos en azul.',
+    p: 'La lista muestra las salidas del día con empresa, clase y precio. Abres una y ves sus 40 asientos: los ocupados en gris, los tuyos en rojo.',
     link: 'Ver salidas a Tegucigalpa',
     arte: 'La ventana de Sacbé con doce salidas de San Pedro Sula a Tegucigalpa y el mapa de asientos de la de Viana a las 10:00',
     cols: ['Empresa', 'Salida', 'Clase', 'Precio'],
@@ -113,7 +113,7 @@ const en: Textos = {
   },
   app: {
     h2: 'The seat map of every bus',
-    p: 'The list shows the day’s departures with company, class and price. Open one and you see its 40 seats: taken ones in grey, yours in blue.',
+    p: 'The list shows the day’s departures with company, class and price. Open one and you see its 40 seats: taken ones in grey, yours in red.',
     link: 'See departures to Tegucigalpa',
     arte: 'The Sacbé window with twelve departures from San Pedro Sula to Tegucigalpa and the seat map of the Viana bus at 10:00',
     cols: ['Company', 'Leaves', 'Class', 'Price'],
