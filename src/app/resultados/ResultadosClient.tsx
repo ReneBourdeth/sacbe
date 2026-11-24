@@ -12,7 +12,6 @@ import VentanaViajes, { type AsientoBus } from '@/components/VentanaViajes'
 import { useAsientos } from './useAsientos'
 import ModalCompra from './ModalCompra'
 import { S } from './estilos'
-import { FOTOS, foto } from '@/lib/fotos'
 
 // Same limit the database enforces per person and trip
 const MAX_ASIENTOS = 6
@@ -74,13 +73,13 @@ export default function ResultadosClient({ viajes, origen, destino, fecha, proxi
         <a href="/" style={S.shEdit}>{t.editar}</a>
       </div>
 
-      <div className="sb-ventana marco-foto" style={{ ['--marco' as string]: `url("${foto(FOTOS.bus.f)}")` }}>
+      <div className="sb-ventana">
         <VentanaViajes
           titulo={ruta}
           filas={viajes.map(v => ({ id: v.id, empresa: v.empresa, hora: hora24Honduras(v.salida), clase: v.clase, precio: v.precio, disp: v.asientos_disp }))}
           elegido={elegidoId}
           onElegir={elegir}
-          asientos={!viaje ? [] : cargado ? asientos.map(a => ({ id: a.id, numero: a.numero, columna: a.columna, libre: a.estado === 'disponible' })) : null}
+          asientos={!viaje ? [] : cargado || asientos.length ? asientos.map(a => ({ id: a.id, numero: a.numero, columna: a.columna, libre: a.estado === 'disponible' })) : null}
           marcados={tuyos}
           onAsiento={alternar}
           total={viaje ? tuyos.length * totalConCargo(viaje.precio) : 0}
