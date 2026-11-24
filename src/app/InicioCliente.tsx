@@ -73,11 +73,13 @@ export default function InicioCliente() {
     if (!hayBus(o, destino)) setDestino(TERMINALES.find(d => d.codigo !== o && hayBus(o, d.codigo))?.codigo ?? destino)
   }
 
+  // The search as a link, from what the form holds now: the form, the bar's button and the close all go here.
+  // A full page load, so the results page does not keep the home page's kit flags on <html>.
+  const urlBusqueda = `/resultados?${new URLSearchParams({ origen, destino, fecha })}`
   function buscar(e: React.FormEvent) {
     e.preventDefault()
     if (origen === destino) return
-    // a full page load: the results page must not keep the home page's kit flags on <html>
-    location.assign(`/resultados?${new URLSearchParams({ origen, destino, fecha })}`)
+    location.assign(urlBusqueda)
   }
 
   const clase = (c: string) => ({ economica: lang === 'es' ? 'Económica' : 'Economy', ejecutivo: lang === 'es' ? 'Ejecutivo' : 'Executive', primera: lang === 'es' ? 'Primera' : 'First' }[c] ?? c)
@@ -120,7 +122,7 @@ html[data-tema="claro"] {
             <span className="idioma"><LangToggle /></span>
             <span className="idioma"><TemaToggle /></span>
             <AuthLink className="nav__link" />
-            <a className="btn btn--primary" href="#buscar">{T.accion}</a>
+            <a className="btn btn--primary" href={urlBusqueda}>{T.accion}</a>
           </div>
           <button className="nav__toggle" type="button" aria-expanded="false" aria-label={T.nav.menu}>
             <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
@@ -406,7 +408,7 @@ html[data-tema="claro"] {
           <div className="closing__cta close--word">
             <div className="section-head--split">
               <div><h2 id="close-h">{T.cierre.h2}</h2><p className="t-lead">{T.cierre.p}</p></div>
-              <a className="btn btn--primary" href="#buscar">{T.accion}{flecha}</a>
+              <a className="btn btn--primary" href={urlBusqueda}>{T.accion}{flecha}</a>
             </div>
             <p className="close__word" aria-hidden="true">Sacbé</p>
           </div>
