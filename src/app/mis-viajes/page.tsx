@@ -7,6 +7,7 @@ import { cancelarBoleto, getMisBoletos } from '@/lib/api'
 import { useLang } from '@/lib/i18n'
 import { formatoFechaHora } from '@/lib/fecha'
 import { qrComoImagen } from '@/lib/qr'
+import { nombreTerminal } from '@/lib/terminales'
 import SiteHeader, { SiteFooter } from '@/components/SiteHeader'
 
 // Shape returned by getMisBoletos: a ticket joined with its trip, route and seat.
@@ -23,8 +24,8 @@ type BoletoFila = {
     salida: string
     rutas: {
       empresas: { nombre: string } | null
-      origen: { nombre: string } | null
-      destino: { nombre: string } | null
+      origen: { nombre: string; codigo: string } | null
+      destino: { nombre: string; codigo: string } | null
     } | null
   } | null
   asientos: { numero: string } | null
@@ -101,14 +102,15 @@ export default function MisViajesPage() {
             <div key={b.id} className="tk">
               <div className="tk-info">
                 <div className="tk-head">
-                  <b>{r?.origen?.nombre ?? '—'} → {r?.destino?.nombre ?? '—'}</b>
+                  <b>{t.reserva} {b.codigo_qr}</b>
                   <span className={`vv-chip${b.estado === 'reservado' ? ' is-pocos' : b.estado === 'pagado' ? '' : ' is-off'}`}>{t.estados[b.estado]}</span>
                 </div>
                 <small>{r?.empresas?.nombre}{b.viajes && ` · ${formatoFechaHora(b.viajes.salida, locale)}`}</small>
+                <small>{nombreTerminal(r?.origen?.codigo ?? '')} → {nombreTerminal(r?.destino?.codigo ?? '')}</small>
                 <dl className="tk-filas">
                   <div><dt>{t.asiento}</dt><dd><strong>{b.asientos?.numero}</strong></dd></div>
                   <div><dt>{t.pasajero}</dt><dd>{b.nombre_pasajero}</dd></div>
-                  <div><dt>{t.codigo}</dt><dd className="tk-codigo">{b.codigo_qr}</dd></div>
+                  <div className="tk-total"><dt>{t.boleto}</dt><dd>L {Number(b.precio_final)}</dd></div>
                 </dl>
                 {b.estado === 'cancelado' && Number(b.reembolso) > 0 && (
                   <p style={S.muted}>{b.reembolsado_at ? t.reembolsoHecho(Number(b.reembolso)) : t.reembolsoPendiente(Number(b.reembolso))}</p>

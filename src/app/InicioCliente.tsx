@@ -26,7 +26,7 @@ import { FOTOS, foto } from '@/lib/fotos'
 
 const CSS = [
   'system.css', 'ui/cards.css', 'motion/motion.css', 'backgrounds/backgrounds.css', 'layout/layout.css',
-  'icons/icon.css', 'ui/base.css', 'ui/window/fragment.css', 'layout/demo.css', 'inicio.css?v=13', // bump v when the file changes, so browsers drop the old copy
+  'icons/icon.css', 'ui/base.css', 'ui/window/fragment.css', 'layout/demo.css', 'inicio.css?v=15', // bump v when the file changes, so browsers drop the old copy
 ]
 const SCRIPTS = ['system.js', 'motion/motion.js', 'layout/layout.js']
 // Copán's ball court, public domain (Talk2winik, Wikimedia Commons), credited in the footer
@@ -251,8 +251,9 @@ html[data-tema="claro"] {
               <div className="frame frame--split span-6 start-7" role="img" aria-label={T.pago.arte}>
                 {/* eslint-disable-next-line @next/next/no-img-element -- remote Wikimedia photos, served already sized */}
                 <img className="foto-panel" src={foto(FOTOS.tegucigalpa.f)} alt="" loading="lazy" />
-                <div className="stage stage--fade-br">
-                  <div className="at-rise to-edge recibo-pos">
+                {/* the receipt sits still in the middle of the photo (the kit's rise replayed on every scroll) */}
+                <div className="recibo-centro">
+                  <div>
                     <div className="ui ui-panel recibo">
                       <div className="recibo__head"><b>{T.pago.reserva} SCB-7Q2K-M9XD-4TFA</b><span className="d-chip recibo__chip">{T.pago.pagado}</span></div>
                       <p className="recibo__viaje">{T.pago.viaje}</p>

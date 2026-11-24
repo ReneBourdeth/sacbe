@@ -330,3 +330,15 @@ html[data-tema="claro"] .marco-foto .vv { background: rgb(255 255 255 / .9); bor
 .vm-cuerpo fieldset { background: var(--hundido); border-color: var(--borde2) !important; }
 .vm-cuerpo fieldset > legend { float: left; width: 100%; padding: 0 !important; margin-bottom: .6rem; font-weight: 700 !important; }
 .vm-cuerpo fieldset > legend + * { clear: both; }
+
+/* tickets and the booking receipt read exactly as the home page's payment receipt: dark glass, a bold
+   "Reserva CODE" with its state chip, small grey lines, rows on hairlines */
+.tk, .vm-recibo-caja { background: rgb(10 10 10 / .86); border: 1px solid rgb(255 255 255 / .14); color: #fff;
+  backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(16px) saturate(1.2); box-shadow: 0 24px 60px -24px rgb(0 0 0 / .6); }
+html[data-tema="claro"] :is(.tk, .vm-recibo-caja) { background: rgb(255 255 255 / .92); border-color: rgb(0 0 0 / .08); color: #111; }
+:is(.tk, .vm-recibo-caja) .tk-head b { font-family: var(--font-sans); font-size: 1rem; font-weight: 700; letter-spacing: 0; }
+:is(.tk, .vm-recibo-caja) small { color: #aeb3b8; font-size: .85rem; }
+html[data-tema="claro"] :is(.tk, .vm-recibo-caja) small { color: #4d5257; }
+:is(.tk, .vm-recibo-caja) .tk-filas > div { border-color: rgb(127 127 127 / .22); font-size: .92rem; }
+:is(.tk, .vm-recibo-caja) .tk-filas dt { color: #aeb3b8; }
+html[data-tema="claro"] :is(.tk, .vm-recibo-caja) .tk-filas dt { color: #4d5257; }
