@@ -93,7 +93,13 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
     )
     if (e2) {
       await supabase.auth.signOut() // drop the empty guest session
-      alert(e2.code === 'email_exists' || /already/i.test(e2.message) ? t.correoConCuenta : t.errorInvitado)
+      // Supabase's reasons, in words the guest can act on (it checks the address can receive mail)
+      alert(e2.code === 'email_exists' || /already/i.test(e2.message) ? t.correoConCuenta
+        : e2.code === 'email_address_invalid' ? t.correoInvalido
+        // shortcut: Supabase's built-in email only reaches the project team; connect an SMTP service for customers
+        : e2.code === 'email_address_not_authorized' ? t.correoNoAutorizado
+        : e2.code === 'over_email_send_rate_limit' || e2.status === 429 ? t.correoLimite
+        : t.errorInvitado)
       return false
     }
     setCorreoEnviado(correo.trim())
