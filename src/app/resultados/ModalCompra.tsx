@@ -50,6 +50,7 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
   const [correoEnviado, setCorreoEnviado] = useState('')
   const [whatsappDe, setWhatsappDe] = useState('') // the guest's number, digits with country code
   const [boletos, setBoletos] = useState<BoletoListo[]>([])
+  const [qrArchivos, setQrArchivos] = useState<File[]>([]) // the QR images, ready before the share button is tapped
 
   // Signed-in users buy as themselves; guests buy with an email instead (see comprarComoInvitado)
   useEffect(() => {
@@ -132,6 +133,11 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
         qr: await qrComoImagen(r.codigoQr, 150),
       }))))
       setPaso(4)
+      // Made now, not on the tap: a phone only opens its share sheet straight from the tap itself
+      setQrArchivos(await Promise.all(reservas.map(async r => {
+        const blob = await (await fetch(await qrComoImagen(r.codigoQr, 600))).blob()
+        return new File([blob], `sacbe-${r.codigoQr}.png`, { type: 'image/png' })
+      })).catch(() => []))
     } catch (e) {
       const msg = e instanceof Error ? e.message : ''
       if (msg.includes('ASIENTO_OCUPADO')) {
@@ -151,11 +157,21 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
     }
   }
 
-  /** Opens WhatsApp with the tickets written in: on the guest's own chat when they gave a number, else any chat. */
+  /**
+   * Sends the tickets to WhatsApp. A phone shares the QR images themselves with the text as their caption
+   * (the system share sheet; the person picks the chat). Elsewhere, wa.me takes text only, so each ticket
+   * gets a link to its QR image (/qr/<code>), opened on the guest's own chat when they gave a number.
+   */
   function compartirWhatsApp() {
     const lineas = boletos.map(b => `${t.asiento} ${b.numero} · ${b.nombre} · ${t.codigo}: ${b.codigo}`)
     const texto = `${t.whatsappMsg}\n${ruta}\n${formatoFechaHora(viaje.salida, locale)}\n${lineas.join('\n')}\n${t.whatsappAbordar}`
-    window.open(`https://wa.me/${whatsappDe}?text=${encodeURIComponent(texto)}`, '_blank')
+    const telefono = matchMedia('(pointer: coarse)').matches
+    if (telefono && qrArchivos.length && navigator.canShare?.({ files: qrArchivos })) {
+      navigator.share({ files: qrArchivos, text: texto }).catch(() => {}) // closing the sheet is not an error
+      return
+    }
+    const enlaces = boletos.map(b => `QR ${t.asiento} ${b.numero}: ${location.origin}/qr/${b.codigo}`)
+    window.open(`https://wa.me/${whatsappDe}?text=${encodeURIComponent(`${texto}\n${enlaces.join('\n')}`)}`, '_blank')
   }
 
   return (
