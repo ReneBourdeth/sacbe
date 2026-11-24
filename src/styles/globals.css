@@ -25,6 +25,24 @@
   --borde:  rgba(255, 255, 255, .3);
   --borde2: rgba(255, 255, 255, .16);
   --radio:  16px; /* round: one corner size for every box, button and field */
+  --barra:  rgba(0, 0, 0, .6); /* the top bar's glass */
+}
+
+/* light mode, chosen with the ☀ switch (TemaToggle): a white page with the same macaw red */
+html[data-tema="claro"] {
+  color-scheme: light;
+  --fondo:      #FFFFFF;
+  --superficie: rgba(255, 255, 255, .82);
+  --hundido:    rgba(0, 0, 0, .05);
+  --tinta:      #111111;
+  --tenue:      #4A4F45;  /* ≈8:1 on white */
+  --toba:       #6B7468;
+  --turquesa:   #0B6FB8;  /* links and focus, 5:1 on white */
+  --rojo:       #C62828;
+  --verde:      #1B7F3B;
+  --borde:  rgba(0, 0, 0, .22);
+  --borde2: rgba(0, 0, 0, .12);
+  --barra:  rgba(255, 255, 255, .78);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,6 +57,7 @@ body {
 }
 
 option { background: #111; } /* native dropdown lists can't be see-through */
+html[data-tema="claro"] option { background: #fff; }
 
 /* Inner pages sit on a darkened photo of Copán's ball court (public domain, Talk2winik, Wikimedia
    Commons) under glass panels. The home page (html[data-type], set by the kit's head line) has its own
@@ -46,6 +65,10 @@ option { background: #111; } /* native dropdown lists can't be see-through */
 html:not([data-type]) body::before {
   content: ''; position: fixed; inset: 0; z-index: -1;
   background: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.88)),
+    url("https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/CPN_BallCourt_01.jpg/1280px-CPN_BallCourt_01.jpg") center / cover;
+}
+html[data-tema="claro"]:not([data-type]) body::before {
+  background: linear-gradient(rgba(255,255,255,.84), rgba(255,255,255,.93)),
     url("https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/CPN_BallCourt_01.jpg/1280px-CPN_BallCourt_01.jpg") center / cover;
 }
 /* panels that float over moving content get a frosted blur */
