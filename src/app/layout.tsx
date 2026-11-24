@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font -- one font link for every page, in the root layout */}
-        <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400..700&family=Red+Hat+Text:wght@400..600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400..900&family=Red+Hat+Text:wght@400..600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
         {/* the taste skill's head line, home page only: the kit's page flags, and the hero's entrance guard
             (its words wait for motion.js, or show after 700 ms if it is late); the moments' guard the same way */}
         <script dangerouslySetInnerHTML={{ __html: KIT_HEAD }} />
