@@ -97,28 +97,30 @@ export default function MisViajesPage() {
         ) : boletos.map(b => {
           const r = b.viajes?.rutas
           return (
-            <div key={b.id} style={S.card}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={S.ruta}>{r?.origen?.nombre ?? '—'} → {r?.destino?.nombre ?? '—'}</div>
-                <div style={S.muted}>
-                  {r?.empresas?.nombre}
-                  {b.viajes && ` · ${formatoFechaHora(b.viajes.salida, locale)}`}
+            // the receipt look of the home page's drawn tickets: route and state, the rows, the QR beside
+            <div key={b.id} className="tk">
+              <div className="tk-info">
+                <div className="tk-head">
+                  <b>{r?.origen?.nombre ?? '—'} → {r?.destino?.nombre ?? '—'}</b>
+                  <span className={`vv-chip${b.estado === 'reservado' ? ' is-pocos' : b.estado === 'pagado' ? '' : ' is-off'}`}>{t.estados[b.estado]}</span>
                 </div>
-                <div style={S.fila}><span>{t.asiento}</span><strong>{b.asientos?.numero}</strong></div>
-                <div style={S.fila}><span>{t.pasajero}</span><span>{b.nombre_pasajero}</span></div>
-                <div style={S.fila}><span>{t.codigo}</span><span style={{ fontFamily: 'monospace' }}>{b.codigo_qr}</span></div>
-                <span style={{ ...S.estado, ...(b.estado === 'pagado' ? S.estadoOk : {}) }}>{t.estados[b.estado]}</span>
+                <small>{r?.empresas?.nombre}{b.viajes && ` · ${formatoFechaHora(b.viajes.salida, locale)}`}</small>
+                <dl className="tk-filas">
+                  <div><dt>{t.asiento}</dt><dd><strong>{b.asientos?.numero}</strong></dd></div>
+                  <div><dt>{t.pasajero}</dt><dd>{b.nombre_pasajero}</dd></div>
+                  <div><dt>{t.codigo}</dt><dd className="tk-codigo">{b.codigo_qr}</dd></div>
+                </dl>
                 {b.estado === 'cancelado' && Number(b.reembolso) > 0 && (
-                  <span style={S.muted}> · {b.reembolsado_at ? t.reembolsoHecho(Number(b.reembolso)) : t.reembolsoPendiente(Number(b.reembolso))}</span>
+                  <p style={S.muted}>{b.reembolsado_at ? t.reembolsoHecho(Number(b.reembolso)) : t.reembolsoPendiente(Number(b.reembolso))}</p>
                 )}
                 {(b.estado === 'reservado' || b.estado === 'pagado') && b.viajes && new Date(b.viajes.salida) > new Date() && (
                   <button style={S.cancelar} onClick={() => cancelar(b)}>{t.cancelarBoleto}</button>
                 )}
               </div>
               {qrs[b.id] && b.estado !== 'cancelado' && ( // a cancelled ticket can't board, so don't offer its QR
-                <div style={{ background: 'white', padding: 8, alignSelf: 'center', borderRadius: 'var(--radio-campo)' }}>
+                <div className="tk-qr">
                   {/* eslint-disable-next-line @next/next/no-img-element -- local data: URL */}
-                  <img src={qrs[b.id]} alt="QR" width={110} height={110} style={{ display: 'block' }} />
+                  <img src={qrs[b.id]} alt={`QR ${b.codigo_qr}`} width={128} height={128} />
                 </div>
               )}
             </div>

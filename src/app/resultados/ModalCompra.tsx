@@ -26,6 +26,7 @@ const VACIO: Pasajero = { nombre: '', identidad: '', esMenor: false }
 
 type Props = {
   viaje: Viaje
+  inicial?: Asiento[] // seats already picked in the departures window: the window opens on the passengers
   onCerrar: () => void
 }
 
@@ -33,12 +34,12 @@ type Props = {
  * Booking window for one trip: up to 6 seats in one purchase, one passenger per seat.
  * It owns all booking state, so closing it (which unmounts it) resets everything.
  */
-export default function ModalCompra({ viaje, onCerrar }: Props) {
+export default function ModalCompra({ viaje, inicial = [], onCerrar }: Props) {
   const { t, locale } = useLang()
   const { asientos, cargado } = useAsientos(viaje.id)
 
-  const [paso, setPaso] = useState<Paso>(1)
-  const [elegidos, setElegidos] = useState<Asiento[]>([])
+  const [paso, setPaso] = useState<Paso>(inicial.length ? 2 : 1)
+  const [elegidos, setElegidos] = useState<Asiento[]>(inicial)
   const [pasajeros, setPasajeros] = useState<Record<string, Pasajero>>({}) // by seat id
   const [metodo, setMetodo] = useState<MetodoPago>('tarjeta')
   const [enviando, setEnviando] = useState(false)

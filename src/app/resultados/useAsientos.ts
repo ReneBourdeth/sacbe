@@ -9,13 +9,15 @@ import type { Asiento } from '@/lib/supabase'
  * just booked turns grey without reloading.
  * `cargado` tells "still loading" apart from "this trip has no seats".
  */
-export function useAsientos(viajeId: string) {
+export function useAsientos(viajeId: string | null) {
   const [asientos, setAsientos] = useState<Asiento[]>([])
   const [cargado, setCargado] = useState(false)
 
   useEffect(() => {
     let activo = true // ignore late answers after the window closes
     setCargado(false)
+    setAsientos([])
+    if (!viajeId) return
 
     getAsientos(viajeId)
       .then(lista => { if (activo) setAsientos(lista) })

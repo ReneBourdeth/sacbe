@@ -140,10 +140,10 @@ export default function PanelPage() {
           ) : viajes.map(v => (
             <section key={v.id} style={S.viaje}>
               <div style={S.viajeFila}>
-                <strong style={{ fontSize: '1.2rem' }}>{formatoHora(v.salida, locale)}</strong>
+                <strong style={{ fontSize: '1.2rem', fontFamily: 'var(--font-display)', letterSpacing: '-.02em' }}><i className="vv-punto" data-clase={v.clase} style={{ marginRight: 8 }} />{formatoHora(v.salida, locale)}</strong>
                 <span>{nombreTerminal(v.rutas.origen?.codigo ?? '')} → {nombreTerminal(v.rutas.destino?.codigo ?? '')}</span>
                 <span style={S.muted}>{t[v.clase]}</span>
-                <span style={S.vendidos}>{t.vendidos(v.capacidad - v.asientos_disp, v.capacidad)}</span>
+                <span className="vv-chip" style={S.vendidos}>{t.vendidos(v.capacidad - v.asientos_disp, v.capacidad)}</span>
               </div>
               <EditarViaje key={v.salida + v.precio} viaje={{ id: v.id, salida: v.salida, precio: v.precio, duracion_min: v.rutas.duracion_min }} onCambio={() => setRecarga(n => n + 1)} />
               <details>
@@ -175,7 +175,7 @@ export default function PanelPage() {
                                 }}>{t.reembolsado} · L. {Number(b.reembolso)}</button>
                               ) : (
                                 <>
-                                  {t.estados[b.estado]}
+                                  <span className={`vv-chip${b.estado === 'cancelado' ? ' is-off' : ''}`}>{t.estados[b.estado]}</span>
                                   {b.reembolsado_at && <span style={S.muted}> · {t.reembolsoHecho(Number(b.reembolso))}</span>}
                                 </>
                               )}

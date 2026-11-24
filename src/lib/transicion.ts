@@ -19,6 +19,7 @@ export function conTransicion(cambio: () => void, desde?: { x: number; y: number
     document.documentElement.animate(
       { clipPath: [`circle(0px at ${desde.x}px ${desde.y}px)`, `circle(${r}px at ${desde.x}px ${desde.y}px)`] },
       { duration: 520, easing: 'cubic-bezier(.2,.8,.2,1)', pseudoElement: '::view-transition-new(root)' },
-    ).finished.finally(() => { delete document.documentElement.dataset.vt })
+    // keep colour transitions off one more frame: switched on at once, they replayed the change as a flash
+    ).finished.finally(() => requestAnimationFrame(() => requestAnimationFrame(() => { delete document.documentElement.dataset.vt })))
   }).catch(() => { delete document.documentElement.dataset.vt })
 }

@@ -246,8 +246,6 @@ html[data-tema="claro"] .ruta-link:hover .rows__value { color: #b51f33; }
 /* two-screen sections (.g2) without the screen-sized gap between their two halves */
 main > section.g2 > .wrap { grid-template-rows: auto auto !important; row-gap: var(--s-8) !important; }
 /* the seat-map window filled the rest of a screen-tall section; with sections at content height it keeps its own */
-#asientos .app.fill { flex: none; height: clamp(520px, 72svh, 680px); }
-@media (max-width: 639px) { #asientos .app.fill { height: 620px; } }
 /* the route ring (RedRutas.tsx): pick an origin, then a destination; the red line is that route */
 .red-rutas { overflow: hidden; border-radius: var(--r-lg, 24px); }
 .rr-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -299,3 +297,21 @@ html[data-tema="claro"] .mapa__asiento.is-ocupado { background: repeating-linear
 /* hero window: a narrower filter column and content-sized price and seats, so company names stay whole */
 .hero__art .d-win__body { grid-template-columns: 124px minmax(0, 1fr) !important; }
 .hero__art .d-row { grid-template-columns: 52px minmax(0, 1fr) auto auto !important; }
+/* the live departures window (VentanaViajes, styled in globals.css) under the section's heading */
+.ventana-demo { margin-top: var(--s-7); }
+/* the drawn windows are live: the hero's filters and rows, and each step and company picture, lead somewhere */
+.d-side button { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.d-side > button { padding: 8px 10px; border-radius: 10px; transition: background-color .2s; }
+.d-side > button:hover { background: rgb(255 255 255 / .06); }
+.d-side > button.is-on { background: rgb(255 255 255 / .1); color: #fff; font-weight: 600; }
+html[data-tema="claro"] .d-win--dark .d-side > button.is-on { background: rgb(0 0 0 / .06); color: #16181a; }
+.d-side > button:focus-visible { outline: 2px solid #4db8ff; }
+a.d-row { color: inherit; text-decoration: none; border-radius: 10px; transition: background-color .2s; }
+a.d-row:hover { background: rgb(255 255 255 / .06); }
+html[data-tema="claro"] a.d-row:hover { background: rgb(0 0 0 / .04); }
+.panel-link { display: block; color: inherit; text-decoration: none; transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s; }
+.panel-link:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgb(0 0 0 / .35); }
+.panel-link:hover .mini { transform: scale(1.02); }
+.panel-link .mini { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+@media (prefers-reduced-motion: reduce) { .panel-link, .panel-link .mini { transition: none; } .panel-link:hover { transform: none; } }
+.d-side > button > i { flex: none; width: 12px; height: 12px; border-radius: 50%; }

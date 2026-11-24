@@ -19,17 +19,21 @@ import TemaToggle from '@/components/TemaToggle'
 import { MarcaGuacamaya } from '@/components/Simbolos'
 import { TEXTOS, SALIDAS, RUTAS } from './inicio-textos'
 import RedRutas, { type Par } from './RedRutas'
+import VentanaViajes, { type AsientoBus, type FilaViaje } from '@/components/VentanaViajes'
+import { CARGO_SERVICIO } from '@/lib/precios'
 import { Franja } from '@/components/SiteHeader'
 import { FOTOS, foto } from '@/lib/fotos'
 
 const CSS = [
   'system.css', 'ui/cards.css', 'motion/motion.css', 'backgrounds/backgrounds.css', 'layout/layout.css',
-  'icons/icon.css', 'ui/base.css', 'ui/window/fragment.css', 'layout/demo.css', 'inicio.css?v=10', // bump v when the file changes, so browsers drop the old copy
+  'icons/icon.css', 'ui/base.css', 'ui/window/fragment.css', 'layout/demo.css', 'inicio.css?v=13', // bump v when the file changes, so browsers drop the old copy
 ]
 const SCRIPTS = ['system.js', 'motion/motion.js', 'layout/layout.js']
 // Copán's ball court, public domain (Talk2winik, Wikimedia Commons), credited in the footer
 const FOTO_COPAN = 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/CPN_BallCourt_01.jpg/1920px-CPN_BallCourt_01.jpg'
 const PASOS_FOTOS = [FOTOS.carretera, FOTOS.roatan, FOTOS.bus]
+// where each step's picture leads: pick seats, how to pay, your tickets with their QR
+const PASOS_ENLACES = ['/resultados?origen=SPS&destino=TGU', '#faq', '/mis-viajes']
 
 // The kit's scripts change the DOM (entrances, nav sheet, moments). Loading them after hydration
 // keeps React's markup and the kit's changes from clashing.
@@ -50,6 +54,18 @@ const OCUPADOS = new Set(['1A', '1B', '2C', '3A', '3D', '5B', '5C', '6A', '7D', 
 const ELEGIDOS = new Set(['4C', '4D'])
 // the results page's class filters, in its order
 const FILTROS = ['todos', 'economica', 'ejecutivo', 'primera'] as const
+// The sample departures in the live window, and each bus's 40 seats: the same taken pattern, turned per bus
+const asientosDemo = (id: string | null): AsientoBus[] => {
+  if (id === null) return []
+  const giro = Number(id)
+  return Array.from({ length: 40 }, (_, k) => {
+    const numero = `${Math.floor(k / 4) + 1}${'ABCD'[k % 4]}`
+    const ocupado = id === '4' ? !['4A', '4B', '7C', '9D', '10A', '10B'].includes(numero) : OCUPADOS.has(`${(Math.floor(k / 4) + giro) % 10 + 1}${'ABCD'[k % 4]}`) && giro % 3 !== 0
+    return { id: `${id}-${numero}`, numero, columna: 'ABCD'[k % 4], libre: !ocupado }
+  })
+}
+// free seats counted from the same pattern, so the list and the open bus agree
+const FILAS_DEMO: FilaViaje[] = SALIDAS.map((s, i) => ({ id: String(i), empresa: s.empresa, hora: s.hora, clase: s.clase as FilaViaje['clase'], precio: s.precio, disp: asientosDemo(String(i)).filter(x => x.libre).length }))
 // Each city's lowest fare to anywhere, from RUTAS (the database's prices)
 // plus the other city of that cheapest route, so a card can open its search
 const CIUDADES_DESDE = ['SPS', 'TGU', 'CEI', 'CMG', 'CHO', 'CPN'].map(c => {
@@ -77,6 +93,10 @@ export default function InicioCliente() {
   // The route ring: a chosen origin/destination, and a route being looked at (a hovered row)
   const [par, setPar] = useState<Par | null>(null)
   const [vista, setVista] = useState<[string, string] | null>(null)
+  // the live sample window: Viana at 10:00 open, no seats picked
+  const [demoId, setDemoId] = useState<string | null>('4')
+  const [demoSel, setDemoSel] = useState<string[]>([])
+  const [heroFiltro, setHeroFiltro] = useState<typeof FILTROS[number]>('todos')
   const hayBus = (o: string, d: string) => !rutas || rutas.has(`${o}-${d}`)
   const origenes = TERMINALES.filter(o => TERMINALES.some(d => hayBus(o.codigo, d.codigo)))
   const destinos = TERMINALES.filter(d => d.codigo !== origen && hayBus(origen, d.codigo))
@@ -166,25 +186,25 @@ html[data-tema="claro"] {
               </form>
               <p className="hero__proof">{T.hero.prueba}</p>
             </div>
-            <div className="hero__art span-6 start-7" role="img" aria-label={T.hero.arte}>
+            <div className="hero__art span-6 start-7">
               {/* eslint-disable-next-line @next/next/no-img-element -- remote Wikimedia photos, served already sized */}
               <img className="foto-panel" src={foto(FOTOS.piramide.f)} alt="" fetchPriority="high" />
-              <div className="ly-piece ly-piece--main d-win d-win--dark" aria-hidden="true">
+              <div className="ly-piece ly-piece--main d-win d-win--dark" role="group" aria-label={T.hero.arte}>
                 <div className="d-win__bar"><span className="d-win__dots"><i /><i /><i /></span><span>Sacbé · San Pedro Sula → Tegucigalpa</span></div>
                 <div className="d-win__body">
                   <div className="d-side">
-                    {FILTROS.map((f, i) => <span key={f} className={i === 0 ? 'is-on' : undefined}><i data-clase={f} />{f === 'todos' ? t.todos : t[f]}</span>)}
+                    {FILTROS.map(f => <button type="button" key={f} className={heroFiltro === f ? 'is-on' : undefined} aria-pressed={heroFiltro === f} onClick={() => setHeroFiltro(f)}><i data-clase={f} />{f === 'todos' ? t.todos : t[f]}</button>)}
                   </div>
                   <div className="d-main">
                     <div className="d-main__head"><h4>{T.hero.ventana}</h4></div>
                     <div className="d-rows">
-                      {SALIDAS.slice(0, 7).map((s, i) => (
-                        <div className="d-row" key={i}>
+                      {FILAS_DEMO.filter(f => heroFiltro === 'todos' || f.clase === heroFiltro).slice(0, 7).map(s => (
+                        <a className="d-row" key={s.id} href="/resultados?origen=SPS&destino=TGU">
                           <span className="d-thumb d-hora">{s.hora}</span>
                           <div><b>{s.empresa}</b><small>{clase(s.clase)}</small></div>
                           <span className="num">L {s.precio}</span>
-                          <span className={`d-chip${i === 4 ? ' d-chip--low' : ''}`}>{i === 4 ? `6 ${T.app.libres}` : `40 ${T.app.libres}`}</span>
-                        </div>
+                          <span className={`d-chip${s.disp <= 5 ? ' d-chip--low' : ''}`}>{s.disp} {t.disp}</span>
+                        </a>
                       ))}
                     </div>
                   </div>
@@ -207,56 +227,13 @@ html[data-tema="claro"] {
               <h2 id="asientos-h" className="span-5">{T.app.h2}</h2>
               <p className="span-6 start-7">{T.app.p} <a className="link" href="/resultados?origen=SPS&destino=TGU">{T.app.link}</a></p>
             </div>
-            <div className="ui app fill" role="img" aria-label={T.app.arte}>
-              <div className="app__pane app__pane--list">
-                <div className="ui ui-panel ui-win" data-ui="window" data-open="—" data-work="—" data-done="—">
-                  <div className="ui-win__bar">
-                    <span className="ui-dots" aria-hidden="true"><i /><i /><i /></span>
-                    <span className="ui-win__crumb">Sacbé <i>/</i> <b>San Pedro Sula → Tegucigalpa</b></span>
-                    <span className="ui-spacer" />
-                  </div>
-                  <div className="ui-win__body">
-                    <nav className="ui-win__side" aria-hidden="true">
-                      {FILTROS.map((f, i) => <span key={f} className={`ui-win__nav${i === 0 ? ' is-on' : ''}`}>{f === 'todos' ? t.todos : t[f]}<em>{f === 'todos' ? SALIDAS.length : SALIDAS.filter(x => x.clase === f).length}</em></span>)}
-                    </nav>
-                    <div className="ui-win__main">
-                      <div className="ui-win__cols" aria-hidden="true">{T.app.cols.map(c => <span key={c}>{c}</span>)}</div>
-                      <ul className="ui-win__rows">
-                        {SALIDAS.map((s, i) => (
-                          <li className={`ui-win__row${i === 4 ? ' is-open' : ''}`} key={i}>
-                            <span className="ui-avatar clase-punto" data-clase={s.clase} aria-hidden="true" />
-                            <span className="ui-win__who">{s.empresa}</span>
-                            <span className="ui-win__sub">{s.hora} · {clase(s.clase)} · L {s.precio}</span>
-                            <span className={`ui-win__st${i === 4 ? ' is-you' : ''}`}>{i === 4 ? `6 ${T.app.libres}` : `40 ${T.app.libres}`}</span>
-                            <span className="ui-win__age">{s.hora}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="app__pane app__pane--open">
-                <div className="ui ui-panel mapa">
-                  <div className="mapa__head">
-                    <div><b>Viana · 10:00</b><small>{clase('ejecutivo')} · L 442</small></div>
-                    <div className="mapa__leyenda"><span><i className="m-libre" />{T.app.libre}</span><span><i className="m-ocupado" />{T.app.ocupado}</span><span><i className="m-tuyo" />{T.app.tuyo}</span></div>
-                  </div>
-                  <div className="mapa__bus">
-                    <span className="mapa__frente">{T.app.frente}</span>
-                    {Array.from({ length: 10 }, (_, f) => (
-                      <div className="mapa__fila" key={f}>
-                        {['A', 'B', '', 'C', 'D'].map(col => {
-                          if (!col) return <span key="pasillo" className="mapa__pasillo" />
-                          const n = `${f + 1}${col}`
-                          return <span key={n} className={`mapa__asiento${OCUPADOS.has(n) ? ' is-ocupado' : ''}${ELEGIDOS.has(n) ? ' is-tuyo' : ''}`}>{n}</span>
-                        })}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mapa__pie"><span>{T.app.resumen}</span><span className="d-btn mapa__btn">{T.app.continuar}</span></div>
-                </div>
-              </div>
+            {/* the same departures window as the results page, with sample trips: pick a departure and seats, then Continue */}
+            <div className="ventana-demo">
+              <VentanaViajes titulo="San Pedro Sula → Tegucigalpa" filas={FILAS_DEMO} elegido={demoId} onElegir={id => { setDemoId(id); setDemoSel([]) }}
+                asientos={asientosDemo(demoId)} marcados={demoSel}
+                onAsiento={a => setDemoSel(m => m.includes(a.id) ? m.filter(x => x !== a.id) : m.length >= 6 ? m : [...m, a.id])}
+                total={demoSel.length * ((FILAS_DEMO.find(f => f.id === demoId)?.precio ?? 0) + CARGO_SERVICIO)}
+                onContinuar={() => location.assign('/resultados?origen=SPS&destino=TGU')} />
             </div>
           </div>
         </section>
@@ -302,15 +279,6 @@ html[data-tema="claro"] {
                 <h2 id="rutas-h">{T.rutas.h2}</h2>
                 <p>{T.rutas.p}</p>
               </div>
-              <div className="grid rutas-lista">
-                {[RUTAS.slice(0, 8), RUTAS.slice(8)].map((col, c) => (
-                  <ul className="rows span-6" key={c}>
-                    {col.map(([a, b, p]) => (
-                      <li key={a + b}><a className="ruta-link" href={enlaceRuta(a, b)} onMouseEnter={() => setVista([a, b])} onMouseLeave={() => setVista(null)} onFocus={() => setVista([a, b])} onBlur={() => setVista(null)}><span className="rows__name">{nombreTerminal(a)} ↔ {nombreTerminal(b)}</span><span className="rows__value">{T.rutas.desde} L {p} <span aria-hidden="true">→</span></span></a></li>
-                    ))}
-                  </ul>
-                ))}
-              </div>
             </div>
             {/* the route network: pick two cities, the red line draws the route and links to its buses */}
             <RedRutas rutas={RUTAS} par={par} vista={vista} onPar={setPar} onVista={setVista} enlace={enlaceRuta} T={T.rutas} />
@@ -336,7 +304,7 @@ html[data-tema="claro"] {
                   <span className="step-num">{i + 1}</span>
                   <h3>{c.h3}</h3>
                   <p>{c.p}</p>
-                  <div className="panel">
+                  <a className="panel panel-link" href={PASOS_ENLACES[i]} aria-label={c.h3}>
                     {/* eslint-disable-next-line @next/next/no-img-element -- remote Wikimedia photos, served already sized */}
                     <img className="foto-panel" src={foto(PASOS_FOTOS[i].f, 960)} alt="" loading="lazy" />
                     <div className="stage stage--fade-b"><div className="at-rise fit paso-pos">
@@ -363,7 +331,7 @@ html[data-tema="claro"] {
                         </div>
                       )}
                     </div></div>
-                  </div>
+                  </a>
                 </article>
               ))}
             </div>
@@ -449,7 +417,7 @@ function TarjetaEmpresa({ i, c, T }: { i: number; c: { h3: string; p: string }; 
     <article className="card card--row card--open span-6">
       <h3>{c.h3}</h3>
       <p>{c.p}</p>
-      <div className="panel">
+      <a className="panel panel-link" href="/panel" aria-label={c.h3}>
         <div className="stage stage--fade-b"><div className="at-rise fit panel-pos">
           <div className="ui ui-panel mini mini--ancho">
             {i === 0 && <>
@@ -479,7 +447,7 @@ function TarjetaEmpresa({ i, c, T }: { i: number; c: { h3: string; p: string }; 
             </>}
           </div>
         </div></div>
-      </div>
+      </a>
     </article>
   )
 }
