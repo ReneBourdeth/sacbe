@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import AuthLink from './AuthLink'
 import LangToggle from './LangToggle'
 import { MarcaGuacamaya } from './Simbolos'
@@ -11,7 +10,6 @@ import { MarcaGuacamaya } from './Simbolos'
 export default function SiteHeader({ children }: { children?: React.ReactNode }) {
   return (
     <div style={S.pegado}>
-      <div className="sb-plumas" />
       <header className="sb-header" style={S.header}>
         <Logo />
         <nav className="sb-header-links" style={S.links}>
@@ -24,19 +22,19 @@ export default function SiteHeader({ children }: { children?: React.ReactNode })
   )
 }
 
-/** Macaw mark + "Sacbé" wordmark, linking home. */
+/** Macaw mark + "Sacbé" wordmark, linking home (a full page load, so the home page's kit starts fresh). */
 export function Logo() {
   return (
-    <Link href="/" style={S.logo}>
+    <a href="/" style={S.logo}>
       <MarcaGuacamaya size={26} />
       Sacbé
-    </Link>
+    </a>
   )
 }
 
 const S: Record<string, React.CSSProperties> = {
   pegado: { position: 'sticky', top: 0, zIndex: 200 },
-  header: { background: 'rgba(0, 0, 0, .6)', borderBottom: '1px solid var(--borde2)', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem' },
-  logo: { display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 800, color: 'var(--tinta)' },
+  header: { background: 'rgba(0, 0, 0, .6)', borderBottom: '1px solid var(--borde2)', height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem' },
+  logo: { display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 500, color: 'var(--tinta)' },
   links: { display: 'flex', alignItems: 'center', gap: '1.25rem' },
 }

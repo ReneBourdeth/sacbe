@@ -274,7 +274,7 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
                   <img src={b.qr} alt={`QR ${t.asiento} ${b.numero}`} style={{ display: 'block', width: 120, height: 120 }} />
                 </div>
                 <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{t.asiento} {b.numero}</div>
+                  <div style={{ fontWeight: 500, fontSize: '1.1rem' }}>{t.asiento} {b.numero}</div>
                   <div>{b.nombre}</div>
                   <div style={{ fontFamily: 'monospace', color: 'var(--tenue)' }}>{b.codigo}</div>
                 </div>
