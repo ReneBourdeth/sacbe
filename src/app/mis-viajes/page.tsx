@@ -83,7 +83,7 @@ export default function MisViajesPage() {
 
       <div style={S.wrap}>
         <h1 className="sb-titulo-pagina" style={S.title}>{t.misBoletos}</h1>
-        {porConfirmar !== null && <p style={S.aviso}>✉ {t.confirmaCorreo(porConfirmar)}</p>}
+        {porConfirmar !== null && <p style={S.aviso}>{porConfirmar ? `✉ ${t.confirmaCorreo(porConfirmar)}` : `📲 ${t.invitadoSinCorreo}`}</p>}
 
         {error ? (
           <p style={S.muted}>{t.errorViajes} · <a href="/mis-viajes" style={{ color: 'var(--turquesa)', textDecoration: 'underline' }}>{t.intentarDeNuevo}</a></p>

@@ -8,6 +8,7 @@ import { formatoFechaHora, formatoHora } from '@/lib/fecha'
 import { CARGO_SERVICIO, totalConCargo } from '@/lib/precios'
 import { nombreTerminal } from '@/lib/terminales'
 import { qrComoImagen } from '@/lib/qr'
+import { numeroWhatsApp } from '@/lib/telefono'
 import { useAsientos } from './useAsientos'
 import MapaAsientos from './MapaAsientos'
 import { MarcaGuacamaya } from '@/components/Simbolos'
@@ -42,8 +43,12 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
   const [metodo, setMetodo] = useState<MetodoPago>('tarjeta')
   const [enviando, setEnviando] = useState(false)
   const [logueado, setLogueado] = useState(true) // assume yes until checked, to avoid a flash
-  const [correo, setCorreo] = useState('')       // guests only: where the confirmation goes
+  // guests only: the confirmation goes by email (Supabase sends it) or to their WhatsApp (they send it to themselves)
+  const [via, setVia] = useState<'correo' | 'whatsapp'>('correo')
+  const [correo, setCorreo] = useState('')
+  const [telefono, setTelefono] = useState('')
   const [correoEnviado, setCorreoEnviado] = useState('')
+  const [whatsappDe, setWhatsappDe] = useState('') // the guest's number, digits with country code
   const [boletos, setBoletos] = useState<BoletoListo[]>([])
 
   // Signed-in users buy as themselves; guests buy with an email instead (see comprarComoInvitado)
@@ -70,7 +75,8 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
   }
 
   function irAPago() {
-    if (!logueado && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.trim())) return alert(t.alertCorreo)
+    if (!logueado && via === 'correo' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.trim())) return alert(t.alertCorreo)
+    if (!logueado && via === 'whatsapp' && !numeroWhatsApp(telefono)) return alert(t.alertTelefono)
     if (elegidos.some(a => !pasajeroDe(a).nombre.trim() || !pasajeroDe(a).identidad.trim())) return alert(t.alertDatos)
     setPaso(3)
   }
@@ -81,12 +87,19 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
    * email is attached to it. Supabase emails a confirmation link; opening it
    * turns the guest into a normal account that keeps these tickets.
    * The email goes out before any seat is taken, so every guest gets one.
+   * A WhatsApp guest skips the email: the last step opens WhatsApp on their own number with the tickets
+   * written in (free; automatic WhatsApp messages are paid), and the tickets stay in this browser.
    * Returns false when the purchase must stop.
    */
   async function comprarComoInvitado() {
     const supabase = createClient()
     const { error: e1 } = await supabase.auth.signInAnonymously()
     if (e1) { alert(t.errorInvitado); return false }
+    if (via === 'whatsapp') {
+      setWhatsappDe(numeroWhatsApp(telefono) ?? '')
+      setLogueado(true)
+      return true
+    }
     const { error: e2 } = await supabase.auth.updateUser(
       { email: correo.trim() },
       { emailRedirectTo: `${location.origin}/entrar/callback?next=/mis-viajes` },
@@ -138,10 +151,11 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
     }
   }
 
+  /** Opens WhatsApp with the tickets written in: on the guest's own chat when they gave a number, else any chat. */
   function compartirWhatsApp() {
     const lineas = boletos.map(b => `${t.asiento} ${b.numero} · ${b.nombre} · ${t.codigo}: ${b.codigo}`)
-    const texto = `${t.whatsappMsg}\n${ruta}\n${formatoFechaHora(viaje.salida, locale)}\n${lineas.join('\n')}`
-    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank')
+    const texto = `${t.whatsappMsg}\n${ruta}\n${formatoFechaHora(viaje.salida, locale)}\n${lineas.join('\n')}\n${t.whatsappAbordar}`
+    window.open(`https://wa.me/${whatsappDe}?text=${encodeURIComponent(texto)}`, '_blank')
   }
 
   return (
@@ -178,12 +192,28 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
             <div style={S.mTitle}>{t.datosPasajero}</div>
             {!logueado && (
               <div style={S.pasajeroCaja}>
-                <div style={S.ff}>
-                  <label htmlFor="correo-invitado" style={S.ffLabel}>{t.correoConfirmacion}</label>
-                  <input id="correo-invitado" type="email" autoComplete="email" required style={S.ffInput}
-                    value={correo} onChange={e => setCorreo(e.target.value)} placeholder="tu@correo.com" />
+                <div role="radiogroup" aria-label={t.confirmacionPor} style={{ ...S.metodos, marginBottom: '.75rem' }}>
+                  {(['correo', 'whatsapp'] as const).map(v => (
+                    <button key={v} type="button" role="radio" aria-checked={via === v} onClick={() => setVia(v)}
+                      style={{ ...S.metodo, ...(via === v ? S.metodoOn : {}), fontSize: '1rem', color: 'var(--tinta)' }}>
+                      {v === 'correo' ? `✉ ${t.porCorreo}` : `📲 ${t.porWhatsapp}`}
+                    </button>
+                  ))}
                 </div>
-                <p style={{ color: 'var(--tenue)', fontSize: '.9rem', margin: '.5rem 0' }}>{t.correoInvitadoInfo}</p>
+                {via === 'correo' ? (
+                  <div style={S.ff}>
+                    <label htmlFor="correo-invitado" style={S.ffLabel}>{t.correoConfirmacion}</label>
+                    <input id="correo-invitado" type="email" autoComplete="email" required style={S.ffInput}
+                      value={correo} onChange={e => setCorreo(e.target.value)} placeholder="tu@correo.com" />
+                  </div>
+                ) : (
+                  <div style={S.ff}>
+                    <label htmlFor="whatsapp-invitado" style={S.ffLabel}>{t.numeroWhatsapp}</label>
+                    <input id="whatsapp-invitado" type="tel" inputMode="tel" autoComplete="tel" required style={S.ffInput}
+                      value={telefono} onChange={e => setTelefono(e.target.value)} placeholder="9999-9999" />
+                  </div>
+                )}
+                <p style={{ color: 'var(--tenue)', fontSize: '.9rem', margin: '.5rem 0' }}>{via === 'correo' ? t.correoInvitadoInfo : t.whatsappInvitadoInfo}</p>
                 <a href={`/entrar?next=${encodeURIComponent(location.pathname + location.search)}`} style={S.loginHint}>
                   {t.loginHint}
                 </a>
@@ -283,12 +313,13 @@ export default function ModalCompra({ viaje, onCerrar }: Props) {
                   <div style={{ fontWeight: 500, fontSize: '1.1rem' }}>{t.asiento} {b.numero}</div>
                   <div>{b.nombre}</div>
                   <div style={{ fontFamily: 'monospace', color: 'var(--tenue)' }}>{b.codigo}</div>
+                  <a href={b.qr} download={`sacbe-${b.codigo}.png`} style={{ display: 'inline-block', marginTop: '.35rem', color: 'var(--turquesa)', textDecoration: 'underline' }}>{t.descargarQr}</a>
                 </div>
               </div>
             ))}
 
             <button style={{ ...S.btnPagar, marginBottom: '.5rem', background: '#25D366', color: '#000000' }} onClick={compartirWhatsApp}>
-              {t.whatsapp}
+              {whatsappDe ? t.enviarMiWhatsapp : t.whatsapp}
             </button>
             <a href="/mis-viajes" style={{ ...S.btnPagar, ...S.btnSecundario }}>{t.verBoletos}</a>
           </div>
