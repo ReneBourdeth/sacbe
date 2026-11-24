@@ -194,3 +194,20 @@ html footer.closing.footer--dark.ground-inverse {
   .hero__art > .ly-piece--note { display: none; }
   .hero__art { min-height: 380px; }
 }
+
+/* light mode: the drawn app pieces turn to white glass with dark text (they stayed night-dark) */
+html[data-tema="claro"] .d-win--dark {
+  background: rgb(255 255 255 / .9) !important; color: #16181a; border-color: rgb(0 0 0 / .08);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / .07), 0 24px 60px -28px rgb(0 0 0 / .35); }
+html[data-tema="claro"] .d-win--dark :is(.d-win__bar, .d-side, .d-row small) { color: #4d5257; border-color: rgb(0 0 0 / .08); }
+html[data-tema="claro"] .d-win--dark .d-row b { color: #16181a; }
+html[data-tema="claro"] .d-win--dark :is(.d-rows, .d-row) { border-color: rgb(0 0 0 / .08); }
+html[data-tema="claro"] .d-win--dark .d-side > span.is-on { background: rgb(0 0 0 / .05); color: #16181a; }
+html[data-tema="claro"] .d-win--dark .d-win__dots i { background: #d6d9dd; }
+html[data-tema="claro"] .d-hora { color: #16181a; background: rgb(0 0 0 / .05) !important; }
+html[data-tema="claro"] :is(.frame .recibo, .panel:has(> .foto-panel) .mini) {
+  background: rgb(255 255 255 / .88) !important; border-color: rgb(0 0 0 / .08);
+  --u-ink: #111111; --u-muted: #4d5257; --u-line: rgb(0 0 0 / .1); color: #111111; }
+
+/* titles and the Sacbé wordmark: bold and tight, as the client asked (over the kit's 500 weight) */
+.nav__logo { font-weight: 700; letter-spacing: -0.035em; }
