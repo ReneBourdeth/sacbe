@@ -1,6 +1,6 @@
 'use client'
 
-import SiteHeader from '@/components/SiteHeader'
+import SiteHeader, { SiteFooter } from '@/components/SiteHeader'
 import { useLang } from '@/lib/i18n'
 import { FOTOS } from '@/lib/fotos'
 
@@ -21,6 +21,7 @@ export default function CreditosPage() {
           ))}
         </ul>
       </div>
+      <SiteFooter />
     </main>
   )
 }

@@ -6,7 +6,7 @@ import { useLang } from '@/lib/i18n'
 import { formatoDia } from '@/lib/fecha'
 import { nombreTerminal } from '@/lib/terminales'
 import type { Clase, Viaje } from '@/lib/supabase'
-import SiteHeader from '@/components/SiteHeader'
+import SiteHeader, { SiteFooter } from '@/components/SiteHeader'
 import TarjetaViaje from './TarjetaViaje'
 import ResumenSeleccion from './ResumenSeleccion'
 import ModalCompra from './ModalCompra'
@@ -78,6 +78,7 @@ export default function ResultadosClient({ viajes, origen, destino, fecha, proxi
       </div>
 
       {comprando && elegido && <ModalCompra viaje={elegido} onCerrar={() => setComprando(false)} />}
+      <SiteFooter />
     </main>
   )
 }

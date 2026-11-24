@@ -22,7 +22,7 @@ import { FOTOS, foto } from '@/lib/fotos'
 
 const CSS = [
   'system.css', 'ui/cards.css', 'motion/motion.css', 'backgrounds/backgrounds.css', 'layout/layout.css',
-  'icons/icon.css', 'ui/base.css', 'ui/window/fragment.css', 'diagrams/diagram.css', 'layout/demo.css', 'inicio.css?v=3', // bump v when the file changes, so browsers drop the old copy
+  'icons/icon.css', 'ui/base.css', 'ui/window/fragment.css', 'diagrams/diagram.css', 'layout/demo.css', 'inicio.css?v=6', // bump v when the file changes, so browsers drop the old copy
 ]
 const SCRIPTS = ['system.js', 'motion/motion.js', 'layout/layout.js', 'diagrams/mount.js']
 // Copán's ball court, public domain (Talk2winik, Wikimedia Commons), credited in the footer
@@ -69,6 +69,22 @@ export default function InicioCliente() {
   // Only cities with buses; every city until the routes load or if loading fails
   const [rutas, setRutas] = useState<Set<string> | null>(null)
   useEffect(() => { getRutasActivas().then(setRutas).catch(() => {}) }, [])
+
+  // The ring diagram is drawn by the kit after load: once its city discs exist, a click on one opens
+  // that city's cheapest route (the same link as its card; the route rows stay the keyboard path)
+  useEffect(() => {
+    const destinos = new Map(CIUDADES_DESDE.map(([c, , d]) => [nombreTerminal(c), enlaceRuta(c, d)]))
+    const enlazar = () => {
+      const nodos = document.querySelectorAll<HTMLElement>('.red-rutas .dg-node')
+      nodos.forEach(n => {
+        const href = destinos.get(n.querySelector('.dg-cap__l')?.textContent?.trim() ?? '')
+        if (href && !n.dataset.ruta) { n.dataset.ruta = href; n.onclick = () => location.assign(href) }
+      })
+      return nodos.length > 0
+    }
+    const id = setInterval(() => { if (enlazar()) clearInterval(id) }, 400)
+    return () => clearInterval(id)
+  }, [])
   const hayBus = (o: string, d: string) => !rutas || rutas.has(`${o}-${d}`)
   const origenes = TERMINALES.filter(o => TERMINALES.some(d => hayBus(o.codigo, d.codigo)))
   const destinos = TERMINALES.filter(d => d.codigo !== origen && hayBus(origen, d.codigo))
@@ -314,7 +330,7 @@ html[data-tema="claro"] {
             <ul className="ciudades" aria-label={T.rutas.alt}>
               {CIUDADES_DESDE.map(([c, l, d]) => (
                 <li key={c}><a className="ciudad" href={enlaceRuta(c, d)}>
-                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z" fill="none" stroke="currentColor" strokeWidth="1.8" /><circle cx="12" cy="10" r="2.3" fill="currentColor" /></svg>
+                  <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z" fill="none" stroke="currentColor" strokeWidth="1.8" /><circle cx="12" cy="10" r="2.3" fill="currentColor" /></svg>
                   <span><b>{nombreTerminal(c)}</b><small>{nombreTerminal(d)} · {T.rutas.desde} L {l}</small></span>
                 </a></li>
               ))}

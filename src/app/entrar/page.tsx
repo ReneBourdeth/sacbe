@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { useLang } from '@/lib/i18n'
 import { rutaInternaSegura } from '@/lib/navegacion'
-import SiteHeader from '@/components/SiteHeader'
+import SiteHeader, { SiteFooter } from '@/components/SiteHeader'
 
 /**
  * /entrar?next=/mis-viajes — passwordless sign-in by email.
@@ -93,6 +93,7 @@ function EntrarInner() {
 
         {error && <p style={S.error}>{error}</p>}
       </div>
+      <SiteFooter />
     </main>
   )
 }

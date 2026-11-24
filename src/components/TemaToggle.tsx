@@ -25,7 +25,7 @@ export default function TemaToggle() {
     : (lang === 'es' ? 'Cambiar a modo claro' : 'Switch to light mode')
   return (
     <button type="button" onClick={cambiar} aria-label={etiqueta} title={etiqueta}
-      style={{ width: 30, height: 30, display: 'inline-grid', placeItems: 'center', border: '1px solid var(--borde)', borderRadius: 'var(--radio)', background: 'transparent', color: 'var(--tinta)', cursor: 'pointer', fontSize: '1rem' }}>
+      style={{ width: 30, height: 30, display: 'inline-grid', placeItems: 'center', border: '1px solid var(--borde)', borderRadius: 'var(--radio-btn)', background: 'transparent', color: 'var(--tinta)', cursor: 'pointer', fontSize: '1rem' }}>
       <span aria-hidden="true">{claro ? '☾' : '☀'}</span>
     </button>
   )
