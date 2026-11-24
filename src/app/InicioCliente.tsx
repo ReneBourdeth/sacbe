@@ -18,13 +18,15 @@ import LangToggle from '@/components/LangToggle'
 import TemaToggle from '@/components/TemaToggle'
 import { MarcaGuacamaya } from '@/components/Simbolos'
 import { TEXTOS, SALIDAS, RUTAS } from './inicio-textos'
+import RedRutas, { type Par } from './RedRutas'
+import { Franja } from '@/components/SiteHeader'
 import { FOTOS, foto } from '@/lib/fotos'
 
 const CSS = [
   'system.css', 'ui/cards.css', 'motion/motion.css', 'backgrounds/backgrounds.css', 'layout/layout.css',
-  'icons/icon.css', 'ui/base.css', 'ui/window/fragment.css', 'diagrams/diagram.css', 'layout/demo.css', 'inicio.css?v=6', // bump v when the file changes, so browsers drop the old copy
+  'icons/icon.css', 'ui/base.css', 'ui/window/fragment.css', 'layout/demo.css', 'inicio.css?v=10', // bump v when the file changes, so browsers drop the old copy
 ]
-const SCRIPTS = ['system.js', 'motion/motion.js', 'layout/layout.js', 'diagrams/mount.js']
+const SCRIPTS = ['system.js', 'motion/motion.js', 'layout/layout.js']
 // Copán's ball court, public domain (Talk2winik, Wikimedia Commons), credited in the footer
 const FOTO_COPAN = 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/CPN_BallCourt_01.jpg/1920px-CPN_BallCourt_01.jpg'
 const PASOS_FOTOS = [FOTOS.carretera, FOTOS.roatan, FOTOS.bus]
@@ -46,6 +48,8 @@ function useKit() {
 // The seat map in the app window: 10 rows of 4 seats, taken ones from a fixed pattern.
 const OCUPADOS = new Set(['1A', '1B', '2C', '3A', '3D', '5B', '5C', '6A', '7D', '8B', '8C', '9A', '10C', '10D'])
 const ELEGIDOS = new Set(['4C', '4D'])
+// the results page's class filters, in its order
+const FILTROS = ['todos', 'economica', 'ejecutivo', 'primera'] as const
 // Each city's lowest fare to anywhere, from RUTAS (the database's prices)
 // plus the other city of that cheapest route, so a card can open its search
 const CIUDADES_DESDE = ['SPS', 'TGU', 'CEI', 'CMG', 'CHO', 'CPN'].map(c => {
@@ -56,7 +60,7 @@ const CIUDADES_DESDE = ['SPS', 'TGU', 'CEI', 'CMG', 'CHO', 'CPN'].map(c => {
 const enlaceRuta = (o: string, d: string) => `/resultados?${new URLSearchParams({ origen: o, destino: d })}`
 
 export default function InicioCliente() {
-  const { lang } = useLang()
+  const { lang, t } = useLang()
   const T = TEXTOS[lang]
   useKit()
 
@@ -70,21 +74,9 @@ export default function InicioCliente() {
   const [rutas, setRutas] = useState<Set<string> | null>(null)
   useEffect(() => { getRutasActivas().then(setRutas).catch(() => {}) }, [])
 
-  // The ring diagram is drawn by the kit after load: once its city discs exist, a click on one opens
-  // that city's cheapest route (the same link as its card; the route rows stay the keyboard path)
-  useEffect(() => {
-    const destinos = new Map(CIUDADES_DESDE.map(([c, , d]) => [nombreTerminal(c), enlaceRuta(c, d)]))
-    const enlazar = () => {
-      const nodos = document.querySelectorAll<HTMLElement>('.red-rutas .dg-node')
-      nodos.forEach(n => {
-        const href = destinos.get(n.querySelector('.dg-cap__l')?.textContent?.trim() ?? '')
-        if (href && !n.dataset.ruta) { n.dataset.ruta = href; n.onclick = () => location.assign(href) }
-      })
-      return nodos.length > 0
-    }
-    const id = setInterval(() => { if (enlazar()) clearInterval(id) }, 400)
-    return () => clearInterval(id)
-  }, [])
+  // The route ring: a chosen origin/destination, and a route being looked at (a hovered row)
+  const [par, setPar] = useState<Par | null>(null)
+  const [vista, setVista] = useState<[string, string] | null>(null)
   const hayBus = (o: string, d: string) => !rutas || rutas.has(`${o}-${d}`)
   const origenes = TERMINALES.filter(o => TERMINALES.some(d => hayBus(o.codigo, d.codigo)))
   const destinos = TERMINALES.filter(d => d.codigo !== origen && hayBus(origen, d.codigo))
@@ -149,6 +141,7 @@ html[data-tema="claro"] {
             <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
           </button>
         </div>
+        <Franja />
       </header>
 
       <main id="top">
@@ -180,7 +173,7 @@ html[data-tema="claro"] {
                 <div className="d-win__bar"><span className="d-win__dots"><i /><i /><i /></span><span>Sacbé · San Pedro Sula → Tegucigalpa</span></div>
                 <div className="d-win__body">
                   <div className="d-side">
-                    <span className="is-on"><i />{T.app.side[0]}</span><span><i />{T.app.side[1]}</span><span><i />{T.app.side[2]}</span>
+                    {FILTROS.map((f, i) => <span key={f} className={i === 0 ? 'is-on' : undefined}><i data-clase={f} />{f === 'todos' ? t.todos : t[f]}</span>)}
                   </div>
                   <div className="d-main">
                     <div className="d-main__head"><h4>{T.hero.ventana}</h4></div>
@@ -219,21 +212,19 @@ html[data-tema="claro"] {
                 <div className="ui ui-panel ui-win" data-ui="window" data-open="—" data-work="—" data-done="—">
                   <div className="ui-win__bar">
                     <span className="ui-dots" aria-hidden="true"><i /><i /><i /></span>
-                    <span className="ui-win__crumb">Sacbé <i>/</i> <b>{T.app.side[0]}</b></span>
+                    <span className="ui-win__crumb">Sacbé <i>/</i> <b>San Pedro Sula → Tegucigalpa</b></span>
                     <span className="ui-spacer" />
                   </div>
                   <div className="ui-win__body">
                     <nav className="ui-win__side" aria-hidden="true">
-                      <span className="ui-win__nav is-on">{T.app.side[0]}<em>12</em></span>
-                      <span className="ui-win__nav">{T.app.side[1]}</span>
-                      <span className="ui-win__nav">{T.app.side[2]}<em>30</em></span>
+                      {FILTROS.map((f, i) => <span key={f} className={`ui-win__nav${i === 0 ? ' is-on' : ''}`}>{f === 'todos' ? t.todos : t[f]}<em>{f === 'todos' ? SALIDAS.length : SALIDAS.filter(x => x.clase === f).length}</em></span>)}
                     </nav>
                     <div className="ui-win__main">
                       <div className="ui-win__cols" aria-hidden="true">{T.app.cols.map(c => <span key={c}>{c}</span>)}</div>
                       <ul className="ui-win__rows">
                         {SALIDAS.map((s, i) => (
                           <li className={`ui-win__row${i === 4 ? ' is-open' : ''}`} key={i}>
-                            <span className="ui-avatar" data-tone={(i % 5) + 1}>{s.empresa.split(' ').map(w => w[0]).join('').slice(0, 2)}</span>
+                            <span className="ui-avatar clase-punto" data-clase={s.clase} aria-hidden="true" />
                             <span className="ui-win__who">{s.empresa}</span>
                             <span className="ui-win__sub">{s.hora} · {clase(s.clase)} · L {s.precio}</span>
                             <span className={`ui-win__st${i === 4 ? ' is-you' : ''}`}>{i === 4 ? `6 ${T.app.libres}` : `40 ${T.app.libres}`}</span>
@@ -315,17 +306,14 @@ html[data-tema="claro"] {
                 {[RUTAS.slice(0, 8), RUTAS.slice(8)].map((col, c) => (
                   <ul className="rows span-6" key={c}>
                     {col.map(([a, b, p]) => (
-                      <li key={a + b}><a className="ruta-link" href={enlaceRuta(a, b)}><span className="rows__name">{nombreTerminal(a)} ↔ {nombreTerminal(b)}</span><span className="rows__value">{T.rutas.desde} L {p} <span aria-hidden="true">→</span></span></a></li>
+                      <li key={a + b}><a className="ruta-link" href={enlaceRuta(a, b)} onMouseEnter={() => setVista([a, b])} onMouseLeave={() => setVista(null)} onFocus={() => setVista([a, b])} onBlur={() => setVista(null)}><span className="rows__name">{nombreTerminal(a)} ↔ {nombreTerminal(b)}</span><span className="rows__value">{T.rutas.desde} L {p} <span aria-hidden="true">→</span></span></a></li>
                     ))}
                   </ul>
                 ))}
               </div>
             </div>
-            {/* the route network as the kit's ring diagram, each city with its lowest real fare */}
-              <div className="panel red-rutas"><div className="dg" data-dg-still data-diagram={JSON.stringify({
-                layout: 'ring', ground: 'none', motion: { pulse: 'none' }, alt: T.rutas.alt, center: { label: 'Sacbé', icon: 'ui:globe' },
-                ring: CIUDADES_DESDE.map(([c, l]) => ({ label: nombreTerminal(c), icon: 'ui:map-pin', meta: `${T.rutas.desde} L ${l}` })),
-              })} /></div>
+            {/* the route network: pick two cities, the red line draws the route and links to its buses */}
+            <RedRutas rutas={RUTAS} par={par} vista={vista} onPar={setPar} onVista={setVista} enlace={enlaceRuta} T={T.rutas} />
             {/* phones and tablets: the same cities and fares as plain cards (the ring is too small to read there) */}
             <ul className="ciudades" aria-label={T.rutas.alt}>
               {CIUDADES_DESDE.map(([c, l, d]) => (

@@ -160,10 +160,17 @@ button { font-weight: 600; }
   .sb-card-auth { margin: 2rem 1rem !important; padding: 1.5rem !important; }
 }
 
-/* the inner pages' bar matches the home bar: the macaw's red, yellow and blue as a thin stripe under it */
+/* every bar (home and inner pages): the macaw's red, yellow and blue as three round-ended pills under it,
+   apart from each other, like the site's other round shapes (Franja in SiteHeader.tsx) */
 .sb-header { position: relative; }
-.sb-header::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px;
-  background: linear-gradient(90deg, #d7263d 0 50%, #ffc21a 50% 67%, #4db8ff 67% 100%); pointer-events: none; }
+.franja { position: absolute; left: clamp(1rem, 4vw, 2.5rem); right: clamp(1rem, 4vw, 2.5rem); bottom: -2px; height: 4px;
+  display: flex; gap: 6px; pointer-events: none; z-index: 1; }
+.franja i { display: block; height: 100%; border-radius: 999px; transform-origin: left; animation: franja-entra .9s cubic-bezier(.2,.8,.2,1) both; }
+.franja i:nth-child(1) { flex: 50; background: #d7263d; }
+.franja i:nth-child(2) { flex: 17; background: #ffc21a; animation-delay: .12s; }
+.franja i:nth-child(3) { flex: 33; background: #4db8ff; animation-delay: .24s; }
+@keyframes franja-entra { from { transform: scaleX(0); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .franja i { animation: none; } }
 
 /* inner bar, laid out like the home bar: the home sections in the middle */
 .sb-header-centro { display: flex; justify-content: center; gap: 1.75rem; font-size: .95rem; font-weight: 500; }
@@ -182,3 +189,19 @@ main:has(> .sb-footer) { display: flex; flex-direction: column; min-height: 100v
 main:has(> .sb-footer) > * { width: 100%; width: -webkit-fill-available; width: -moz-available; width: stretch; } /* full width minus its own margins */
 main:has(> .sb-footer) > .sb-footer { margin-top: auto; }
 main:has(> .sb-footer) > :nth-last-child(2) { margin-bottom: 4rem; }
+
+/* page-wide changes (lib/transicion.ts): language cross-fades quickly; the theme opens as a circle */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .28s; }
+html[data-vt="circulo"]::view-transition-old(root), html[data-vt="circulo"]::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+.tema-icono { animation: tema-gira .45s cubic-bezier(.2,.8,.2,1); }
+@keyframes tema-gira { from { transform: rotate(-90deg) scale(.6); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .tema-icono { animation: none; } }
+
+/* a little life on the inner pages, light on the page: content rises in once, cards lift under the pointer */
+@keyframes sube { from { opacity: 0; transform: translateY(10px); } }
+main:has(> .sb-footer) > :not(:first-child):not(.sb-footer) { animation: sube .5s cubic-bezier(.2,.8,.2,1) both; }
+.sb-trip { transition: transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s, box-shadow .2s; }
+.sb-trip:hover { transform: translateY(-2px); }
+.sb-btn, .sb-header-cta { transition: background-color .2s, transform .15s; }
+.sb-btn:active, .sb-header-cta:active { transform: scale(.97); }
+@media (prefers-reduced-motion: reduce) { main:has(> .sb-footer) > * { animation: none !important; } .sb-trip:hover { transform: none; } }

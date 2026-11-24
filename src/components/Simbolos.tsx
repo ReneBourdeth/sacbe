@@ -1,26 +1,20 @@
-// The macaw logo, as inline SVG (no image file to load).
-// Colors come from the tokens in globals.css.
+// The macaw logo, as inline SVG (no image file to load). The same drawing is the site icon (src/app/icon.svg).
 
-/** Scarlet macaw head, facing left. */
-function Cabeza() {
-  return (
-    <>
-      <circle cx="152" cy="17" r="13" fill="var(--guacamaya)" />
-      <path d="M156 26C168 30 176 42 176 56C176 64 172 70 166 72H150C150 60 148 44 146 30Z" fill="var(--guacamaya)" />
-      {/* Bare white face patch, then the pale hooked upper beak and black lower beak */}
-      <ellipse cx="145" cy="18" rx="7" ry="8.5" fill="#F7F3E8" />
-      <circle cx="146" cy="16" r="2.4" fill="var(--tinta)" />
-      <path d="M140 9C130 9 125 17 127 27C129 24 132 22 136 22L141 21Z" fill="#EFE6D2" />
-      <path d="M136 22C133 24 132 28 134 31C138 30 141 27 142 23Z" fill="var(--tinta)" />
-    </>
-  )
-}
-
-/** Small macaw mark next to the "Sacbé" wordmark and on the ticket confirmation. */
+/**
+ * Scarlet macaw head facing left, drawn from round shapes to match the site's ovals: red head, cream face,
+ * ivory hooked beak, and the yellow and blue wing feathers of the bar's stripe at the neck.
+ */
 export function MarcaGuacamaya({ size = 22 }: { size?: number }) {
   return (
-    <svg viewBox="124 2 46 40" width={size} height={size * 40 / 46} aria-hidden focusable="false">
-      <Cabeza />
+    <svg viewBox="0 0 48 48" width={size} height={size} aria-hidden focusable="false">
+      <path d="M38 47C44 41 47 33 47 24C47 19 46 15.5 44 13C45 20 45 26 43.5 31C42 37 40.5 42 38 47Z" fill="#2F8FD8" />
+      <path d="M33 47C40 41 44.5 33 44.5 23C44.5 17 43 13 40.5 10.5C41.5 17 41.5 22 40.5 27C39 35 36.5 41 33 47Z" fill="#FFC21A" />
+      <path d="M30 3c-8.8 0-15 6.6-15 15 0 4.2 1.6 8 4.4 10.8C22.6 32 24 37 23 47h12c3.3-5 5-11 5-17 0-2-.2-3.8-.6-5.4C41.7 22 43 18.8 43 15.5 43 8.5 37.5 3 30 3z" fill="#D7263D" />
+      <ellipse cx="22.5" cy="15.5" rx="7" ry="8" fill="#FFF4E4" />
+      <path d="M17.5 9.5C9.5 9.5 4 15.5 5 23.5c.4 3 2.6 4.4 4.4 3C10 21 13 18 18.5 18z" fill="#F1E6CF" />
+      <path d="M10 25c1.2 3.6 5 5 8.5 2.4V19.5c-4.2.2-7.2 2-8.5 5.5z" fill="#3A3A3A" />
+      <circle cx="23.5" cy="13.5" r="2.4" fill="#141414" />
+      <circle cx="24.3" cy="12.7" r=".8" fill="#FFFFFF" />
     </svg>
   )
 }

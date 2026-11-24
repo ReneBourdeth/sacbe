@@ -24,8 +24,7 @@ const es = {
     link: 'Ver salidas a Tegucigalpa',
     arte: 'La ventana de Sacbé con doce salidas de San Pedro Sula a Tegucigalpa y el mapa de asientos de la de Viana a las 10:00',
     cols: ['Empresa', 'Salida', 'Clase', 'Precio'],
-    side: ['Salidas', 'Mis boletos', 'Rutas'],
-    libres: 'libres', libre: 'Libre', ocupado: 'Ocupado', tuyo: 'Tuyo', frente: 'Frente', continuar: 'Continuar', resumen: '2 asientos · L 914',
+    libres: 'disp.', libre: 'Libre', ocupado: 'Ocupado', tuyo: 'Tuyo', frente: 'Frente', continuar: 'Continuar', resumen: '2 asientos · L 914',
   },
   pago: {
     h2: 'Paga en efectivo en PagoExpress',
@@ -39,6 +38,11 @@ const es = {
     h2: 'Rutas y precios',
     p: 'Seis ciudades conectadas en los dos sentidos. Roatán no tiene buses: el ferry sale de La Ceiba.',
     desde: 'desde',
+    elige: 'Toca una ciudad para salir de ahí',
+    eligeDestino: (c: string) => `Desde ${c}: ahora toca el destino`,
+    ver: 'Ver buses',
+    cambiar: 'Invertir',
+    quitar: 'Quitar',
     alt: 'Sacbé al centro y las seis ciudades alrededor, cada una con su tarifa más baja: Tegucigalpa y Comayagua desde L 120, Choluteca desde L 200, San Pedro Sula desde L 180, La Ceiba desde L 250 y Copán Ruinas desde L 300.',
   },
   pasos: {
@@ -117,8 +121,7 @@ const en: Textos = {
     link: 'See departures to Tegucigalpa',
     arte: 'The Sacbé window with twelve departures from San Pedro Sula to Tegucigalpa and the seat map of the Viana bus at 10:00',
     cols: ['Company', 'Leaves', 'Class', 'Price'],
-    side: ['Departures', 'My tickets', 'Routes'],
-    libres: 'free', libre: 'Free', ocupado: 'Taken', tuyo: 'Yours', frente: 'Front', continuar: 'Continue', resumen: '2 seats · L 914',
+    libres: 'available', libre: 'Free', ocupado: 'Taken', tuyo: 'Yours', frente: 'Front', continuar: 'Continue', resumen: '2 seats · L 914',
   },
   pago: {
     h2: 'Pay cash at PagoExpress',
@@ -132,6 +135,11 @@ const en: Textos = {
     h2: 'Routes and prices',
     p: 'Six cities connected both ways. Roatán has no buses: the ferry leaves from La Ceiba.',
     desde: 'from',
+    elige: 'Tap a city to leave from it',
+    eligeDestino: (c: string) => `From ${c}: now tap where you’re going`,
+    ver: 'See buses',
+    cambiar: 'Swap',
+    quitar: 'Clear',
     alt: 'Sacbé in the centre and the six cities around it, each with its lowest fare: Tegucigalpa and Comayagua from L 120, Choluteca from L 200, San Pedro Sula from L 180, La Ceiba from L 250 and Copán Ruinas from L 300.',
   },
   pasos: {
