@@ -150,3 +150,8 @@ header.nav::after { content: ""; position: absolute; left: 0; right: 0; bottom: 
 /* the hero's window sits over the brightest photograph: a denser glass and lighter grey text */
 .d-win--dark { background: rgb(10 10 10 / .88) !important; }
 .d-win--dark .d-win__bar, .d-win--dark .d-side, .d-win--dark .d-row small { color: #d6d9dd; }
+
+/* Sections are one or two screens tall, but never shorter than what they hold: on a short window the hero
+   (with its search form) and the close ran past their fixed height, and the next section covered the
+   bottom of the search button and the footer's links. */
+:is(main > section, footer.closing) { height: auto !important; min-height: calc(var(--h, 1) * 100svh); }
