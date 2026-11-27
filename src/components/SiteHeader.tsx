@@ -42,7 +42,7 @@ export default function SiteHeader({ children }: { children?: React.ReactNode })
 export function Logo() {
   return (
     <a href="/" style={S.logo}>
-      <MarcaGuacamaya size={26} />
+      <MarcaGuacamaya size={32} />
       Sacbé
     </a>
   )

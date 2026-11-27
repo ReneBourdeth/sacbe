@@ -144,7 +144,7 @@ html[data-tema="claro"] {
       <header className="nav nav--centre">
         <div className="wrap nav__bar">
           <a className="skip-link" href="#top">{T.saltar}</a>
-          <a className="nav__logo" href="#top"><MarcaGuacamaya size={26} />Sacbé</a>
+          <a className="nav__logo" href="#top"><MarcaGuacamaya size={32} />Sacbé</a>
           <nav className="nav__links" aria-label={lang === 'es' ? 'Principal' : 'Main'}>
             <div className="nav__item"><a className="nav__link" href="#asientos">{T.nav.asientos}</a></div>
             <div className="nav__item"><a className="nav__link" href="#prices">{T.nav.rutas}</a></div>
@@ -393,7 +393,7 @@ html[data-tema="claro"] {
           <div className="closing__links">
             <div className="grid">
               <div className="span-4 stack-4">
-                <a className="nav__logo" href="#top"><MarcaGuacamaya size={26} />Sacbé</a>
+                <a className="nav__logo" href="#top"><MarcaGuacamaya size={32} />Sacbé</a>
                 <p className="footer__lede">{T.pie.lede}</p>
               </div>
               {T.pie.cols.map(col => (

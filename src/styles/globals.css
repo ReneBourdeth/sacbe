@@ -358,3 +358,9 @@ html[data-tema="claro"] .sb-ventana .vv { background: rgb(255 255 255 / .9); bor
 .vv, .marco-foto .vv, .sb-ventana .vv { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
 .sb-ventana .vv, .marco-foto .vv { background: rgb(12 12 12 / .94); }
 html[data-tema="claro"] :is(.sb-ventana, .marco-foto) .vv { background: rgb(255 255 255 / .96); }
+
+/* the small macaw's tile (Simbolos.tsx): black at night; white by day with the ivory beak outlined */
+:root { --marca-placa: #161616; --marca-borde: rgb(255 255 255 / .12); --marca-pico: transparent; }
+html[data-tema="claro"] { --marca-placa: #fff; --marca-borde: #e2e2e2; --marca-pico: #161616; }
+/* the kit sets its logo icons to 24px; the macaw keeps the size it is drawn at */
+.nav__logo svg { width: 32px !important; height: 32px !important; }
