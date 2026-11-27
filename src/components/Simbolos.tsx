@@ -1,20 +1,25 @@
-// The macaw logo, as inline SVG (no image file to load). The same drawing is the site icon (src/app/icon.svg).
+// The macaw logo, as inline SVG (no image file to load). Drawn with the logo-design skill on a 256 grid:
+// a circle head into a neck, a hooked ivory beak, the white face patch with the eye, and the wing's yellow and
+// blue as two bands at the neck (the bar's stripe). Masters and icons: docs/logo/; the site icon is src/app/icon.svg.
 
-/**
- * Scarlet macaw head facing left, drawn from round shapes to match the site's ovals: red head, cream face,
- * ivory hooked beak, and the yellow and blue wing feathers of the bar's stripe at the neck.
- */
+/** Below 40 px the small cut draws: no lower beak or bands, a bigger eye, so it still reads in a tab or a bar. */
 export function MarcaGuacamaya({ size = 22 }: { size?: number }) {
-  return (
-    <svg viewBox="0 0 48 48" width={size} height={size} aria-hidden focusable="false">
-      <path d="M38 47C44 41 47 33 47 24C47 19 46 15.5 44 13C45 20 45 26 43.5 31C42 37 40.5 42 38 47Z" fill="#2F8FD8" />
-      <path d="M33 47C40 41 44.5 33 44.5 23C44.5 17 43 13 40.5 10.5C41.5 17 41.5 22 40.5 27C39 35 36.5 41 33 47Z" fill="#FFC21A" />
-      <path d="M30 3c-8.8 0-15 6.6-15 15 0 4.2 1.6 8 4.4 10.8C22.6 32 24 37 23 47h12c3.3-5 5-11 5-17 0-2-.2-3.8-.6-5.4C41.7 22 43 18.8 43 15.5 43 8.5 37.5 3 30 3z" fill="#D7263D" />
-      <ellipse cx="22.5" cy="15.5" rx="7" ry="8" fill="#FFF4E4" />
-      <path d="M17.5 9.5C9.5 9.5 4 15.5 5 23.5c.4 3 2.6 4.4 4.4 3C10 21 13 18 18.5 18z" fill="#F1E6CF" />
-      <path d="M10 25c1.2 3.6 5 5 8.5 2.4V19.5c-4.2.2-7.2 2-8.5 5.5z" fill="#3A3A3A" />
-      <circle cx="23.5" cy="13.5" r="2.4" fill="#141414" />
-      <circle cx="24.3" cy="12.7" r=".8" fill="#FFFFFF" />
+  return size < 40 ? (
+    <svg viewBox="0 0 256 256" width={size} height={size} aria-hidden focusable="false">
+      <path fill="#D7263D" fillRule="evenodd" d="M152 28 A76 76 0 0 1 228 104 C228 150 214 196 200 236 L120 236 C126 204 116 178 96 158 A76 76 0 0 1 152 28 Z M120 56 A36 40 0 1 0 120.1 56 Z" />
+      <path fill="#FFF6EC" d="M120 56 A36 40 0 1 0 120.1 56 Z" />
+      <path fill="#161616" d="M132 75 A13 13 0 1 1 131.9 75 Z" />
+      <path fill="#EFE3C8" d="M96 62 C54 62 26 98 30 144 C32 162 40 174 50 180 C48 146 64 122 96 116 C108 102 108 76 96 62 Z" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 256 256" width={size} height={size} aria-hidden focusable="false">
+      <path fill="#D7263D" fillRule="evenodd" d="M152 28 A76 76 0 0 1 228 104 C228 150 214 196 200 236 L120 236 C126 204 116 178 96 158 A76 76 0 0 1 152 28 Z M120 56 A36 40 0 1 0 120.1 56 Z" />
+      <path fill="#FFC21A" d="M125 198 L212 198 L208 213 L123 213 Z" />
+      <path fill="#4DB8FF" d="M123 219 L206 219 L200 236 L120 236 Z" />
+      <path fill="#FFF6EC" d="M120 56 A36 40 0 1 0 120.1 56 Z" />
+      <path fill="#161616" d="M132 78 A10 10 0 1 1 131.9 78 Z" />
+      <path fill="#EFE3C8" d="M96 62 C54 62 26 98 30 144 C32 162 40 174 50 180 C48 146 64 122 96 116 C108 102 108 76 96 62 Z" />
+      <path fill="#161616" d="M66 186 C76 202 96 206 112 196 C118 190 120 176 116 164 C96 164 76 172 66 186 Z" />
     </svg>
   )
 }
